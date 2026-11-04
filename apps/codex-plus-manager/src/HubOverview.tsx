@@ -82,35 +82,14 @@ export function HubOverview({
 }) {
   const payload = useGatewayPayload(LIVE_REFRESH_MS);
   const usage = useTodayUsage();
-  const callsByProvider = useMemo(
-    () => (usage ? new Map(usage.byProvider.map((group) => [group.key, group.calls])) : null),
-    [usage],
-  );
   // 没勾选的 Agent 不在总览里出现；单 Agent 模式下网关就是这一个 Agent 专用的供应商池。
   const focus = useAgentFocus();
   const solo = singleAgent(focus);
-  const agents = hubAgents(payload, codex).filter((agent) => agentVisible(focus, agent.id));
-  const providers = hubProviders(payload, callsByProvider);
-  // 连线的「活跃」改由真实请求决定：有请求在进行的连线流动，每条请求一颗来回的光点。
-  const links = hubLinks(agents, providers).map((link) => (link.tone === "live" ? { ...link, tone: "idle" as const } : link));
-  const totals = hubTotals(payload);
   const requestFlow = useRequestFlow(FLOW_REFRESH_MS);
   const flowEntries = requestFlow.entries.filter((entry) => agentVisible(focus, flowAgent(entry)));
-  const flow = useMemo(
-    () => ({ busy: busyLinks(flowEntries), routes: liveFlowRoutes(flowEntries) }),
-    // 连线随进行中的请求、路由和响应阶段变化。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [flowEntries.filter((entry) => entry.state === "running").map((entry) => `${entry.id}:${entry.relayId}:${entry.phase}:${entry.firstTokenMs}:${entry.estimatedOutputTokens}`).join("|")],
-  );
   const feed = flowEntries.slice(0, FEED_LIMIT);
   const routeRecords = routeRecordsByEntry(payload, feed);
-  const connected = agents.filter((agent) => agent.enabled).length;
-  // 「接入 Agent」「添加供应商」就地弹窗，不跳到对应页面。
-  const [adding, setAdding] = useState<"agent" | "provider" | "import" | null>(null);
-  const pendingImports = pendingImportCount(payload);
-  const [busy, setBusy] = useState<string | null>(null);
-  const run: Run = makeRun(setBusy, publishGatewayPayload, notify);
-  const poolState = hubPoolState(payload);
+
 
   // 参照 Cursor 的 Customize：顶部一排今日数字，中间一张拓扑卡（Codex++ 的卖点：任意 Agent → 网关 → 多家供应商），
   // 下面「最近请求」一个列表。现状说明不再单独写一段，拓扑图自己就说明了。
@@ -123,89 +102,7 @@ export function HubOverview({
         <UsageStats showAgents={!solo} usage={usage} />
       </CxSection>
 
-      <CxCard className="hub-topology-card">
-        <HubTopology className="hub-topology-compact" flow={flow} links={links}>
-          <div className="hub-col">
-            <div className="hub-col-head"><span>{t("Agent")}</span><span>{t("请求")}</span></div>
-            {agents.map((agent) => (
-              <AgentNode agent={agent} key={agent.id} onOpen={() => onOpenAgent(agent.id)} />
-            ))}
-            {solo ? null : (
-              <button className="hub-node hub-node-ghost" onClick={() => setAdding("agent")} type="button">
-                <Plus aria-hidden="true" className="h-4 w-4" />
-                {t("接入 Agent")}
-              </button>
-            )}
-          </div>
-
-          <div className="hub-core" data-node="hub" data-running={payload?.helperRunning ?? false}>
-            <div className="hub-core-head">
-              <img alt="" src={APP_LOGO_URL} />
-              <span>
-                <strong>Codex++</strong>
-                <span className="hub-addr">
-                  <i className="hub-dot" data-tone={payload?.helperRunning ? "ok" : "off"} />
-                  {payload ? `127.0.0.1:${payload.port}` : t("读取中…")}
-                </span>
-              </span>
-            </div>
-            {/* 能力说明压成一行小字；完整说明放在悬停提示里，不在页面上再写一段。 */}
-            <p
-              className="hub-caps"
-              title={!payload
-                ? t("正在读取网关状态…")
-                : solo
-                  ? tf("{0} 通过 Codex++ 使用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [agentName(solo), providers.length])
-                  : tf("{0} 个 Agent 通过 Codex++ 共用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [connected, providers.length])}
-            >
-              {[
-                t("按模型名路由"),
-                t("协议互转"),
-                payload?.gateway.keyPolicy.mode === "roundRobin" ? t("逐请求轮换 Key") : t("会话粘性 Key"),
-                ...(payload?.groups.length ? [tf("{0} 个模型组", [payload.groups.length])] : []),
-              ].join(" · ")}
-            </p>
-            <dl>
-              <div><dt>{t("请求")}</dt><dd>{totals.requests}</dd></div>
-              <div><dt>{t("换上游")}</dt><dd data-tone={totals.rerouted ? "warn" : undefined}>{totals.rerouted}</dd></div>
-              <div><dt>{t("冷却 Key")}</dt><dd data-tone={totals.coolingKeys ? "warn" : undefined}>{totals.coolingKeys}</dd></div>
-              <div><dt>{t("熔断")}</dt><dd data-tone={totals.openBreakers ? "err" : undefined}>{totals.openBreakers}</dd></div>
-            </dl>
-          </div>
-
-          <div className="hub-col">
-            <div className="hub-col-head"><span>{t("供应商池")}</span><span>{t("今日调用")}</span></div>
-            {poolState === "loading" ? <p className="hub-empty">{t("读取中…")}</p> : null}
-            {poolState === "empty" ? <p className="hub-empty">{t("供应商池还是空的。")}</p> : null}
-            {poolState === "allOff" ? <p className="hub-empty">{tf("池里的 {0} 个供应商都已关闭。", [payload?.pool.length ?? 0])}</p> : null}
-            {poolState === "empty" && pendingImports ? (
-              <button className="hub-node hub-node-ghost hub-node-import" onClick={() => setAdding("import")} type="button">
-                {tf("导入直连模式的 {0} 个供应商", [pendingImports])}
-              </button>
-            ) : null}
-            {providers.map((provider) => (
-              <button className="hub-node" data-node={`provider:${provider.id}`} data-flow-provider={flowProviderSlot(provider.id)} key={provider.id} onClick={() => onNavigate("gatewayProviders")} title={provider.name} type="button">
-                <i className="flow-provider-mark" aria-hidden="true" />
-                <Avatar baseUrl={provider.baseUrl} name={provider.name} size="sm" />
-                <span className="hub-node-text">
-                  <strong>
-                    <span className="hub-node-name">{provider.name}</span>
-                    {provider.status.state === "cooling" ? <i className="hub-dot" data-tone="warn" /> : null}
-                  </strong>
-                  <small data-state={provider.status.state}>
-                    {provider.status.state === "idle" ? <KeyCount count={provider.keyCount} /> : <MemberStatusLabel status={provider.status} />}
-                  </small>
-                </span>
-                {provider.calls !== null ? <span className="hub-node-num">{provider.calls}</span> : null}
-              </button>
-            ))}
-            <button className="hub-node hub-node-ghost" onClick={() => setAdding("provider")} type="button">
-              <Plus aria-hidden="true" className="h-4 w-4" />
-              {t("添加供应商")}
-            </button>
-          </div>
-        </HubTopology>
-      </CxCard>
+      <HubTopologyCard codex={codex} notify={notify} onNavigate={onNavigate} onOpenAgent={onOpenAgent} />
 
       <CxSection
         aside={<button className="hub-link" onClick={() => onNavigate("requestLog")} type="button">{t("请求日志")}<ArrowUpRight className="h-3.5 w-3.5" /></button>}
@@ -222,19 +119,6 @@ export function HubOverview({
         </CxCard>
       </CxSection>
 
-      {adding === "agent" ? (
-        <AgentConnectDialog
-          busy={busy}
-          notify={notify}
-          onClose={() => setAdding(null)}
-          onManage={() => { setAdding(null); onNavigate("gateway"); }}
-          payload={payload}
-          run={run}
-        />
-      ) : null}
-      {adding === "provider" || adding === "import" ? (
-        <ProviderAdder busy={busy} notify={notify} onClose={() => setAdding(null)} payload={payload} run={run} startWith={adding === "import" ? "import" : "catalog"} />
-      ) : null}
     </div>
   );
 }
@@ -494,4 +378,156 @@ function FlowStreamLayer({ routes, paths, pathRefs }: {
       </g>)}
     </g>)}
   </g>;
+}
+
+/**
+ * 网关拓扑卡：任意 Agent → Codex++ → 任意供应商，连线上的光点跟真实请求走。
+ *
+ * 总览和首页共用。首页传 `roomy`：走旧版（紧凑布局之前）的宽松尺寸，
+ * 节点更高、行距更大，正好填上移走推荐位后空出来的地方。
+ */
+export function HubTopologyCard({
+  codex,
+  notify,
+  onNavigate,
+  onOpenAgent,
+  roomy = false,
+}: {
+  codex: CodexSummary;
+  notify: Notify;
+  onNavigate: (target: "gateway" | "gatewayProviders" | "gatewayUsage" | "requestLog") => void;
+  onOpenAgent: (agent: string) => void;
+  /** 首页用：更大的节点与行距，不做紧凑压缩。 */
+  roomy?: boolean;
+}) {
+  const payload = useGatewayPayload(LIVE_REFRESH_MS);
+  const usage = useTodayUsage();
+  const callsByProvider = useMemo(
+    () => (usage ? new Map(usage.byProvider.map((group) => [group.key, group.calls])) : null),
+    [usage],
+  );
+  // 没勾选的 Agent 不在总览里出现；单 Agent 模式下网关就是这一个 Agent 专用的供应商池。
+  const focus = useAgentFocus();
+  const solo = singleAgent(focus);
+  const agents = hubAgents(payload, codex).filter((agent) => agentVisible(focus, agent.id));
+  const providers = hubProviders(payload, callsByProvider);
+  // 连线的「活跃」改由真实请求决定：有请求在进行的连线流动，每条请求一颗来回的光点。
+  const links = hubLinks(agents, providers).map((link) => (link.tone === "live" ? { ...link, tone: "idle" as const } : link));
+  const totals = hubTotals(payload);
+  const requestFlow = useRequestFlow(FLOW_REFRESH_MS);
+  const flowEntries = requestFlow.entries.filter((entry) => agentVisible(focus, flowAgent(entry)));
+  const flow = useMemo(
+    () => ({ busy: busyLinks(flowEntries), routes: liveFlowRoutes(flowEntries) }),
+    // 连线随进行中的请求、路由和响应阶段变化。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [flowEntries.filter((entry) => entry.state === "running").map((entry) => `${entry.id}:${entry.relayId}:${entry.phase}:${entry.firstTokenMs}:${entry.estimatedOutputTokens}`).join("|")],
+  );
+  const connected = agents.filter((agent) => agent.enabled).length;
+  // 「接入 Agent」「添加供应商」就地弹窗，不跳到对应页面。
+  const [adding, setAdding] = useState<"agent" | "provider" | "import" | null>(null);
+  const pendingImports = pendingImportCount(payload);
+  const [busy, setBusy] = useState<string | null>(null);
+  const run: Run = makeRun(setBusy, publishGatewayPayload, notify);
+  const poolState = hubPoolState(payload);
+  return (
+    <>
+    <CxCard className={`hub-topology-card${roomy ? " hub-topology-home" : ""}`}>
+      <HubTopology className={roomy ? "hub-topology-roomy" : "hub-topology-compact"} flow={flow} links={links}>
+        <div className="hub-col">
+          <div className="hub-col-head"><span>{t("Agent")}</span><span>{t("请求")}</span></div>
+          {agents.map((agent) => (
+            <AgentNode agent={agent} key={agent.id} onOpen={() => onOpenAgent(agent.id)} />
+          ))}
+          {solo ? null : (
+            <button className="hub-node hub-node-ghost" onClick={() => setAdding("agent")} type="button">
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              {t("接入 Agent")}
+            </button>
+          )}
+        </div>
+
+        <div className="hub-core" data-node="hub" data-running={payload?.helperRunning ?? false}>
+          <div className="hub-core-head">
+            <img alt="" src={APP_LOGO_URL} />
+            <span>
+              <strong>Codex++</strong>
+              <span className="hub-addr">
+                <i className="hub-dot" data-tone={payload?.helperRunning ? "ok" : "off"} />
+                {payload ? `127.0.0.1:${payload.port}` : t("读取中…")}
+              </span>
+            </span>
+          </div>
+          {/* 能力说明压成一行小字；完整说明放在悬停提示里，不在页面上再写一段。 */}
+          <p
+            className="hub-caps"
+            title={!payload
+              ? t("正在读取网关状态…")
+              : solo
+                ? tf("{0} 通过 Codex++ 使用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [agentName(solo), providers.length])
+                : tf("{0} 个 Agent 通过 Codex++ 共用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [connected, providers.length])}
+          >
+            {[
+              t("按模型名路由"),
+              t("协议互转"),
+              payload?.gateway.keyPolicy.mode === "roundRobin" ? t("逐请求轮换 Key") : t("会话粘性 Key"),
+              ...(payload?.groups.length ? [tf("{0} 个模型组", [payload.groups.length])] : []),
+            ].join(" · ")}
+          </p>
+          <dl>
+            <div><dt>{t("请求")}</dt><dd>{totals.requests}</dd></div>
+            <div><dt>{t("换上游")}</dt><dd data-tone={totals.rerouted ? "warn" : undefined}>{totals.rerouted}</dd></div>
+            <div><dt>{t("冷却 Key")}</dt><dd data-tone={totals.coolingKeys ? "warn" : undefined}>{totals.coolingKeys}</dd></div>
+            <div><dt>{t("熔断")}</dt><dd data-tone={totals.openBreakers ? "err" : undefined}>{totals.openBreakers}</dd></div>
+          </dl>
+        </div>
+
+        <div className="hub-col">
+          <div className="hub-col-head"><span>{t("供应商池")}</span><span>{t("今日调用")}</span></div>
+          {poolState === "loading" ? <p className="hub-empty">{t("读取中…")}</p> : null}
+          {poolState === "empty" ? <p className="hub-empty">{t("供应商池还是空的。")}</p> : null}
+          {poolState === "allOff" ? <p className="hub-empty">{tf("池里的 {0} 个供应商都已关闭。", [payload?.pool.length ?? 0])}</p> : null}
+          {poolState === "empty" && pendingImports ? (
+            <button className="hub-node hub-node-ghost hub-node-import" onClick={() => setAdding("import")} type="button">
+              {tf("导入直连模式的 {0} 个供应商", [pendingImports])}
+            </button>
+          ) : null}
+          {providers.map((provider) => (
+            <button className="hub-node" data-node={`provider:${provider.id}`} data-flow-provider={flowProviderSlot(provider.id)} key={provider.id} onClick={() => onNavigate("gatewayProviders")} title={provider.name} type="button">
+              <i className="flow-provider-mark" aria-hidden="true" />
+              <Avatar baseUrl={provider.baseUrl} name={provider.name} size="sm" />
+              <span className="hub-node-text">
+                <strong>
+                  <span className="hub-node-name">{provider.name}</span>
+                  {provider.status.state === "cooling" ? <i className="hub-dot" data-tone="warn" /> : null}
+                </strong>
+                <small data-state={provider.status.state}>
+                  {provider.status.state === "idle" ? <KeyCount count={provider.keyCount} /> : <MemberStatusLabel status={provider.status} />}
+                </small>
+              </span>
+              {provider.calls !== null ? <span className="hub-node-num">{provider.calls}</span> : null}
+            </button>
+          ))}
+          <button className="hub-node hub-node-ghost" onClick={() => setAdding("provider")} type="button">
+            <Plus aria-hidden="true" className="h-4 w-4" />
+            {t("添加供应商")}
+          </button>
+        </div>
+      </HubTopology>
+    </CxCard>
+
+    {adding === "agent" ? (
+      <AgentConnectDialog
+        busy={busy}
+        notify={notify}
+        onClose={() => setAdding(null)}
+        onManage={() => { setAdding(null); onNavigate("gateway"); }}
+        payload={payload}
+        run={run}
+      />
+    ) : null}
+    {adding === "provider" || adding === "import" ? (
+      <ProviderAdder busy={busy} notify={notify} onClose={() => setAdding(null)} payload={payload} run={run} startWith={adding === "import" ? "import" : "catalog"} />
+    ) : null}
+    </>
+  );
 }

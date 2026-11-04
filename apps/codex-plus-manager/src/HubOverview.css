@@ -717,3 +717,96 @@
     max-width: none;
   }
 }
+
+/* ── 首页的拓扑卡（roomy）──
+   首页移走推荐位后空出一块，这里用旧版（紧凑布局之前）的宽松尺寸顶上：
+   节点更高、行距更大，连线上的光点也更容易看清。总览仍用 compact 版本。 ── */
+
+.hub-topology-home .hub-topology {
+  gap: 0 clamp(40px, 6vw, 88px);
+  padding: 26px 26px;
+}
+
+.hub-topology-home .hub-col {
+  gap: 10px;
+}
+
+.hub-topology-home .hub-col-head {
+  padding: 0 4px 6px;
+  font-size: 11.5px;
+}
+
+.hub-topology-home .hub-node {
+  gap: 10px;
+  min-height: 54px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.hub-topology-home .hub-node-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.hub-topology-home .hub-node-icon .hub-agent-glyph {
+  width: 18px;
+  height: 18px;
+}
+
+.hub-topology-home .hub-node-text strong {
+  font-size: 13.5px;
+}
+
+.hub-topology-home .hub-node-text small {
+  font-size: 11.5px;
+}
+
+.hub-topology-home .hub-node-num {
+  font-size: 12.5px;
+}
+
+.hub-topology-home .hub-node-ghost {
+  min-height: 44px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+}
+
+.hub-topology-home .hub-core {
+  max-width: 340px;
+  padding: 20px 18px;
+  border-radius: 16px;
+}
+
+.hub-topology-home .hub-core-head img {
+  width: 34px;
+  height: 34px;
+}
+
+.hub-topology-home .hub-core-head strong {
+  font-size: 15px;
+}
+
+.hub-topology-home .hub-addr {
+  font-size: 11.5px;
+}
+
+.hub-topology-home .hub-caps {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.hub-topology-home .hub-core dl {
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.hub-topology-home .hub-core dt {
+  font-size: 11px;
+}
+
+.hub-topology-home .hub-core dd {
+  font-size: 15px;
+}
+
