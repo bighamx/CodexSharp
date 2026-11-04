@@ -1,5 +1,5 @@
 import { Children, useEffect, useState, type ReactNode } from "react";
-import { BadgeCheck, Download, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { BadgeCheck, Download, Loader2, ShieldAlert, ShieldCheck, Trash2 } from "lucide-react";
 import { CxBadge, CxBanner, CxCard, CxEmpty, CxSection } from "./cx-layout";
 import { MenuItem } from "./ManagementPages";
 import { InstallDialog, errorText, request, type Prepared } from "./CommunityExtensionsPanel";
@@ -48,6 +48,7 @@ export function CuratedPackagesSection({
   children,
   onInstalled,
   onOpenUrl,
+  onUninstall,
 }: {
   packages: CuratedPackage[];
   blockedInstalled: BlockedInstall[];
@@ -61,6 +62,8 @@ export function CuratedPackagesSection({
   children?: ReactNode;
   onInstalled: () => Promise<void>;
   onOpenUrl: (url: string) => void;
+  /** 卸载已安装的拓展包：按清单 id 找到本地目录交给后端删。 */
+  onUninstall?: (id: string) => void;
 }) {
   const [preparing, setPreparing] = useState("");
   const [prepared, setPrepared] = useState<Prepared | null>(null);
@@ -146,11 +149,18 @@ export function CuratedPackagesSection({
         key={item.id}
         link={{ url: `https://github.com/${item.repo}`, text: item.repo }}
         menu={
-          curation?.maintainer ? (
-            <MenuItem disabled={reviewing !== ""} onClick={() => setReviewing(item.repo)}>
-              <span className="ext-row-menu-item"><ShieldCheck size={14} />{update ? tf("审核更新 {0}", [update.latestTag ?? update.latestSha.slice(0, 7)]) : t("审核")}</span>
-            </MenuItem>
-          ) : null
+          <>
+            {curation?.maintainer ? (
+              <MenuItem disabled={reviewing !== ""} onClick={() => setReviewing(item.repo)}>
+                <span className="ext-row-menu-item"><ShieldCheck size={14} />{update ? tf("审核更新 {0}", [update.latestTag ?? update.latestSha.slice(0, 7)]) : t("审核")}</span>
+              </MenuItem>
+            ) : null}
+            {item.installed && !item.localSource && onUninstall ? (
+              <MenuItem danger onClick={() => onUninstall(item.id)}>
+                <span className="ext-row-menu-item"><Trash2 size={14} />{t("卸载")}</span>
+              </MenuItem>
+            ) : null}
+          </>
         }
         meta={facts}
         name={item.name}

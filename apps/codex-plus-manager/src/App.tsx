@@ -2125,7 +2125,11 @@ export function App() {
   const deleteUserScript = async (key: string) => {
     const script = settings?.user_scripts?.scripts?.find((item) => item.key === key);
     const name = script?.name || key;
-    if (!(await appConfirm(tf("删除脚本“{0}”？此操作会移除本地脚本文件。", [name]), { title: t("删除脚本"), confirmText: t("删除"), danger: true }))) return;
+    const isPackage = script?.kind === "package";
+    const question = isPackage
+      ? tf("卸载拓展「{0}」？会删除它的整个目录，里面的设置和资源一并移除。", [name])
+      : tf("删除脚本“{0}”？此操作会移除本地脚本文件。", [name]);
+    if (!(await appConfirm(question, { title: isPackage ? t("卸载拓展") : t("删除脚本"), confirmText: isPackage ? t("卸载") : t("删除"), danger: true }))) return;
     const result = await run(() => call<SettingsResult>("delete_user_script", { key }));
     if (result) {
       setSettings(result);
@@ -10561,6 +10565,14 @@ function UserScriptsScreen({ host, focus = null, onHostChange, settings, market,
           installedScripts={sortedMarketScripts.filter((script) => script.installed).map(marketRow)}
           onInstalled={async () => { await actions.reloadUserScripts(); await actions.refreshScriptMarket(); }}
           onOpenUrl={(url) => void actions.openExternalUrl(url)}
+          onUninstall={(id) => {
+            const installed = scripts.find((entry) => entry.kind === "package" && entry.package?.id === id);
+            if (!installed) {
+              void actions.showMessage(t("卸载拓展"), t("本地没有找到这个拓展，可能已经被移除。"), "failed");
+              return;
+            }
+            void actions.deleteUserScript(installed.key);
+          }}
           packages={marketPackages}
           search={search}
         >
@@ -17344,8 +17356,8 @@ function ScriptRow({ host, script, globalEnabled, actions }: { host: ExtensionHo
     : isPackage
       ? tf("拓展包 · {0}", [script.package?.version || t("未知版本")])
       : script.source === "builtin" ? t("内置") : t("用户");
-  // 拓展包是文件夹，后端只删单文件，这里不给删除按钮。
-  const canDelete = codexHost && script.source === "user" && !isPackage;
+  // 拓展包是带 codexpp.json 的目录，后端会整个删掉（2026-11 起支持）；内置拓展不动。
+  const canDelete = codexHost && script.source === "user";
   const state = extensionStateForHost(script, host, globalEnabled);
   const { label, hint } = localScriptStateLabel(state, host);
   const stateHint = codexHost && state === "failed" && script.error ? `${hint}\n${script.error}` : hint;
@@ -17457,7 +17469,7 @@ function ScriptRow({ host, script, globalEnabled, actions }: { host: ExtensionHo
           ) : null}
           {canDelete ? (
             <MenuItem danger onClick={() => void actions.deleteUserScript(script.key)}>
-              <span className="user-script-menu-item"><Trash2 className="h-4 w-4" />{t("删除")}</span>
+              <span className="user-script-menu-item"><Trash2 className="h-4 w-4" />{isPackage ? t("卸载") : t("删除")}</span>
             </MenuItem>
           ) : null}
         </Menu>

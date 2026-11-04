@@ -272,11 +272,17 @@ assert.equal(status.scripts['user:plain.js'].manifest, null);
 
     manager.set_script_enabled("user:hello", false).unwrap();
     assert!(!manager.build_enabled_bundle().unwrap().contains("window.order"));
-    // 包是目录，删除接口只删单文件，拒绝并保留目录。
+    // 包是带 codexpp.json 的目录，删除接口现在整个删掉；没有清单的目录仍然拒绝。
     manager.set_script_enabled("user:hello", true).unwrap();
-    let error = manager.delete_user_script("user:hello").unwrap_err();
-    assert!(error.to_string().contains("拓展包"));
-    assert!(user.join("hello/codexpp.json").exists());
+    manager.delete_user_script("user:hello").unwrap();
+    assert!(!user.join("hello").exists());
+
+    let stray = user.join("not-a-package");
+    std::fs::create_dir_all(&stray).unwrap();
+    std::fs::write(stray.join("notes.txt"), "user file").unwrap();
+    let error = manager.delete_user_script("user:not-a-package").unwrap_err();
+    assert!(error.to_string().contains("codexpp.json"), "{error}");
+    assert!(stray.join("notes.txt").exists());
 }
 
 #[test]

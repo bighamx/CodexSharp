@@ -388,10 +388,6 @@ impl UserScriptManager {
             anyhow::bail!("invalid user script key");
         }
         let path = self.user_dir.join(file_name);
-        // 拓展包是目录。删除只做单文件，目录交给用户在文件夹里自己处理。
-        if path.is_dir() {
-            anyhow::bail!("拓展包是一个文件夹，请在用户脚本目录中手动移除：{}", path.display());
-        }
         let canonical_user_dir = self
             .user_dir
             .canonicalize()
@@ -409,12 +405,27 @@ impl UserScriptManager {
             let canonical_path = path
                 .canonicalize()
                 .with_context(|| format!("failed to resolve user script {}", path.display()))?;
-            if !canonical_path.starts_with(&canonical_user_dir) {
+            if !canonical_path.starts_with(&canonical_user_dir) || canonical_path == canonical_user_dir {
                 anyhow::bail!("refusing to delete script outside user script directory");
             }
-            fs::remove_file(&canonical_path).with_context(|| {
-                format!("failed to delete user script {}", canonical_path.display())
-            })?;
+            // 拓展包是 `user_dir/<id>/` 目录：只有确实带 codexpp.json 的目录才整个删掉，
+            // 免得误删用户放在脚本目录里的其它东西；符号链接在 canonicalize 后指到目录外会先被上面挡掉。
+            if canonical_path.is_dir() {
+                if !canonical_path.join(EXTENSION_MANIFEST_FILE).is_file() {
+                    anyhow::bail!(
+                        "目录里没有 {}，不是拓展包，未删除：{}",
+                        EXTENSION_MANIFEST_FILE,
+                        canonical_path.display()
+                    );
+                }
+                fs::remove_dir_all(&canonical_path).with_context(|| {
+                    format!("failed to delete extension package {}", canonical_path.display())
+                })?;
+            } else {
+                fs::remove_file(&canonical_path).with_context(|| {
+                    format!("failed to delete user script {}", canonical_path.display())
+                })?;
+            }
         }
 
         let _guard = self.config_lock.lock().unwrap();
