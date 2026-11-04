@@ -83,8 +83,13 @@ impl ShortcutState {
     }
 }
 
+/// 入口文件名：桌面与开始菜单里的快捷方式。显示名是 Codex #，落盘的安装目录仍沿用 Codex++。
+pub const SHORTCUT_FILE: &str = "Codex #.lnk";
+/// 旧版入口名：升级时用来判断「用户本来有没有桌面图标」，删掉后按新名字重建。
+pub const LEGACY_SHORTCUT_FILE: &str = "Codex++.lnk";
+
 pub fn shortcut_names() -> (&'static str, &'static str) {
-    ("Codex++.lnk", "Codex++.lnk")
+    (SHORTCUT_FILE, SHORTCUT_FILE)
 }
 
 pub fn app_bundle_names() -> (&'static str, &'static str) {
@@ -270,7 +275,8 @@ fn entrypoint_candidates(root: &Option<PathBuf>) -> Vec<PathBuf> {
     };
     let name = APP_NAME;
     if cfg!(windows) {
-        vec![root.join(format!("{name}.lnk"))]
+        // 新名字优先；旧名字一并列出，存量机器上的入口也能被认出来并清理。
+        vec![root.join(SHORTCUT_FILE), root.join(LEGACY_SHORTCUT_FILE)]
     } else if cfg!(target_os = "macos") {
         vec![root.join(format!("{name}.app"))]
     } else {

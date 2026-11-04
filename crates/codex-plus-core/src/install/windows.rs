@@ -40,11 +40,11 @@ pub fn build_windows_entrypoint_plan(options: &InstallOptions) -> WindowsEntrypo
     let quiet_uninstall_command = format!("{uninstall_command} /S");
     WindowsEntrypointPlan {
         silent_shortcut: install_root
-            .join("Codex++.lnk")
+            .join(super::SHORTCUT_FILE)
             .to_string_lossy()
             .to_string(),
         manager_shortcut: install_root
-            .join("Codex++.lnk")
+            .join(super::SHORTCUT_FILE)
             .to_string_lossy()
             .to_string(),
         install_root: install_root.to_string_lossy().to_string(),
@@ -120,6 +120,12 @@ fn create_desktop_shortcut_on_first_install(
 pub fn uninstall_shortcuts(options: &InstallOptions) -> anyhow::Result<()> {
     let plan = build_windows_entrypoint_plan(options);
     let _ = std::fs::remove_file(&plan.silent_shortcut);
+    // 旧版入口名：升级或卸载后都不要在桌面上留一个 Codex++.lnk。
+    if let Some(parent) = Path::new(&plan.silent_shortcut).parent() {
+        for name in [super::LEGACY_SHORTCUT_FILE, "Codex++ 管理工具.lnk"] {
+            let _ = std::fs::remove_file(parent.join(name));
+        }
+    }
     let _ = crate::windows_integration::delete_current_user_key(&format!(
         r"{URL_PROTOCOL_SUBKEY}\shell\open\command"
     ));

@@ -101,13 +101,17 @@ Section "Install"
   File "${ROOT}\dist\windows\app\codex-plus-plus.exe"
 
   ; 只迁移确实存在的桌面入口，用户删掉的入口在升级时仍不补建（issue #2376）。
+  ; 入口名从 Codex++ 换成 Codex #：老名字只用来判断「用户本来有桌面图标」并在删掉后按新名重建，
+  ; 这样升级上来的人不会丢掉桌面入口，也不会同时留着两个图标。
   StrCpy $HadDesktopEntry 0
+  IfFileExists "$DESKTOP\Codex #.lnk" desktop_entry_found 0
   IfFileExists "$DESKTOP\Codex++.lnk" desktop_entry_found 0
   IfFileExists "$DESKTOP\Codex++ 管理工具.lnk" desktop_entry_found 0
   IfFileExists "$DESKTOP\Codex++ 绠＄悊宸ュ叿.lnk" desktop_entry_found desktop_entry_checked
   desktop_entry_found:
   StrCpy $HadDesktopEntry 1
   desktop_entry_checked:
+  Delete "$DESKTOP\Codex #.lnk"
   Delete "$DESKTOP\Codex++.lnk"
   Delete "$DESKTOP\Codex++ 管理工具.lnk"
   Delete "$DESKTOP\Codex++ 绠＄悊宸ュ叿.lnk"
@@ -115,15 +119,16 @@ Section "Install"
   Delete "$SMPROGRAMS\Codex++\Codex++ 管理工具.lnk"
   Delete "$SMPROGRAMS\Codex++\Codex++ 绠＄悊宸ュ叿.lnk"
   Delete "$SMPROGRAMS\Codex++\卸载 Codex++.lnk"
+  RMDir "$SMPROGRAMS\Codex++"
 
   StrCmp $ExistingInstall "" desktop_entry_create 0
   StrCmp $HadDesktopEntry 1 desktop_entry_create desktop_entry_done
   desktop_entry_create:
-  CreateShortcut "$DESKTOP\Codex++.lnk" "$INSTDIR\codex-plus-plus.exe" "" "$INSTDIR\codex-plus-plus.exe"
+  CreateShortcut "$DESKTOP\Codex #.lnk" "$INSTDIR\codex-plus-plus.exe" "" "$INSTDIR\codex-plus-plus.exe"
   desktop_entry_done:
-  CreateDirectory "$SMPROGRAMS\Codex++"
-  CreateShortcut "$SMPROGRAMS\Codex++\Codex++.lnk" "$INSTDIR\codex-plus-plus.exe" "" "$INSTDIR\codex-plus-plus.exe"
-  CreateShortcut "$SMPROGRAMS\Codex++\卸载 Codex++.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\codex-plus-plus.exe"
+  CreateDirectory "$SMPROGRAMS\Codex #"
+  CreateShortcut "$SMPROGRAMS\Codex #\Codex #.lnk" "$INSTDIR\codex-plus-plus.exe" "" "$INSTDIR\codex-plus-plus.exe"
+  CreateShortcut "$SMPROGRAMS\Codex #\卸载 Codex #.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\codex-plus-plus.exe"
 
   WriteUninstaller "$INSTDIR\uninstall.exe"
   WriteRegStr HKCU "Software\Codex++" "InstallDir" "$INSTDIR"
@@ -173,9 +178,13 @@ Section "Uninstall"
   IfFileExists "$INSTDIR\codex-plus-plus.exe" 0 +2
     ExecWait '"$INSTDIR\codex-plus-plus.exe" --codex-plus-uninstall-cleanup'
 
+  Delete "$DESKTOP\Codex #.lnk"
   Delete "$DESKTOP\Codex++.lnk"
   Delete "$DESKTOP\Codex++ 管理工具.lnk"
   Delete "$DESKTOP\Codex++ 绠＄悊宸ュ叿.lnk"
+  Delete "$SMPROGRAMS\Codex #\Codex #.lnk"
+  Delete "$SMPROGRAMS\Codex #\卸载 Codex #.lnk"
+  RMDir "$SMPROGRAMS\Codex #"
   Delete "$SMPROGRAMS\Codex++\Codex++.lnk"
   Delete "$SMPROGRAMS\Codex++\卸载 Codex++.lnk"
   Delete "$SMPROGRAMS\Codex++\Codex++ 管理工具.lnk"

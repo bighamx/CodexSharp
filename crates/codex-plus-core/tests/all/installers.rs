@@ -15,7 +15,8 @@ fn windows_entrypoint_plan_has_one_gui_executable_and_shortcut() {
         remove_owned_data: false,
     };
     let plan = build_windows_entrypoint_plan(&options);
-    assert!(plan.silent_shortcut.ends_with("Codex++.lnk"));
+    // 快捷方式显示名换成 Codex #；安装目录仍是 Codex++。
+    assert!(plan.silent_shortcut.ends_with("Codex #.lnk"));
     assert_eq!(plan.silent_shortcut, plan.manager_shortcut);
     assert_eq!(plan.launcher_path, "C:/Tools/codex-plus-plus.exe");
     assert_eq!(plan.launcher_path, plan.manager_path);
@@ -59,6 +60,8 @@ fn macos_bundle_metadata_has_one_native_gui_app_with_url_protocols() {
     let app = build_macos_app_bundle(&options, false);
     assert_eq!(app, build_macos_app_bundle(&options, true));
     assert!(app.app_path.ends_with("Codex++.app"));
+
+    // macOS 的 .app 名与 bundle id 绑在一起，保持 Codex++；只有对外下载的 DMG 文件名换了。
     assert!(app.info_plist.contains("<string>Codex++</string>"));
     assert!(
         app.info_plist
@@ -81,7 +84,7 @@ fn macos_bundle_metadata_has_one_native_gui_app_with_url_protocols() {
 
 #[test]
 fn installer_name_helpers_and_legacy_constants_keep_api_compatibility() {
-    assert_eq!(shortcut_names(), ("Codex++.lnk", "Codex++.lnk"));
+    assert_eq!(shortcut_names(), ("Codex #.lnk", "Codex #.lnk"));
     assert_eq!(app_bundle_names(), ("Codex++.app", "Codex++.app"));
     assert_eq!(SILENT_BINARY, APP_BINARY);
     assert_eq!(SILENT_BUNDLE_ID, APP_BUNDLE_ID);
@@ -161,6 +164,8 @@ fn windows_installer_migrates_existing_shortcuts_without_reviving_deleted_ones()
     let lf = nsi.replace("\r\n", "\n");
     for text in [&lf, &lf.replace('\n', "\r\n")] {
         let text = text.replace("\r\n", "\n");
+
+        // 正式键 + 旧版键；快捷方式改名不影响卸载登记的键名。
         for key in ["CodexPlusPlus", "Codex++"] {
             let read = format!(
                 r#"ReadRegStr $ExistingInstall HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{key}" "InstallLocation""#
@@ -172,12 +177,14 @@ fn windows_installer_migrates_existing_shortcuts_without_reviving_deleted_ones()
         assert!(
             text.contains(r#"IfFileExists "$DESKTOP\Codex++ 管理工具.lnk" desktop_entry_found 0"#)
         );
+        // 新建的入口用 Codex #，旧名只出现在删除/判断存量入口的地方。
         assert!(
             text.contains(
-                r#"CreateShortcut "$DESKTOP\Codex++.lnk" "$INSTDIR\codex-plus-plus.exe""#
+                r#"CreateShortcut "$DESKTOP\Codex #.lnk" "$INSTDIR\codex-plus-plus.exe""#
             )
         );
-        assert!(text.contains(r#"CreateShortcut "$SMPROGRAMS\Codex++\Codex++.lnk""#));
+        assert!(text.contains(r#"CreateShortcut "$SMPROGRAMS\Codex #\Codex #.lnk""#));
+        assert!(!text.contains(r#"CreateShortcut "$SMPROGRAMS\Codex++\Codex++.lnk""#));
         assert!(!text.contains(r#"CreateShortcut "$DESKTOP\Codex++ 管理工具.lnk""#));
         assert!(!text.contains(r#"File "${ROOT}\dist\windows\app\codex-plus-plus-manager.exe""#));
     }
