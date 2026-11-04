@@ -7,7 +7,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 DIST="$ROOT/dist/macos"
 STAGE="$DIST/stage"
 BINARY_DIR="${BINARY_DIR:-$ROOT/target/release}"
-DMG="$DIST/CodexPlusPlus-${VERSION}-macos-${ARCH}.dmg"
+DMG="$DIST/CodexSharp-${VERSION}-macos-${ARCH}.dmg"
 # macOS 用带圆角方形底的版本：macOS 26 会把不是标准圆角方形的图标放进一块灰色底板。没有时退回通用图标。
 ICON_SOURCE="$ROOT/apps/codex-plus-manager/src-tauri/icons/icon-macos.png"
 [ -f "$ICON_SOURCE" ] || ICON_SOURCE="$ROOT/apps/codex-plus-manager/src-tauri/icons/icon.png"
