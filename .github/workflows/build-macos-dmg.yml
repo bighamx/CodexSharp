@@ -1,0 +1,174 @@
+name: Build macOS DMG
+
+# 给这个 fork 用的 macOS 打包流程。
+# 上游的 Release assets 工作流依赖官方签名证书与 tag 约定，这里只要能编出 DMG：
+# 有证书就正式签名 + 公证，没有就走 package-dmg.sh 的 ad-hoc 签名（用户需手动放行）。
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "版本号，写进 DMG 文件名（不带 v）"
+        required: true
+        default: "2.2.0"
+      publish_release:
+        description: "编好后上传到 Release（需要填 tag）"
+        type: boolean
+        default: false
+      release_tag:
+        description: "要上传的 Release tag，例如 v2.2.0-sharp.1"
+        required: false
+        default: ""
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macos-dmg-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  macos-dmg:
+    name: macOS DMG (universal)
+    runs-on: macos-15
+    timeout-minutes: 120
+    env:
+      # 与 Info.plist 的 LSMinimumSystemVersion 一致，避免 runner 的新 SDK 抬高 C 依赖的最低系统版本。
+      MACOSX_DEPLOYMENT_TARGET: "12.0"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: vars
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "push" ]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="${{ inputs.version }}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "building version: $version"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # 通用包需要两个架构的 std，build-universal.sh 会各编一遍再 lipo 合并。
+          targets: x86_64-apple-darwin,aarch64-apple-darwin
+
+      - name: Cache cargo registry and target dirs
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/x86_64-apple-darwin
+            target/aarch64-apple-darwin
+          key: macos-cargo-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            macos-cargo-
+
+      - name: Install frontend dependencies
+        working-directory: apps/codex-plus-manager
+        run: npm ci --no-audit --no-fund
+
+      - name: Build frontend
+        working-directory: apps/codex-plus-manager
+        run: npm run vite:build
+
+      - name: Import signing certificate (optional)
+        env:
+          MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          # secrets 不能用在 if: 里，只能在这里判空：没配证书就跳过，走 ad-hoc 签名。
+          if [ -z "${MACOS_CERT_P12:-}" ]; then
+            echo "note: 未配置 MACOS_CERT_P12，跳过证书导入，产物为 ad-hoc 签名"
+            exit 0
+          fi
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          echo "$MACOS_CERT_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$MACOS_KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN"
+          security unlock-keychain -p "$MACOS_KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+          # 少了这一步 codesign 会弹 GUI 授权框然后挂到超时。
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          # runner 没有 Developer ID G2 中间证书，缺了身份会报 CSSMERR_TP_NOT_TRUSTED。
+          curl -fsSL -o "$RUNNER_TEMP/DeveloperIDG2CA.cer" https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer
+          security import "$RUNNER_TEMP/DeveloperIDG2CA.cer" -k "$KEYCHAIN" -T /usr/bin/codesign
+          security find-identity -v -p codesigning
+          rm -f "$RUNNER_TEMP/cert.p12"
+
+      - name: Store notarization credentials (optional)
+        env:
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APPLE_API_KEY_P8:-}" ]; then
+            echo "note: 未配置公证凭据，跳过"
+            exit 0
+          fi
+          KEY_PATH="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
+          echo "$APPLE_API_KEY_P8" | base64 --decode > "$KEY_PATH"
+          chmod 600 "$KEY_PATH"
+          xcrun notarytool store-credentials "codexsharp-notary" \
+            --key "$KEY_PATH" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER_ID"
+          rm -f "$KEY_PATH"
+
+      - name: Build universal macOS DMG
+        env:
+          # 两个 secret 都为空时 package-dmg.sh 会自动退回 ad-hoc 签名并跳过公证。
+          MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+          MACOS_NOTARY_PROFILE: ${{ secrets.APPLE_API_KEY_P8 != '' && 'codexsharp-notary' || '' }}
+        run: |
+          set -euo pipefail
+          bash scripts/installer/macos/build-universal.sh "${{ steps.vars.outputs.version }}"
+
+      - name: Inspect DMG
+        run: |
+          set -euo pipefail
+          ls -lh dist/macos/
+          dmg="$(ls dist/macos/*.dmg | head -1)"
+          hdiutil imageinfo "$dmg" | head -20
+          # 挂载后确认两个 .app 都在，且主可执行文件是通用二进制。
+          mnt="$RUNNER_TEMP/dmg-mnt"
+          mkdir -p "$mnt"
+          hdiutil attach "$dmg" -mountpoint "$mnt" -nobrowse -quiet
+          ls -1 "$mnt"
+          for app in "$mnt"/*.app; do
+            name="$(plutil -extract CFBundleExecutable raw "$app/Contents/Info.plist")"
+            echo "== $app"
+            lipo -archs "$app/Contents/MacOS/$name"
+            codesign -dv "$app" 2>&1 | head -5 || true
+          done
+          hdiutil detach "$mnt" -quiet || true
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codexsharp-macos-dmg
+          path: dist/macos/*.dmg
+          if-no-files-found: error
+
+      - name: Attach to Release
+        if: ${{ github.event_name == 'push' || (inputs.publish_release && inputs.release_tag != '') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'push' && github.ref_name || inputs.release_tag }}
+          files: dist/macos/*.dmg
+          fail_on_unmatched_files: true
