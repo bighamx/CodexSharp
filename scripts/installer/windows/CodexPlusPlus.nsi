@@ -10,7 +10,7 @@ ${Using:StrFunc} UnStrStr
 !define ROOT "..\..\.."
 
 Name "Codex #"
-OutFile "${ROOT}\dist\windows\CodexPlusPlus-${VERSION}-windows-x64-setup.exe"
+OutFile "${ROOT}\dist\windows\CodexSharp-${VERSION}-windows-x64-setup.exe"
 InstallDir "$LOCALAPPDATA\Programs\Codex++"
 ; 沿用旧安装目录登记，覆盖升级继续安装到原目录。
 InstallDirRegKey HKCU "Software\Codex++" "InstallDir"
