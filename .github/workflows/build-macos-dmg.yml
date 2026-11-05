@@ -18,9 +18,8 @@ on:
         description: "要上传的 Release tag，例如 v2.2.0-sharp.1"
         required: false
         default: ""
-  push:
-    tags:
-      - "v*"
+# 不再监听 tag push：本地建 release 会顺带推 tag，那样会多触发一次构建并往同一个 release 上传第二份 DMG。
+# 需要出包时手动 workflow_dispatch，或在 inputs 里勾 publish_release + 填 release_tag 让它自己挂。
 
 permissions:
   contents: write
