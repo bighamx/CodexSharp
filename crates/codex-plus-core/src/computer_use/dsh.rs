@@ -40,7 +40,7 @@ use super::RuntimeLocation;
 const BEGIN_TAG: &str = "# >>> codex-plus-computer-use";
 const BEGIN: &str = concat!(
     "# >>> codex-plus-computer-use",
-    "：由 Codex++ 写入与维护，请在 Codex++ 的 Computer Use 页移除，不要手改"
+    "：由 Codex # 写入与维护，请在 Codex # 的 Computer Use 页移除，不要手改"
 );
 const END: &str = "# <<< codex-plus-computer-use";
 const PLUGIN: &str = "@deepseek-ai/dsh-mcp-client";
@@ -155,7 +155,7 @@ fn split_block(text: &str) -> anyhow::Result<(String, Option<String>)> {
         return Ok((text.to_string(), None));
     };
     let Some(offset) = lines[start..].iter().position(|line| line.trim_end() == END) else {
-        bail!("补丁层里的 Codex++ 托管块缺少结束标记，未修改");
+        bail!("补丁层里的 Codex # 托管块缺少结束标记，未修改");
     };
     let end = start + offset;
     let mut block = lines[start..=end].join("\n");

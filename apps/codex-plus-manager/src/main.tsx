@@ -34,7 +34,7 @@ class StartupErrorBoundary extends Component<{ children: ReactNode }, { error: E
   }
 
   componentDidCatch(error: unknown, info: ErrorInfo) {
-    console.error("[Codex++] 界面渲染失败", error, info.componentStack);
+    console.error("[Codex #] 界面渲染失败", error, info.componentStack);
   }
 
   render() {
@@ -42,7 +42,7 @@ class StartupErrorBoundary extends Component<{ children: ReactNode }, { error: E
     if (!error) return this.props.children;
     return (
       <div role="alert" style={{ boxSizing: "border-box", minHeight: "100vh", padding: "32px", background: "#111318", color: "#e8e9ed", font: "14px/1.6 -apple-system, BlinkMacSystemFont, sans-serif" }}>
-        <h1 style={{ margin: "0 0 8px", fontSize: "18px" }}>Codex++ 界面加载失败 / Codex++ failed to load</h1>
+        <h1 style={{ margin: "0 0 8px", fontSize: "18px" }}>Codex # 界面加载失败 / Codex # failed to load</h1>
         <p style={{ margin: "0 0 12px", color: "#a9adb8" }}>
           可以先重新加载；如果仍然失败，请把 macOS 更新到最新版本，并把下面的错误信息附到 GitHub issue 里。
           <br />

@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/schemastery 替身。
+// Codex # 兼容宿主提供的 @deepseek-ai/schemastery 替身。
 // 插件用它声明 Config；宿主只需要「按 schema 填默认值、拒绝缺失的必填项」，不做完整的类型校验。
 // 所有修饰方法（min / max / pattern / description / role …）都接受并返回自身，未知方法同样如此。
 

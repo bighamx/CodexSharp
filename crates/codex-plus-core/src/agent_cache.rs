@@ -124,16 +124,16 @@ fn discover_roots(home: &Path, codex: &Path) -> Result<Vec<CacheRoot>> {
     // CODEX_HOME 在用户目录外或通过符号链接配置时，只忽略这部分。
     add("Codex", "cache", codex.join("cache"), true);
     add("Codex", "temporary", codex.join(".tmp"), false);
-    // Codex++ 的会话删除备份和更新下载目录不属于 Codex 会话正文，
+    // Codex # 的会话删除备份和更新下载目录不属于 Codex 会话正文，
     // 允许用户在扫描预览后按文件清理，避免 GB 级历史备份长期占满磁盘。
     add(
-        "Codex++",
+        "Codex #",
         "backup",
         home.join(".codex-session-delete/backups"),
         true,
     );
     add(
-        "Codex++",
+        "Codex #",
         "update",
         home.join(".codex-session-delete/updates"),
         true,
@@ -145,7 +145,7 @@ fn discover_roots(home: &Path, codex: &Path) -> Result<Vec<CacheRoot>> {
         for (app, name) in [
             ("Codex", "Codex"),
             ("Codex", "com.openai.codex"),
-            ("Codex++", "com.bigpizzav3.codexplusplus.current-build"),
+            ("Codex #", "com.bigpizzav3.codexplusplus.current-build"),
             ("Claude", "com.anthropic.claudefordesktop"),
             ("Claude", "local.claudecodecn.claude"),
             ("Claude", "claude-cli-nodejs"),
@@ -529,9 +529,9 @@ impl CachePlan {
             .iter()
             .filter(|group| ids.contains(&group.id))
         {
-            // Codex++ 的备份、更新包和自身缓存不被 Codex 客户端占用；
-            // 管理器自己就是 Codex++，无法先退出，只靠 24 小时与快照校验兜底。
-            if group.app == "Codex++" {
+            // Codex # 的备份、更新包和自身缓存不被 Codex 客户端占用；
+            // 管理器自己就是 Codex #，无法先退出，只靠 24 小时与快照校验兜底。
+            if group.app == "Codex #" {
                 continue;
             }
             let app = &group.app;
@@ -603,7 +603,7 @@ fn apps_from_process_names(names: &str) -> BTreeSet<String> {
             .next()
             .unwrap_or("")
             .trim_end_matches(".exe");
-        // Codex++ 已合并为单一应用（管理器 + 启动运行时），正在执行清理的就是它，
+        // Codex # 已合并为单一应用（管理器 + 启动运行时），正在执行清理的就是它，
         // 不能算作 Codex 在运行，否则任何清理都会被自己拦下。
         if executable.contains("manager")
             || executable == "ps"
@@ -679,7 +679,7 @@ mod tests {
             .report
             .groups
             .iter()
-            .filter(|group| group.app == "Codex++")
+            .filter(|group| group.app == "Codex #")
             .collect::<Vec<_>>();
         assert!(groups.iter().any(|group| group.kind == "backup" && group.eligible_files == 1));
         assert!(groups.iter().any(|group| group.kind == "update" && group.eligible_files == 1));
@@ -697,7 +697,7 @@ mod tests {
             .report
             .groups
             .iter()
-            .filter(|group| group.app == "Codex++" && group.eligible_files > 0)
+            .filter(|group| group.app == "Codex #" && group.eligible_files > 0)
             .map(|group| group.id.clone())
             .collect::<Vec<_>>();
         let id = plan.report.scan_id.clone();

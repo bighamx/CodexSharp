@@ -1018,7 +1018,7 @@ impl Subscription for Devin {
                 Ok(LoginStart {
                     open_url: Some(url),
                     user_code: None,
-                    message: "在浏览器里登录 Devin，完成后会自动回到 Codex++。".into(),
+                    message: "在浏览器里登录 Devin，完成后会自动回到 Codex #。".into(),
                     state: json!({
                         "method": "browser",
                         "listener": key,

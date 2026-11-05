@@ -49,13 +49,13 @@
 //! 4. `start /b` 出来的子进程在 cmd.exe 退出后是否继续存活（控制台生命周期）；
 //! 5. 含非 ASCII 的路径（中文用户名）在 cmd 按 OEM 代码页解析 .cmd 时是否仍然正确；
 //! 6. 包上下文里拉起的 Codex 是否依赖发起激活的 PowerShell 宿主存活（issue #2764：宿主一直
-//!    存活的交互式 shell 能拉起，宿主立刻退出的 Codex++ 拉不起）。主实例兜底因此让宿主活到
+//!    存活的交互式 shell 能拉起，宿主立刻退出的 Codex # 拉不起）。主实例兜底因此让宿主活到
 //!    调试端口可连，再看 Codex 在宿主退出后是否仍在（诊断日志的 `codex_pids_after`）。
 //!    2.1.1 的日志表明另一类失败与宿主无关：主 Codex 已经开着但没带调试端口（回退前后同一批
 //!    进程原样存在），新进程拿不到单实例锁直接退出。launcher 现在启动前先识别这种情况
 //!    （`main_instances_blocking_debug_launch`）；其余失败靠 wrapper 轨迹与宿主内的
 //!    `SEEN_PIDS` 区分「wrapper 没执行 / Codex 没起来 / 起来又退了」。
-//! 7. Codex++ 以管理员身份运行时，Codex 继承提权令牌，会被 Chromium 经 explorer 降权重启而
+//! 7. Codex # 以管理员身份运行时，Codex 继承提权令牌，会被 Chromium 经 explorer 降权重启而
 //!    脱离包上下文（issue #2789 的 `elevated:true` + 「出现过 1 个进程、随后 0 个」）。现在提权
 //!    时带上 [`DO_NOT_DE_ELEVATE_SWITCH`]；这一推断同样只能靠实机日志确认。
 //!
@@ -87,10 +87,10 @@ const ACTIVATION_TIMEOUT: Duration = Duration::from_secs(30);
 /// 要求 PowerShell 宿主等待调试端口时的上限（秒），见 [`activation_script`]。
 pub const HOST_PORT_WAIT_SECS: u64 = 20;
 
-/// 不能从 Codex++ 进程一路继承给 Codex 的环境变量（issue #2764）。
+/// 不能从 Codex # 进程一路继承给 Codex 的环境变量（issue #2764）。
 ///
 /// AUMID 激活（开始菜单同款）由系统代为创建进程，拿的是用户默认环境；包上下文兜底则是
-/// Codex++ → powershell → cmd → Codex 逐级继承，Codex++ 进程环境里的东西会被带进 Codex。
+/// Codex # → powershell → cmd → Codex 逐级继承，Codex # 进程环境里的东西会被带进 Codex。
 /// 这里只列「会让 Electron 不按桌面应用启动」的运行时开关：
 /// - `ELECTRON_RUN_AS_NODE`：exe 退化成 Node，遇到 `--remote-debugging-port` 直接报错退出；
 /// - `ELECTRON_NO_ASAR`：关掉 asar 支持，应用包读不出来；
@@ -127,14 +127,14 @@ fn push_env_scrub_lines(script: &mut String) {
 /// `kDoNotDeElevateOnLaunch`）。Codex 的 Windows 版基于含 chrome 层的 Chromium 外壳，
 /// 主进程 JS 也在读这个开关（`hasDoNotDeElevateSwitch`），说明这条逻辑在 Codex 里生效。
 ///
-/// 对 Codex++ 的影响：Codex++ 被以管理员身份运行时，包上下文 wrapper 拉起的 Codex 继承
+/// 对 Codex # 的影响：Codex # 被以管理员身份运行时，包上下文 wrapper 拉起的 Codex 继承
 /// 提权令牌，Chromium 随即经 explorer 降权重启——重启出来的进程不再处于 MSIX 包上下文
 /// （没有包身份），也拿不到 wrapper 设置的环境；表现就是「出现过 1 个 Codex 进程，随后
-/// 一个不剩、调试端口始终不监听」。所以 Codex++ 提权时显式带上本开关，让 Codex 留在
-/// 包上下文里启动（与 Codex++ 同权限）。未提权时 Chromium 本来就不会降权，不加。
+/// 一个不剩、调试端口始终不监听」。所以 Codex # 提权时显式带上本开关，让 Codex 留在
+/// 包上下文里启动（与 Codex # 同权限）。未提权时 Chromium 本来就不会降权，不加。
 pub const DO_NOT_DE_ELEVATE_SWITCH: &str = "--do-not-de-elevate";
 
-/// 打包版主实例的启动附加参数：Codex++ 提权运行时补上 [`DO_NOT_DE_ELEVATE_SWITCH`]
+/// 打包版主实例的启动附加参数：Codex # 提权运行时补上 [`DO_NOT_DE_ELEVATE_SWITCH`]
 /// （纯函数）。用户自己已经写了该开关时不重复添加；未提权时原样返回。
 pub fn packaged_launch_extra_args(extra_args: &[String], elevated: bool) -> Vec<String> {
     let mut args = extra_args.to_vec();
@@ -153,7 +153,7 @@ pub fn packaged_launch_extra_args(extra_args: &[String], elevated: bool) -> Vec<
 /// `IApplicationActivationManager::ActivateApplication` 的调用上限（issue #2795）。
 ///
 /// 正常几秒内返回。#2795 的日志停在 `launch_codex` 阶段十几分钟没有下文，同时任务管理器里
-/// 有一个「已挂起」、内存 0.1 MB 的 Codex 进程——激活调用原先没有超时，一旦卡住 Codex++
+/// 有一个「已挂起」、内存 0.1 MB 的 Codex 进程——激活调用原先没有超时，一旦卡住 Codex #
 /// 就一直停在「启动 Codex」、没有任何报错。超过上限即放弃本次激活并给出提示。
 pub const AUMID_ACTIVATION_CALL_TIMEOUT: Duration = Duration::from_secs(20);
 
@@ -651,10 +651,10 @@ pub fn existing_main_instance_blocks_launch_message(
         .join(", ");
     format!(
         "检测到 Codex 已在运行，但没有开启调试端口 {debug_port}（主进程 PID {ids}）。\
-         Codex 同时只允许一个主实例，Codex++ 再启动的实例会把请求交给它后立即退出，无法注入。\
+         Codex 同时只允许一个主实例，Codex # 再启动的实例会把请求交给它后立即退出，无法注入。\
          请先完全退出 Codex：关掉窗口后若托盘里还有 Codex 图标，右键选择退出；\
          或在任务管理器里结束所有 {executable_name} 进程。然后再点「启动 Codex」。\
-         也可以点「重启 Codex」，由 Codex++ 结束它并重新启动。"
+         也可以点「重启 Codex」，由 Codex # 结束它并重新启动。"
     )
 }
 
@@ -706,7 +706,7 @@ pub fn blocking_main_instance_leftovers(
     leftovers
 }
 
-/// 挡路主进程退出后残留的某个进程能否由 Codex++ 结束（纯函数）。
+/// 挡路主进程退出后残留的某个进程能否由 Codex # 结束（纯函数）。
 ///
 /// 只认同一 MSIX 包内的 Codex 自家进程：
 /// - 与 Codex 同名（`ChatGPT.exe`）的 Electron 子进程（命令行带 `--type=`）；
@@ -869,7 +869,7 @@ impl AumidActivationWatch {
 /// - 仅在 cmdlet 真报回 `Id` 时输出 `PID=` 标记；
 /// - `wait_port` 为 `Some` 时，PowerShell 宿主激活后继续存活，直到该回环端口可连接或
 ///   [`HOST_PORT_WAIT_SECS`] 秒耗尽，再输出 `PORT_READY=1/0`。issue #2764 的对照实验里，
-///   同一份 wrapper 在「宿主一直存活」的交互式 PowerShell 里能拉起 Codex，而 Codex++ 的宿主
+///   同一份 wrapper 在「宿主一直存活」的交互式 PowerShell 里能拉起 Codex，而 Codex # 的宿主
 ///   激活后立刻退出；这里让宿主活过 Codex 的启动阶段，与可用的形态保持一致。
 ///
 /// 所有动态值都走 PowerShell 单引号字面量，内部的 `'` 按 `''` 转义。
@@ -983,7 +983,7 @@ fn activation_powershell_arguments(script: &str) -> Vec<String> {
 
 /// 系统自带 Windows PowerShell 的绝对路径；拿不到 `SystemRoot` 时退回按 PATH 查找。
 ///
-/// 不依赖 PATH：Codex++ 进程的 PATH 可能与用户交互式 shell 不同（issue #2764 的差异排查项）。
+/// 不依赖 PATH：Codex # 进程的 PATH 可能与用户交互式 shell 不同（issue #2764 的差异排查项）。
 #[cfg(any(windows, test))]
 fn windows_powershell_path(system_root: Option<&std::ffi::OsStr>) -> PathBuf {
     match system_root.filter(|root| !root.is_empty()) {
@@ -1884,7 +1884,7 @@ mod tests {
         for name in ["ELECTRON_RUN_AS_NODE", "ELECTRON_NO_ASAR", "NODE_OPTIONS"] {
             assert!(SCRUBBED_CODEX_ENV_VARS.contains(&name), "{name}");
         }
-        // 用户有意设置的 Codex 数据目录 / Codex++ 状态目录不能被清掉。
+        // 用户有意设置的 Codex 数据目录 / Codex # 状态目录不能被清掉。
         for name in ["CODEX_HOME", "CODEX_SQLITE_HOME", STATE_DIR_ENV, "PATH"] {
             assert!(!SCRUBBED_CODEX_ENV_VARS.contains(&name), "{name}");
         }
@@ -2543,7 +2543,7 @@ mod tests {
             None,
             Some(&format!("{STORE_EXE} --type=gpu-process"))
         ));
-        // 包外的程序（用户装的 codex CLI、VS Code、node、浏览器、Codex++ 自身）：一律不碰。
+        // 包外的程序（用户装的 codex CLI、VS Code、node、浏览器、Codex # 自身）：一律不碰。
         assert!(!allowed(
             "codex.exe",
             Some(r"C:\Users\me\AppData\Roaming\npm\node_modules\@openai\codex\codex.exe"),

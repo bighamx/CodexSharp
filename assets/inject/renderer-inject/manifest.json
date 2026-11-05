@@ -17,7 +17,7 @@
     },
     {
       "name": "20-menu.js",
-      "description": "Codex++ 菜单、后端设置加载、插件解锁策略与版本判定",
+      "description": "Codex # 菜单、后端设置加载、插件解锁策略与版本判定",
       "lines": 594
     },
     {
@@ -182,7 +182,7 @@
     },
     {
       "name": "96-dsh-client.js",
-      "description": "dsh 前端插件运行时：用 Codex 的 React 渲染 dsh 插槽组件，映射到 Codex++ 的界面插槽",
+      "description": "dsh 前端插件运行时：用 Codex 的 React 渲染 dsh 插槽组件，映射到 Codex # 的界面插槽",
       "lines": 1065
     },
     {

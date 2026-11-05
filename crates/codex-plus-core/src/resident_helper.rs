@@ -3,17 +3,17 @@
 //! 背景：协议转换 / 聚合 / 请求避震等能力依赖 `config.toml` 里写死的本地代理
 //! 地址（默认 `http://127.0.0.1:57321/v1`）。helper 过去只在
 //! `launch_and_inject` 里随 Codex 会话启动，Codex 一退出就关闭；于是「不从
-//! Codex++ 启动 Codex」（终端 CLI、IDE 插件、直接双击官方 App）时，config 指向
+//! Codex # 启动 Codex」（终端 CLI、IDE 插件、直接双击官方 App）时，config 指向
 //! 的端口没人监听，请求直接连不上。
 //!
 //! 本模块让管理器在运行期托管一个常驻 helper：
-//! - Codex++ 启动 / 恢复 / 供应商切换后，只要 live `config.toml` 指向本地代理，
+//! - Codex # 启动 / 恢复 / 供应商切换后，只要 live `config.toml` 指向本地代理，
 //!   就把 helper 拉起来（端口取 `protocol_proxy::protocol_proxy_port()`）；
-//! - Codex 会话结束不关闭，只有 Codex++ 退出时才停止；
+//! - Codex 会话结束不关闭，只有 Codex # 退出时才停止；
 //! - 启动链路里的 `DefaultLaunchHooks::start_helper` 会识别常驻 helper 并复用，
 //!   避免二次 bind 同一个端口失败。
 //!
-//! 因此只要 Codex++ 在跑，config.toml 里的本地代理地址就是可用的，与 Codex
+//! 因此只要 Codex # 在跑，config.toml 里的本地代理地址就是可用的，与 Codex
 //! 由谁启动无关。
 
 use std::sync::{Mutex, OnceLock};
@@ -67,7 +67,7 @@ pub fn resident_helper_port() -> Option<u16> {
 /// 确保常驻 helper 监听在 `port` 上。
 ///
 /// 幂等：已经监听同一端口时直接返回成功；已在其它端口时先停旧的再起新的。
-/// 端口被「上一个 Codex++ 进程」短暂占用时会小窗口重试；被其它程序持续占用时
+/// 端口被「上一个 Codex # 进程」短暂占用时会小窗口重试；被其它程序持续占用时
 /// 返回错误，由调用方决定是否降级（不在这里静默换端口，因为该端口已经写进
 /// `config.toml` 的 `base_url`）。
 pub fn ensure_resident_helper(port: u16) -> anyhow::Result<()> {
@@ -100,7 +100,7 @@ pub fn ensure_resident_helper(port: u16) -> anyhow::Result<()> {
     }
 }
 
-/// 停止常驻 helper。Codex++ 退出时调用；Codex 会话结束不应调用。
+/// 停止常驻 helper。Codex # 退出时调用；Codex 会话结束不应调用。
 pub fn stop_resident_helper() {
     let helper = { lock_slot().take() };
     if let Some(helper) = helper {

@@ -8,10 +8,10 @@ export const SpillLocator = brand
 export const ApprovalRequestId = brand
 export const APPROVAL_POLICIES = Object.freeze(['ask', 'never'])
 
-/** 这些服务在 Codex++ 里由宿主经 ctx 提供；插件只拿类来做类型判断，不会自己 new。 */
+/** 这些服务在 Codex # 里由宿主经 ctx 提供；插件只拿类来做类型判断，不会自己 new。 */
 class HostProvided {
   constructor() {
-    throw new Error(`${new.target.name} 由 Codex++ 宿主经 ctx 提供，不能在插件里直接创建`)
+    throw new Error(`${new.target.name} 由 Codex # 宿主经 ctx 提供，不能在插件里直接创建`)
   }
 }
 export class SpillStore extends HostProvided {}
@@ -81,7 +81,7 @@ export function fallbackSessionTitle(input, maxWords, maxBytes) {
   return truncateTitleUtf8(cleanTitleText(input).split(' ').filter(Boolean).slice(0, maxWords).join(' '), maxBytes).trimEnd()
 }
 
-/** dsh 里 setApprovalPolicy 写会话事件；Codex++ 的审批策略经 ctx.approval.setPolicy 设置，这里只是兼容导出。 */
+/** dsh 里 setApprovalPolicy 写会话事件；Codex # 的审批策略经 ctx.approval.setPolicy 设置，这里只是兼容导出。 */
 export function setApprovalPolicy() {}
 
 export default SpillStore

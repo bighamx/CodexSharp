@@ -75,7 +75,7 @@ test("诊断报告挑出版本、Codex 应用、快捷方式和最近启动；�
     },
   });
   const facts = diagnosticFacts(report);
-  assert.deepEqual(facts.map((fact) => fact.label), ["Codex++ 版本", "Codex 应用", "Codex 版本", "静默启动入口", "管理入口", "最近一次启动"]);
+  assert.deepEqual(facts.map((fact) => fact.label), ["Codex # 版本", "Codex 应用", "Codex 版本", "静默启动入口", "管理入口", "最近一次启动"]);
   // 状态词翻成中文，路径原样。
   assert.equal(facts[1].status, "已找到");
   assert.equal(facts[1].value, "/Applications/ChatGPT.app");

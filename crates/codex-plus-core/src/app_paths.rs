@@ -522,14 +522,14 @@ fn standalone_cli_in_dir(dir: &Path) -> Option<PathBuf> {
 /// `normalize_codex_app_path` 拒绝一个已存在路径时，说明具体卡在哪一条判据。
 ///
 /// issue #2204：失败时四个平台四种原因共用一句「Codex App directory not found」，
-/// 用户与维护者都无法判断是「路径不存在」「误选了 Codex++」还是「目录里没有可执行
+/// 用户与维护者都无法判断是「路径不存在」「误选了 Codex #」还是「目录里没有可执行
 /// 文件」。这里只做归因，不改变接受/拒绝结果。
 pub fn describe_codex_app_dir_rejection(path: &Path) -> String {
     if path.as_os_str().is_empty() {
         return "路径为空".to_string();
     }
     if is_codex_plus_plus_path(path) {
-        return "该路径是 Codex++ 自己的安装目录，不是 Codex 桌面应用".to_string();
+        return "该路径是 Codex # 自己的安装目录，不是 Codex 桌面应用".to_string();
     }
     if !path.exists() {
         return "路径不存在".to_string();
@@ -686,7 +686,7 @@ pub fn normalize_codex_app_path(path: &Path) -> Option<PathBuf> {
         return None;
     }
 
-    // 拒绝把 Codex++ 管理工具安装目录误当成 Codex 桌面应用
+    // 拒绝把 Codex # 管理工具安装目录误当成 Codex 桌面应用
     if is_codex_plus_plus_path(path) {
         return None;
     }
@@ -743,7 +743,7 @@ fn is_desktop_host_directory(path: &Path) -> bool {
     })
 }
 
-/// Codex++ 管理控制台/安装根，绝不能当作 OpenAI Codex 桌面应用。
+/// Codex # 管理控制台/安装根，绝不能当作 OpenAI Codex 桌面应用。
 ///
 /// 目录名只是线索，不能单独作为判据：用户完全可能把真正的 Codex 放在
 /// `C:\codex++` 这类目录下（issue #1036），此时按名字一刀切会连真 Codex 一起拒掉，
@@ -756,7 +756,7 @@ fn is_codex_plus_plus_path(path: &Path) -> bool {
     has_codex_plus_plus_marker(path)
 }
 
-/// 路径中是否存在「像 Codex++ 安装目录」的目录名。
+/// 路径中是否存在「像 Codex # 安装目录」的目录名。
 fn codex_plus_plus_name_path(path: &Path) -> bool {
     for component in path.components() {
         let std::path::Component::Normal(name) = component else {
@@ -789,8 +789,8 @@ fn codex_plus_plus_name_path(path: &Path) -> bool {
         || normalized.ends_with("\\codex++")
 }
 
-/// 目录里是否存在本产品自己铺设的文件。用于确认「这个名字像 Codex++ 的目录」
-/// 确实是 Codex++ 的安装位置，而不是用户恰好这样命名的普通 Codex 目录。
+/// 目录里是否存在本产品自己铺设的文件。用于确认「这个名字像 Codex # 的目录」
+/// 确实是 Codex # 的安装位置，而不是用户恰好这样命名的普通 Codex 目录。
 fn has_codex_plus_plus_marker(path: &Path) -> bool {
     // 沿祖先链向上看：调用方可能传入安装根，也可能传入根里的可执行文件，还可能
     // 传入 .app 包内的 Contents/MacOS/<exe>。安装器把 MANAGER_BINARY /
@@ -1972,7 +1972,7 @@ mod macos_discovery_tests {
         let manager = temp.path().join("Programs").join("Codex++");
         std::fs::create_dir_all(&manager).unwrap();
         std::fs::write(manager.join("codex-plus-plus-manager.exe"), "").unwrap();
-        assert!(describe_codex_app_dir_rejection(&manager).contains("Codex++"));
+        assert!(describe_codex_app_dir_rejection(&manager).contains("Codex #"));
     }
 
     #[test]

@@ -1,4 +1,4 @@
-# Codex++ Computer Use 桥：把 Codex 的 CU 补给 Claude Code
+# Codex # Computer Use 桥：把 Codex 的 CU 补给 Claude Code
 
 - 日期：2026-10-23
 - 依据：[codexapp CU 与 Chrome 移植可行性分析](../reports/2026-10-23-codexapp-cu-and-chrome-porting-analysis.md)
@@ -12,14 +12,14 @@
 > - **关键坑（已修）**：只传 `SKY_CUA_SERVICE_PATH` 不够，缺 `CODEX_CLI_PATH` 会直接报 `-10005 codex app-server exited before returning a response`。CU 的审批链路需要一个 app-server 侧通道，必须把同包的 `codex-cli/CodexCLI.app/Contents/MacOS/codex` 一起传给子进程。
 > - **另一个坑（已修）**：`cua-repl` 会再拉起 `node_repl`，只杀父进程会留下孙进程占着 stdout 管道，自检会永久挂住。现在子进程独立 process group，收尾用 `kill -9 -<pgid>`，并且不 join 读取线程。
 > - **M3（Chrome）已被复用打通**：Codex 的浏览器桥只要求每次 `tools/call` 带 `_meta["x-codex-turn-metadata"]={session_id,turn_id}`，代理自动生成注入后，`cua.listBrowsers()` / `listTabs()` 与 browser 级 `management` capability（`tabs.group` / `tabGroups.update`）均可用——不需要自建 MV3 扩展。代理同时把「优先 element_index、避免坐标点击」这条约定追加进 MCP instructions。
-> - **必须的中间层（2026-10-23 补）**：Claude Code 的 MCP 客户端**不声明 `elicitation`**，直连 `cua-repl` 会在真正接管窗口时抛 `nodeRepl.createElicitation is unavailable`——表现为「能读应用列表，一接管就失败」。现在配置指向 Codex++ 自己的 `--codex-plus-cu-mcp`：它作为 MCP 代理，对 `cua-repl` 声明 elicitation 并就地接受（留痕到 `~/.codex-plus/cu/elicitation.log`），工具面原样透传。自检也改成走这条代理路径，且刻意不声明 elicitation——代理一旦退化，自检立刻失败。
+> - **必须的中间层（2026-10-23 补）**：Claude Code 的 MCP 客户端**不声明 `elicitation`**，直连 `cua-repl` 会在真正接管窗口时抛 `nodeRepl.createElicitation is unavailable`——表现为「能读应用列表，一接管就失败」。现在配置指向 Codex # 自己的 `--codex-plus-cu-mcp`：它作为 MCP 代理，对 `cua-repl` 声明 elicitation 并就地接受（留痕到 `~/.codex-plus/cu/elicitation.log`），工具面原样透传。自检也改成走这条代理路径，且刻意不声明 elicitation——代理一旦退化，自检立刻失败。
 > - **设计修正**：Codex 桌面版自己已经把 `[mcp_servers.computer-use]`（`SkyComputerUseClient.app mcp`）与 `[mcp_servers.node_repl]` 写进 `~/.codex/config.toml`，而 CLI 与桌面会话共用这份文件——也就是说 Codex 侧**本来就有 CU**。因此产品默认只提供 `claudeCode` / `claudeDesktop` 两个接入目标；`codex` 目标保留为高级用法（仅用于没有该条目的环境），不做默认暴露，避免同一个 CU 服务挂两条连接。
 
 ---
 
 ## 1. 目标
 
-在 Codex++ 内建一套 **Computer Use 引擎**，语义对齐 Codex app（AX 树 + element_index + 后台点击 + 虚拟光标），并通过 **MCP stdio** 同时供给：
+在 Codex # 内建一套 **Computer Use 引擎**，语义对齐 Codex app（AX 树 + element_index + 后台点击 + 虚拟光标），并通过 **MCP stdio** 同时供给：
 
 1. **Claude Code CLI**（`~/.claude.json` 用户级 `mcpServers`）
 2. **Claude Desktop**（`claude_desktop_config.json`）
@@ -70,7 +70,7 @@
 3. **健康检查（失败要分类，不能只说"连不上"）**
    MCP 握手 → `js` 里跑 `sky.list_apps()` → 分四类输出：没装 ChatGPT.app / CU 未授权（TCC）/ 服务未就绪 / 版本布局变了。
 4. **elicitation 兜底**
-   Claude Code 支持 elicitation 就直接用它弹审批卡；若某版本不再声明该能力，再在 Codex++ 里加一层 MCP 代理（对外离散 `computer_*` 工具，对内驱动 `cua_repl` 并吞掉 elicitation，用 Codex++ 自己的原生确认框）。
+   Claude Code 支持 elicitation 就直接用它弹审批卡；若某版本不再声明该能力，再在 Codex # 里加一层 MCP 代理（对外离散 `computer_*` 工具，对内驱动 `cua_repl` 并吞掉 elicitation，用 Codex # 自己的原生确认框）。
 
 ### 里程碑修订
 
@@ -84,7 +84,7 @@
 
 **主路径从 6 人周降到 3–5 天**；第 5–9 节的自研引擎方案保留为「不依赖 ChatGPT.app」的可选降级路线（P2）。
 
-## 3. 为什么放在 Codex++ 里最省力（仓库现状）
+## 3. 为什么放在 Codex # 里最省力（仓库现状）
 
 | 已有件 | 位置 | 对本功能的作用 |
 |---|---|---|
@@ -117,9 +117,9 @@ Cursor 等        ─┘                        │
                                                        └── Chrome MV3 扩展（tabs / tabGroups / debugger）
 ```
 
-**关键决策：MVP 不做独立 helper.app**，CU 引擎跑在 Codex++ 主二进制里。理由：
+**关键决策：MVP 不做独立 helper.app**，CU 引擎跑在 Codex # 主二进制里。理由：
 
-1. TCC 身份只有一份（用户给 Codex++ 授权一次；MCP 进程与 GUI 同 bundle、同签名，共享授权）
+1. TCC 身份只有一份（用户给 Codex # 授权一次；MCP 进程与 GUI 同 bundle、同签名，共享授权）
 2. 不引入 XPC / 双进程调试成本
 3. 已有 `--codex-plus-agent-mcp` 证明「同一二进制跑 stdio MCP」可行
 
@@ -272,7 +272,7 @@ UI 流程：`computer_get_state` 首次遇到未授权 app → 返回：
 
 ```json
 {"error":"approval_required","app":{"bundleId":"com.google.Chrome","name":"Google Chrome"},
- "how":"请打开 Codex++ → Computer Use → 批准该应用（或运行 computer_request_access）"}
+ "how":"请打开 Codex # → Computer Use → 批准该应用（或运行 computer_request_access）"}
 ```
 
 配套工具 `computer_request_access {app, tier}` 触发管理器弹原生确认框（复用 Tauri dialog）。

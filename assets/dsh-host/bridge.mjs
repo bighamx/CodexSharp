@@ -1,6 +1,6 @@
-// dsh 插件 → Codex 钩子 / Codex++ 网关中间件 / 拓展命令的转发层。
+// dsh 插件 → Codex 钩子 / Codex # 网关中间件 / 拓展命令的转发层。
 //
-// Codex++ 导入 dsh 插件时，为它生成一个配套拓展包：钩子脚本调用 runHook，网关中间件调用 requestGateway /
+// Codex # 导入 dsh 插件时，为它生成一个配套拓展包：钩子脚本调用 runHook，网关中间件调用 requestGateway /
 // requestError，页面命令经后台调用 runCommand。插件在一个按需启动的常驻进程里加载（`node bridge.mjs daemon <配置>`，
 // 经本地 socket 通信）：插件的内存状态（如按 agent 计数）跨事件保留，同一 Codex 会话拿到同一个 agent
 // 对象；空闲一段时间、插件或配置变了、宿主升级了都会自动退出重启。常驻进程起不来时退回到
@@ -205,7 +205,7 @@ const TRANSLATE = {
     const guarded = host.guardReason(exec)
     if (guarded) return deny(guarded)
     // tools/execute：插件不调 next() 直接给结果就是代为执行——原工具以「拒绝 + 结果」结束，
-    // 结果记成改写，经 Codex++ 代理的下一次请求里整条换成纯结果。插件自己的工具在 MCP 进程里跑这条链，这里跳过；
+    // 结果记成改写，经 Codex # 代理的下一次请求里整条换成纯结果。插件自己的工具在 MCP 进程里跑这条链，这里跳过；
     // 调 next() 的包裹式监听器（超时、重试）包不住 Codex 的工具执行，只能放行原工具。
     if (!String(payload?.tool_name ?? '').startsWith(OWN_MCP_PREFIX) && host.hasListeners('tools/execute')) {
       const passed = Symbol('codexpp.pass')
@@ -251,7 +251,7 @@ const TRANSLATE = {
     const isOriginal = (message) => message === original || message?.id === original.id
     const added = messages.filter((message) => !isOriginal(message))
     if (!messages.some(isOriginal) && agent.session?.id) {
-      // 插件删掉或改写了用户原话：钩子做不到，记下来，经 Codex++ 代理的请求里把这条用户消息换成插件给的消息
+      // 插件删掉或改写了用户原话：钩子做不到，记下来，经 Codex # 代理的请求里把这条用户消息换成插件给的消息
       // （官方直连的请求不经代理，原话照旧）。新增的消息随替换一起进 input，不再重复成补充上下文。
       rememberPromptRewrite(host, agent.session.id, String(payload?.prompt ?? ''), added.map(messageText).map((text) => text.trim()).filter(Boolean))
       return withContext('UserPromptSubmit', {}, sinkContexts(sink))
@@ -789,7 +789,7 @@ function upgradeSocketPath(configPath) {
 }
 
 /**
- * webServer.registerUpgrade 的落点：常驻进程里起一个只听本机 socket 的 Node http 服务，Codex++ 本地代理把
+ * webServer.registerUpgrade 的落点：常驻进程里起一个只听本机 socket 的 Node http 服务，Codex # 本地代理把
  * /ext/<配套拓展>/<路径> 的升级请求原样写进来，'upgrade' 事件按路径（去掉 /ext/<配套拓展> 前缀）交给插件的处理器。
  * 返回给 Rust 的是 socket 路径；路径没有处理器时返回 error。
  */

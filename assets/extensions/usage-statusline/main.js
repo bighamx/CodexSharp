@@ -20,7 +20,7 @@
     });
     ctx.effect(() => {
       // 旧版注入里的内置用量状态栏（拆包前）还在页面里时先停掉它（停了就不会再起），否则输入框下方会有两条。
-      // 已安装的 Codex++ 与本地构建共用配置目录、或 Codex 还没按新版重新注入时会出现这种情况。
+      // 已安装的 Codex # 与本地构建共用配置目录、或 Codex 还没按新版重新注入时会出现这种情况。
       window.__codexPlusUsageStatusLineRuntime?.dispose?.();
       startCodexPlusUsageStatusLine();
       return () => stopCodexPlusUsageStatusLine();

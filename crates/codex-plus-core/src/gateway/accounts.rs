@@ -348,15 +348,15 @@ pub(crate) async fn wait_for_callback_params(
         if params.get("state").map(String::as_str) != Some(state) {
             respond_callback_page(
                 &mut stream,
-                "这个登录页已失效（state 不一致），请在 Codex++ 最新打开的登录页里完成登录。",
+                "这个登录页已失效（state 不一致），请在 Codex # 最新打开的登录页里完成登录。",
             )
             .await;
             continue;
         }
         let result = callback_result(params);
         let page = match &result {
-            Ok(_) => "登录成功，可以回到 Codex++ 了。",
-            Err(_) => "登录没有完成，请回到 Codex++ 重新登录。",
+            Ok(_) => "登录成功，可以回到 Codex # 了。",
+            Err(_) => "登录没有完成，请回到 Codex # 重新登录。",
         };
         respond_callback_page(&mut stream, page).await;
         return result.map_err(|error| anyhow::anyhow!("登录失败：{error}"));
@@ -365,7 +365,7 @@ pub(crate) async fn wait_for_callback_params(
 
 async fn respond_callback_page(stream: &mut tokio::net::TcpStream, page: &str) {
     let body = format!(
-        "<!doctype html><meta charset=\"utf-8\"><title>Codex++</title><body style=\"font-family:system-ui;padding:48px;text-align:center\"><h2>{page}</h2></body>"
+        "<!doctype html><meta charset=\"utf-8\"><title>Codex #</title><body style=\"font-family:system-ui;padding:48px;text-align:center\"><h2>{page}</h2></body>"
     );
     let response = format!(
         "HTTP/1.1 200 OK\r\ncontent-type: text/html; charset=utf-8\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",

@@ -297,7 +297,7 @@ async fn live_publish_and_install_from_github() {
     let manager = manager(root);
     write_package(root, "publish-smoke-test", json!({
         "name": "发布流程测试",
-        "description": "Codex++ 一键发布的实测包，可以删除",
+        "description": "Codex # 一键发布的实测包，可以删除",
         "version": "0.1.0",
         "author": "BigPizzaV3",
         "renderer": "main.js",

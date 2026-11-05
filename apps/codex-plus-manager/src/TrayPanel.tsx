@@ -4,7 +4,7 @@ import "./flow-provider-colors.css";
  * 托盘快捷面板：四个页签——
  * 概览（Codex 状态与启动 / 重启 / 停止、今日速览、常用入口）、
  * 用量（今天 / 7 天的请求与 token、订阅额度、余额）、网关（各 Agent 换模型、最近请求）、
- * 实时（Agent → Codex++ → 供应商的实时请求流，每条真实请求一颗来回的光点）。
+ * 实时（Agent → Codex # → 供应商的实时请求流，每条真实请求一颗来回的光点）。
  * 旧版的直连供应商切换不放进面板：供应商统一在网关里管。
  *
  * 会拉起进程的操作（启动 / 重启 / 停止 Codex）不在面板里重做一遍，而是发给主窗口，
@@ -303,7 +303,7 @@ export function TrayPanel() {
     setPending(next);
     setFlash(null);
     window.setTimeout(() => {
-      if (pendingRef.current?.id === id) finishPending(next, false, t("主窗口没有回应，请打开 Codex++ 查看。"));
+      if (pendingRef.current?.id === id) finishPending(next, false, t("主窗口没有回应，请打开 Codex # 查看。"));
     }, REQUEST_TIMEOUT_MS);
     try {
       await prepareMainWindow();
@@ -342,7 +342,7 @@ export function TrayPanel() {
       <header className="tp-head" data-tauri-drag-region>
         <img alt="" src={APP_LOGO_URL} />
         <div className="tp-head-title" data-tauri-drag-region>
-          <strong>Codex++</strong>
+          <strong>Codex #</strong>
           <span data-tauri-drag-region>
             <i className="tp-dot" data-tone={codexTone(state)} />
             {codexStateText(state)}
@@ -351,7 +351,7 @@ export function TrayPanel() {
         <button aria-label={t("刷新")} className="gw-icon-button" onClick={() => void refreshNow()} title={t("刷新")} type="button">
           <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
         </button>
-        <button aria-label={t("打开 Codex++")} className="gw-icon-button" onClick={() => action("open")} title={t("打开 Codex++")} type="button">
+        <button aria-label={t("打开 Codex #")} className="gw-icon-button" onClick={() => action("open")} title={t("打开 Codex #")} type="button">
           <ExternalLink className="h-4 w-4" />
         </button>
       </header>
@@ -504,7 +504,7 @@ function HomeTab({
     : !active
       ? t("还没有配置供应商")
       : active.kind === "gateway"
-        ? t("经 Codex++ 网关")
+        ? t("经 Codex # 网关")
         : tf("直连 · {0}", [active.name || t("未命名供应商")]);
   return (
     <>
@@ -648,7 +648,7 @@ function UsageTab({
           </div>
         </Section>
       ) : null}
-      {glance && glance.calls === 0 ? <p className="tp-note">{t("只统计经过 Codex++ 的请求（网关或协议转换）。直连时请求不经过 Codex++，这里不会有记录。")}</p> : null}
+      {glance && glance.calls === 0 ? <p className="tp-note">{t("只统计经过 Codex # 的请求（网关或协议转换）。直连时请求不经过 Codex #，这里不会有记录。")}</p> : null}
 
       {quotas.length ? (
         <Section title={t("订阅额度")}>
@@ -744,7 +744,7 @@ function GatewayTab({
         <Waypoints aria-hidden="true" className="tp-intro-icon" />
         <strong>{t("还没用上网关")}</strong>
         <p>{solo
-          ? tf("网关把 {0} 接到 Codex++ 的供应商池：一处管理 Key 和模型，在这里就能随时换模型。", [agentName(solo)])
+          ? tf("网关把 {0} 接到 Codex # 的供应商池：一处管理 Key 和模型，在这里就能随时换模型。", [agentName(solo)])
           : t("网关把 Codex、Claude Code、Grok 接到同一个供应商池：一处管理 Key 和模型，在这里就能随时给每个 Agent 换模型。")}</p>
         <div className="tp-intro-actions">
           <button className="tp-button" data-variant="primary" onClick={() => void onOpenRoute("gatewayProviders")} type="button">{t("添加供应商")}</button>
@@ -806,7 +806,7 @@ function GatewayTab({
 
 /**
  * 实时请求流：上面三个数（进行中、今日请求、今日 token），中间是竖排的小地图——
- * 上排 Agent、中间 Codex++、下排供应商；每条真实请求一颗光点，发出时往下走到供应商，
+ * 上排 Agent、中间 Codex #、下排供应商；每条真实请求一颗光点，发出时往下走到供应商，
  * 回答完再走回来（成功绿、失败红），进行中的连线一直流动。下面是最近的请求。
  */
 function FlowTab({ today, onOpenRoute }: { today: UsageSummary | null; onOpenRoute: (route: TrayRoute) => Promise<void> }) {
@@ -851,7 +851,7 @@ function FlowTab({ today, onOpenRoute }: { today: UsageSummary | null; onOpenRou
             <div className="tp-flow-row">
               <span className="tp-flow-hub" data-live={runningCount > 0} data-node="hub">
                 <img alt="" src={APP_LOGO_URL} />
-                <span>Codex++</span>
+                <span>Codex #</span>
               </span>
             </div>
             <div className="tp-flow-row">
@@ -871,7 +871,7 @@ function FlowTab({ today, onOpenRoute }: { today: UsageSummary | null; onOpenRou
         <div className="tp-card tp-list tp-flow-list">
           {visible.slice(0, FLOW_LIST_LIMIT).map((entry) => <FlowRequestRow entry={entry} key={entry.id} now={now} />)}
           {!loaded ? <div className="tp-empty">{t("读取中…")}</div> : null}
-          {loaded && visible.length === 0 ? <div className="tp-empty">{t("还没有经过 Codex++ 的请求。在接入的 Agent 里发一条消息，这里会实时显示。")}</div> : null}
+          {loaded && visible.length === 0 ? <div className="tp-empty">{t("还没有经过 Codex # 的请求。在接入的 Agent 里发一条消息，这里会实时显示。")}</div> : null}
         </div>
       </Section>
     </>
@@ -908,7 +908,7 @@ function PanelAgentRow({
       type="button"
     >
       <AgentIcon agent={agent.agent} className="gw-popover-agent" />
-      {t("用默认（不经 Codex++）")}
+      {t("用默认（不经 Codex #）")}
       {!agent.enabled && !own ? <Check className="h-3.5 w-3.5" /> : null}
     </button>
   );

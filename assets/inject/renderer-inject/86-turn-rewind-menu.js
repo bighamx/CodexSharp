@@ -200,7 +200,7 @@
   });
 
   function turnRewindAvailability(branch) {
-    if (!codexPlusTurnRewindEnabled()) return { reason: "请先在 Codex++ 设置中开启轮次回退。" };
+    if (!codexPlusTurnRewindEnabled()) return { reason: "请先在 Codex # 设置中开启轮次回退。" };
     const details = {};
     const target = turnRewindContextFromNode(branch, details);
     if (!target) {
@@ -208,7 +208,7 @@
         ? "消息结构超出当前支持的安全识别范围，未执行回退。"
         : details.identityCount !== 1
         ? "无法唯一识别此消息的聊天和轮次，未执行回退。请重新打开此聊天后重试。"
-        : "无法获取此聊天的原生回退接口，未执行回退。请确认通过最新 Codex++ 测试版启动客户端。";
+        : "无法获取此聊天的原生回退接口，未执行回退。请确认通过最新 Codex # 测试版启动客户端。";
       return { reason, details };
     }
     codexPlusTurnRewind.registerManager(target.threadId, target.manager);
@@ -231,7 +231,7 @@
         button.className = `${branch.className || ""} codex-plus-turn-rewind-item`;
         button.setAttribute("data-codex-plus-ext", turnRewindMenuMark);
         button.setAttribute("role", "menuitem");
-        button.textContent = "回退到本轮之前 · Codex++";
+        button.textContent = "回退到本轮之前 · Codex #";
         button.style.cssText = "width:100%;text-align:start;cursor:pointer;";
         button.addEventListener("click", async (event) => {
           event.preventDefault();

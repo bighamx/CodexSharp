@@ -1,9 +1,9 @@
   // 大肥鱼（完整版鲸鱼挂件）由上游原始引擎（whale-engine.js）+ Codex 数据适配层（whale-compat.js）组成。
   // 它是 Agent 桌宠的一种类型：本拓展的 config.kind 为 whaleWidget 时挂载，与 pet.js 的图片桌宠互斥。
   // 数据都经公开路由：`/whale/full`（挂件设置、角色 / 音频图库、余额与用量）、`/whale/history`、`/whale/session`
-  // （本机 Codex 用量统计）、`/whale/media`（内嵌素材）。供应商的 Key 只在 Codex++ 里用，不会交给页面。
+  // （本机 Codex 用量统计）、`/whale/media`（内嵌素材）。供应商的 Key 只在 Codex # 里用，不会交给页面。
 
-  /** 拓展配置里的余额设置，原样转给 Codex++ 的余额查询。 */
+  /** 拓展配置里的余额设置，原样转给 Codex # 的余额查询。 */
   function codexPlusWhaleBalanceFrom(config) {
     const raw = config && typeof config === "object" ? config : {};
     return {
@@ -54,7 +54,7 @@
       notice.setAttribute("data-codex-plus-ext", "whale-widget");
       notice.setAttribute("role", "status");
       notice.style.cssText = "position:fixed;right:20px;bottom:20px;z-index:2147483600;max-width:320px;padding:12px;border-radius:10px;background:#fff5ec;color:#7c3218;font:12px/1.6 system-ui;box-shadow:0 3px 16px #0002";
-      notice.textContent = "鲸鱼挂件暂时无法加载，10 秒后自动重试。可在 Codex++「Agent 桌宠」页关闭后重新开启。";
+      notice.textContent = "鲸鱼挂件暂时无法加载，10 秒后自动重试。可在 Codex #「Agent 桌宠」页关闭后重新开启。";
       document.body.appendChild(notice);
       whale.notice = notice;
     }

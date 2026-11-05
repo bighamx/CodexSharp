@@ -1,4 +1,4 @@
-// Codex++ 的 dsh 插件兼容宿主。
+// Codex # 的 dsh 插件兼容宿主。
 //
 //   node host.mjs inspect <包目录> [选项.json]  分析一个 dsh 插件包，把兼容性报告（JSON）写到 stdout
 //   node host.mjs serve <registry.json>   以 stdio MCP 服务运行注册表里启用的插件，把它们的工具暴露给 Codex
@@ -8,7 +8,7 @@
 // Codex App 没有 dsh 的 agent 循环与会话服务，这里提供插件能用上的那部分 ctx：
 // tools / systemPrompt（片段经网关追加到 instructions，也汇总进 MCP instructions）/ logger / timer / effect / on 等，
 // 以及 services.mjs 里的替身服务（会话镜像、agent 替身、llm、commands、fs、shell……）；
-// 能对上 Codex 钩子 / 网关的事件（见 EVENT_HOOKS、GATEWAY_EVENTS）由 Codex++ 生成的配套拓展包转发；
+// 能对上 Codex 钩子 / 网关的事件（见 EVENT_HOOKS、GATEWAY_EVENTS）由 Codex # 生成的配套拓展包转发；
 // 必需依赖里有别的服务时不加载，并在报告里写明缺了什么。
 
 import { AsyncLocalStorage } from 'node:async_hooks'
@@ -97,7 +97,7 @@ export const EVENT_HOOKS = {
  */
 export const MIRROR_EVENTS = new Set(['session/event', 'session/created', 'agent/status', 'tools/result'])
 export const MIRROR_HOOKS = ['SessionStart', 'UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'Stop', 'PreCompact', 'PostCompact']
-/** 能对上 Codex++ 网关中间件的事件：agent/request 改模型 / 推理强度，agent/request-error 决定重试。 */
+/** 能对上 Codex # 网关中间件的事件：agent/request 改模型 / 推理强度，agent/request-error 决定重试。 */
 export const GATEWAY_EVENTS = {
   'agent/error': 'error',
   'agent/request': 'step',
@@ -167,7 +167,7 @@ for (const level of ['log', 'info', 'debug', 'trace']) {
 export const hostExit = process.exit.bind(process)
 export function guardProcessExit() {
   process.exit = (code) => {
-    throw new Error(`插件调用了 process.exit(${code ?? ''})：Codex++ 不允许插件退出宿主进程`)
+    throw new Error(`插件调用了 process.exit(${code ?? ''})：Codex # 不允许插件退出宿主进程`)
   }
 }
 
@@ -277,7 +277,7 @@ function resolveRowModule(row, root, pkg) {
   const directory = findInstalledPackage(root, packageName)
   if (!directory) {
     if (packageName.startsWith('@deepseek-ai/dsh-')) {
-      return { error: `引用的是 dsh 内置模块 ${packageName}，Codex++ 不提供（多为 Codex 已自带的能力或依赖 dsh 的 agent 循环）`, builtin: true }
+      return { error: `引用的是 dsh 内置模块 ${packageName}，Codex # 不提供（多为 Codex 已自带的能力或依赖 dsh 的 agent 循环）`, builtin: true }
     }
     return { error: `依赖 ${packageName} 没有安装` }
   }
@@ -796,7 +796,7 @@ export class Host {
     const sessions = {
       get: (id) => mirror.sessions.get(String(id)),
       list: () => [...mirror.sessions.values()],
-      /** 新建会话：经 Codex++ 新建一个真实的 Codex 会话，返回它的镜像（dsh 的会话日志格式不在 Codex 里）。 */
+      /** 新建会话：经 Codex # 新建一个真实的 Codex 会话，返回它的镜像（dsh 的会话日志格式不在 Codex 里）。 */
       async create(options = {}) {
         const cwd = typeof options?.cwd === 'string' ? options.cwd : options?.meta?.cwd
         const result = await hostCall('sessions', 'create', { options: cwd ? { cwd } : {} })
@@ -818,7 +818,7 @@ export class Host {
         return true
       },
       registerMessageProjection: () => () => Promise.resolve(),
-      /** Codex++ 扩展：直接读写 Codex 会话（经 Codex 页面里的 app-server 连接）。 */
+      /** Codex # 扩展：直接读写 Codex 会话（经 Codex 页面里的 app-server 连接）。 */
       codex: Object.freeze(Object.fromEntries(
         ['list', 'create', 'fork', 'rename', 'append', 'startTurn', 'steer', 'interrupt', 'compact'].map((method) => [method, (...args) => {
           const [first, second, third] = args
@@ -985,7 +985,7 @@ export class Host {
     return schema && typeof schema.parse === 'function' ? schema.parse(value) : value
   }
 
-  /** 调用请求里的参数：dsh 的 `{ args: { 线上字段: 值 } }`，或 Codex++ 前端没有描述时的 `{ positional: [...] }`。 */
+  /** 调用请求里的参数：dsh 的 `{ args: { 线上字段: 值 } }`，或 Codex # 前端没有描述时的 `{ positional: [...] }`。 */
   async typertArguments(endpoint, descriptor, payload) {
     const parameters = Array.isArray(descriptor.parameters) ? descriptor.parameters : []
     const named = payload && typeof payload === 'object' && payload.args && typeof payload.args === 'object' ? payload.args : undefined
@@ -1581,7 +1581,7 @@ export class Host {
       sessionPersistence: createSessionPersistence(),
       spillStore: createSpillStore(state.dataDir),
       attachments: (host.pluginAttachments ??= new Map()).set(state.key, createAttachments(state.dataDir)).get(state.key),
-      // 网页路由（dsh 的 webServer）：挂到配套拓展包后台的 /ext/<配套拓展>/<路径>，经 Codex++ 本地代理接收。
+      // 网页路由（dsh 的 webServer）：挂到配套拓展包后台的 /ext/<配套拓展>/<路径>，经 Codex # 本地代理接收。
       webServer: {
         register(route) {
           if (!route || typeof route.handler !== 'function') return () => {}
@@ -1600,7 +1600,7 @@ export class Host {
             if (host.webFallback === handler) host.webFallback = undefined
           })
         },
-        // WebSocket 等协议升级：Codex++ 本地代理把 /ext/<配套拓展>/<路径> 的升级请求原样转到常驻进程里的 Node http 服务，
+        // WebSocket 等协议升级：Codex # 本地代理把 /ext/<配套拓展>/<路径> 的升级请求原样转到常驻进程里的 Node http 服务，
         // 处理器拿到真的 IncomingMessage 与 socket（同 dsh 的 node:http upgrade 事件）。
         registerUpgrade(route) {
           if (!route || typeof route.handler !== 'function') return () => {}
@@ -1617,7 +1617,7 @@ export class Host {
         collectIndexInjections: () => [],
         renderIndex: (html) => html,
       },
-      // MCP 资源（dsh 的 mcpResources）：经 Codex++ 托管的 dsh 插件 MCP 的 resources/* 暴露给 Codex。
+      // MCP 资源（dsh 的 mcpResources）：经 Codex # 托管的 dsh 插件 MCP 的 resources/* 暴露给 Codex。
       mcpResources: {
         register(server, provider) {
           if (!provider || typeof provider.request !== 'function') return () => {}
@@ -1777,11 +1777,11 @@ export class Host {
           if (host.tools.has(definition.name)) {
             throw new Error(`tool "${definition.name}" is already registered`)
           }
-          // registerOptions.when：经 Codex++ 代理的每一步请求里按 agent 判断（不满足就从请求的 tools 去掉），MCP 调用时也判断一次。
+          // registerOptions.when：经 Codex # 代理的每一步请求里按 agent 判断（不满足就从请求的 tools 去掉），MCP 调用时也判断一次。
           const when = options && typeof options.when === 'function' ? options.when : undefined
           if (when) {
             mapTo('gateway:step')
-            note('工具的 when 条件在经 Codex++ 代理的请求里按 agent 判断（不满足就不给模型看）；MCP 进程里没有 agent，按无 agent 判断一次，判断出错视为可用')
+            note('工具的 when 条件在经 Codex # 代理的请求里按 agent 判断（不满足就不给模型看）；MCP 进程里没有 agent，按无 agent 判断一次，判断出错视为可用')
           }
           host.tools.set(definition.name, { def: definition, pluginKey: state.key, when })
           state.tools.push(definition.name)
@@ -1980,7 +1980,7 @@ export class Host {
         const list = Array.isArray(names) ? names : Object.keys(names ?? {})
         const missing = list.filter((name) => !host.serviceAvailable(name, state.isolate))
         if (missing.length > 0) {
-          note(`ctx.inject 里的 ${missing.join(', ')} 在 Codex++ 里没有，这一段不会生效`)
+          note(`ctx.inject 里的 ${missing.join(', ')} 在 Codex # 里没有，这一段不会生效`)
           return () => {}
         }
         if (list.some((name) => MIRROR_SERVICES.has(name))) mapTo(MIRROR_TARGET)
@@ -2119,7 +2119,7 @@ export class Host {
         // dsh 的 this.ctx.invocation：正在进行的 typert 调用（不在调用里时为 undefined）。
         if (key === 'invocation') return host.invocations.getStore()
         if (typeof key === 'symbol' || key === 'then' || key === 'toJSON') return undefined
-        note(`访问了 ctx.${String(key)}，Codex++ 不提供这个服务`)
+        note(`访问了 ctx.${String(key)}，Codex # 不提供这个服务`)
         return undefined
       },
     })
@@ -2136,7 +2136,7 @@ export class Host {
     if (!serviceClass && (!normalized || typeof normalized.apply !== 'function')) throw new Error('ctx.plugin 需要带 apply 的插件或 Service 子类')
     const inject = normalizeInject(normalized.inject)
     const missing = inject.required.filter((name) => !this.serviceAvailable(name, parentState.isolate))
-    if (missing.length > 0) throw new Error(`子插件依赖 Codex++ 不提供的服务：${missing.join(', ')}`)
+    if (missing.length > 0) throw new Error(`子插件依赖 Codex # 不提供的服务：${missing.join(', ')}`)
     const resolvedConfig = typeof normalized.Config === 'function' ? normalized.Config(config ?? {}) : config
     const state = { ...parentState, config: resolvedConfig }
     const ctx = this.createContext(state)
@@ -2202,10 +2202,10 @@ export class Host {
       const shimGap = /The requested module '(@deepseek-ai\/[^']+)' does not provide an export named '([^']+)'/.exec(errorText(error))
       if (runtimePackage) {
         record.status = 'incompatible'
-        record.reasons.push(`依赖 dsh 运行时包 ${runtimePackage}，Codex++ 不提供（属于 dsh 的 agent 循环 / 会话 / 模型等运行时）`)
+        record.reasons.push(`依赖 dsh 运行时包 ${runtimePackage}，Codex # 不提供（属于 dsh 的 agent 循环 / 会话 / 模型等运行时）`)
       } else if (shimGap && SHIMS[shimGap[1]]) {
         record.status = 'incompatible'
-        record.reasons.push(`用到 dsh 运行时包 ${shimGap[1]} 的 ${shimGap[2]}，Codex++ 只提供它的少量替身导出`)
+        record.reasons.push(`用到 dsh 运行时包 ${shimGap[1]} 的 ${shimGap[2]}，Codex # 只提供它的少量替身导出`)
       } else {
         record.status = 'error'
         record.reasons.push(`加载失败：${errorText(error)}`)
@@ -2226,7 +2226,7 @@ export class Host {
       // 依赖可能由同一个包里后面的行（Service 子类插件）提供：先跳过，等别的行加载完再试（同 Cordis 等服务就绪再 apply）。
       if (options.defer) return { deferred: missing }
       record.status = 'incompatible'
-      record.reasons.push(`依赖 Codex++ 不提供、包里也没有插件提供的服务：${missing.join(', ')}（属于 dsh 的 agent 循环 / 会话 / 模型等运行时）`)
+      record.reasons.push(`依赖 Codex # 不提供、包里也没有插件提供的服务：${missing.join(', ')}（属于 dsh 的 agent 循环 / 会话 / 模型等运行时）`)
       return record
     }
     const optionalMissing = inject.optional.filter((name) => !this.serviceAvailable(name, row.isolate))
@@ -2240,19 +2240,19 @@ export class Host {
     if ([...inject.required, ...inject.optional].includes('goals')) record.mappings.push('Stop', MIRROR_TARGET)
     const mirrorNotes = {
       sessions: 'ctx.sessions 是 Codex 会话的镜像（由 Codex 钩子事件生成）：没有模型的流式内容与推理，Codex 自己的会话日志请用 sessionQuery',
-      agents: 'ctx.agents 里的 agent 是 Codex 会话的替身：steer / inject 在钩子里翻成补充上下文或要求继续，钩子之外经 Codex++ 往会话里插话',
+      agents: 'ctx.agents 里的 agent 是 Codex 会话的替身：steer / inject 在钩子里翻成补充上下文或要求继续，钩子之外经 Codex # 往会话里插话',
       sessionProjections: 'sessionProjections 在会话镜像上折叠；客户端 useProjection 视图不提供',
-      llm: 'ctx.llm.stream 经 Codex++ 协议代理边收边吐，工具调用与用量在回复结束时给出；registerAdapter 注册的供应商只给宿主进程里的 ctx.llm 用，Codex 自己的请求不经过它',
+      llm: 'ctx.llm.stream 经 Codex # 协议代理边收边吐，工具调用与用量在回复结束时给出；registerAdapter 注册的供应商只给宿主进程里的 ctx.llm 用，Codex 自己的请求不经过它',
       fs: 'ctx.fs 是本机文件系统，不做沙箱与「先读后写」策略',
       shell: 'ctx.shell 用本机 shell 执行，不做沙箱',
-      schedule: 'ctx.schedule 到点经 Codex++ 往 Codex 会话里发起一轮（每分钟检查一次，需要 Codex++ 在运行）',
-      webhookRuntime: 'webhook 规则经 Codex++ 本地代理的 /ext/<配套拓展>/webhook/<kind> 接收，不校验签名',
+      schedule: 'ctx.schedule 到点经 Codex # 往 Codex 会话里发起一轮（每分钟检查一次，需要 Codex # 在运行）',
+      webhookRuntime: 'webhook 规则经 Codex # 本地代理的 /ext/<配套拓展>/webhook/<kind> 接收，不校验签名',
       jobs: 'ctx.jobs 的任务在启动它的进程里跑，别的进程（MCP / 常驻进程）能看到、等待、停止它；任务变化事件只在本进程里发',
       workspaceRegistry: 'ctx.workspaceRegistry 由 Codex 会话的工作目录归出来，只读',
       subprocess: 'ctx.subprocess 不提供 PTY 终端',
       web: 'ctx.web 只有 fetch，没有联网搜索',
       userQuestions: 'ctx.userQuestions 在 Codex 页面里弹框提问（一题一问）',
-      planMode: 'ctx.planMode 开着时，Codex 的写类工具（apply_patch 等）在 PreToolUse 里被拒绝；需要信任 Codex++ 拓展钩子',
+      planMode: 'ctx.planMode 开着时，Codex 的写类工具（apply_patch 等）在 PreToolUse 里被拒绝；需要信任 Codex # 拓展钩子',
       goals: 'ctx.goals 的目标在 Codex 每轮要停下时要求继续推进，连续 8 次后自动暂停',
       subagents: 'ctx.subagents 新建一个 Codex 会话跑子任务并等它结束，不是 Codex 原生的子 agent 树',
     }
@@ -2398,7 +2398,7 @@ export class Host {
       const entry = packageEntry(root, pkg, './client')
       if (entry && existsSync(entry) && statSync(entry).size <= CLIENT_MAX_BYTES) {
         report.clientEntry = entry
-        report.diagnostics.push(`包含 dsh 前端插件（dsh.client）：在 Codex 页面里用 Codex 的 React 运行，dsh 插槽映射到 Codex++ 的界面插槽；对不上的插槽、dsh 专属的前端服务（store、remote、conversation 等）不可用`)
+        report.diagnostics.push(`包含 dsh 前端插件（dsh.client）：在 Codex 页面里用 Codex 的 React 运行，dsh 插槽映射到 Codex # 的界面插槽；对不上的插槽、dsh 专属的前端服务（store、remote、conversation 等）不可用`)
       } else {
         report.diagnostics.push(entry && existsSync(entry)
           ? `dsh 前端插件入口超过 ${CLIENT_MAX_BYTES / 1024 / 1024} MiB，不加载`

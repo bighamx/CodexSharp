@@ -274,7 +274,7 @@ const UPSTREAM_CONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const UPSTREAM_HEADER_TIMEOUT: Duration = Duration::from_secs(30);
 const UPSTREAM_STREAM_HEADER_TIMEOUT: Duration = Duration::from_secs(120);
 const UPSTREAM_IMAGE_HEADER_TIMEOUT: Duration = Duration::from_secs(600);
-/// 压缩请求、以及发给 Codex++ 网关的请求等响应头的上限（#2759）。
+/// 压缩请求、以及发给 Codex # 网关的请求等响应头的上限（#2759）。
 ///
 /// - 原生压缩要整段读完、确认拿到 checkpoint 才回响应头，大上下文压缩常超过两分钟；
 /// - Codex 登录 ChatGPT 时请求先到本地代理、再转给网关：网关这一跳自己也会等上游响应头、
@@ -3529,7 +3529,7 @@ async fn open_responses_proxy_request_with_extensions(
     live_request_id: Option<&str>,
     forced: Option<ForcedRelay>,
 ) -> anyhow::Result<UpstreamProxyResponse> {
-    // 拓展的网关请求中间件：在 Codex++ 自己的转换之前改写原始 Responses 请求，每个请求只跑一次
+    // 拓展的网关请求中间件：在 Codex # 自己的转换之前改写原始 Responses 请求，每个请求只跑一次
     // （失败重试不再重跑）。没有拓展声明时零开销。
     let mut request_json: Value = serde_json::from_str(body)?;
     if let Some(session) = request_json.get("prompt_cache_key").and_then(Value::as_str) {
@@ -3988,7 +3988,7 @@ async fn open_responses_proxy_request_once(
             && !experimental_local_compaction
             && !crate::extension_gateway::builtin_replaced("builtin:exec-adapt")
             && crate::responses_exec::should_adapt_request(&upstream_body, request_path);
-        // 拓展网关中间件的 upstream 段：Codex++ 自己的压缩、路由、协议转换之后，改真正发给这个上游的请求体。
+        // 拓展网关中间件的 upstream 段：Codex # 自己的压缩、路由、协议转换之后，改真正发给这个上游的请求体。
         // 换候选重发时每次都跑（候选不同，请求体也不同）。拒绝时同 request 段，直接回带原因的错误。
         let mut upstream_context = json!({
             "stage": "upstream",
@@ -4002,7 +4002,7 @@ async fn open_responses_proxy_request_once(
             "requestConversion": if crate::extension_gateway::builtin_replaced("builtin:request-conversion") { "extension" } else { "builtin" },
         });
         // 拓展关掉 builtin:auth-headers 时由它自己设鉴权头：这一个候选的 Key 只交给声明了它的拓展的中间件
-        // （见 extension_gateway::apply_middlewares），官方登录成员与转给本机网关的这一跳仍由 Codex++ 认证。
+        // （见 extension_gateway::apply_middlewares），官方登录成员与转给本机网关的这一跳仍由 Codex # 认证。
         if !official_member
             && !via_gateway
             && crate::extension_gateway::builtin_replaced("builtin:auth-headers")
@@ -5563,7 +5563,7 @@ fn response_header_timeout(is_stream: bool) -> Duration {
     }
 }
 
-/// Responses 代理一次上游请求等响应头的上限：压缩请求、发给 Codex++ 网关的请求放宽到
+/// Responses 代理一次上游请求等响应头的上限：压缩请求、发给 Codex # 网关的请求放宽到
 /// [`UPSTREAM_SLOW_HEADER_TIMEOUT`]，其余按是否流式。
 fn responses_request_header_timeout(is_stream: bool, compaction: bool, via_gateway: bool) -> Duration {
     if compaction || via_gateway {
@@ -5879,7 +5879,7 @@ async fn upstream_request_parts(
         );
     }
     // 拓展用 gateway.replaces 关掉 builtin:request-conversion：请求体保持 Responses 形状交给 upstream 段，
-    // 由拓展转成上游协议（端点仍按供应商协议选；响应仍由 Codex++ 按上游协议转回 Responses）。
+    // 由拓展转成上游协议（端点仍按供应商协议选；响应仍由 Codex # 按上游协议转回 Responses）。
     let request_conversion =
         !crate::extension_gateway::builtin_replaced("builtin:request-conversion");
     let mut body = match relay.protocol {
@@ -6072,7 +6072,7 @@ fn build_responses_upstream_request(
         official_credential,
     );
     builder = with_client_session_headers(builder, relay, session_headers);
-    // 转给 Codex++ 自己的本机网关时打上标记：这一层已经跑过拓展的网关中间件，网关那层不再跑一遍。
+    // 转给 Codex # 自己的本机网关时打上标记：这一层已经跑过拓展的网关中间件，网关那层不再跑一遍。
     // 只发往本机回环地址，外部中转站看不到这个头。
     if is_local_protocol_proxy_base_url(endpoint) {
         builder = builder.header(crate::extension_gateway::EXTENSIONS_APPLIED_HEADER, "1");
@@ -6163,7 +6163,7 @@ fn upstream_request_builder(
     builder = match official_credential {
         Some(credential) => with_official_login_auth(builder, relay, credential),
         // 拓展关掉了 builtin:auth-headers：只带供应商自定义头，鉴权头由拓展的 upstream 段给。
-        // 转给 Codex++ 本机网关的这一跳仍带网关令牌，否则网关会拒收。
+        // 转给 Codex # 本机网关的这一跳仍带网关令牌，否则网关会拒收。
         None if !is_local_protocol_proxy_base_url(endpoint)
             && crate::extension_gateway::builtin_replaced("builtin:auth-headers") =>
         {
@@ -7744,7 +7744,7 @@ fn normalize_responses_item_id(item: &mut Value) {
     // 剥掉 id 上现有的前缀再换新的。取**最长**匹配：`fc_` 是 `fco_` 的前缀，
     // 先撞上短的会把 `fco_call_a` 剥成 `call_a` 再换成 `fc_call_a`，
     // 把 function_call_output 错改成 function_call。
-    // `item_` 是历史版本 Codex++ 自己造的前缀；`cp_` 来自压缩项错误使用
+    // `item_` 是历史版本 Codex # 自己造的前缀；`cp_` 来自压缩项错误使用
     // `cp_{response_id}` 的版本；`resp_` 来自历史版本把 message item 命名成
     // `{response_id}_msg`（#1431 / #1781），都要一并剥掉。
     let suffix = ["item_", "cp_", "resp_"]

@@ -179,7 +179,7 @@ fn validate_codex_executable(executable: &str) -> anyhow::Result<()> {
     }
     if crate::app_paths::is_windows_store_cli_path(executable) {
         bail!(
-            "Codex CLI 路径位于系统保护的安装目录内，Codex++ 无法直接运行它：{executable}\n\
+            "Codex CLI 路径位于系统保护的安装目录内，Codex # 无法直接运行它：{executable}\n\
              请清空「Codex CLI 路径」保存（留空时自动查找），\
              或点击「使用桌面版内置 CLI」重新选择。"
         );
@@ -705,7 +705,7 @@ impl CodexAppServer {
             json!({
                 "clientInfo": {
                     "name": "codex-plus-weixin",
-                    "title": "Codex++ Weixin Connect",
+                    "title": "Codex # Weixin Connect",
                     "version": env!("CARGO_PKG_VERSION")
                 },
                 "capabilities": {

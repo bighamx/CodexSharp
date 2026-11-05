@@ -198,7 +198,7 @@ pub struct LaunchOptions {
     pub debug_port: u16,
     pub helper_port: u16,
     pub status_store: StatusStore,
-    /// 本次启动使用的 Codex++ 状态目录（多开实例隔离用）。
+    /// 本次启动使用的 Codex # 状态目录（多开实例隔离用）。
     ///
     /// 多开原先只靠给 worker 换 `HOME`，但 Windows 上 `directories` 走
     /// `SHGetKnownFolderPath`、不读 `HOME`，导致实例会读写主实例的状态文件。
@@ -237,7 +237,7 @@ impl Default for LaunchOptions {
 /// 关键输入也不该走全局可变状态。
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct LaunchInstance {
-    /// Codex++ 状态目录（`settings.json` / `latest-status.json` / 诊断日志）。
+    /// Codex # 状态目录（`settings.json` / `latest-status.json` / 诊断日志）。
     pub state_dir: Option<PathBuf>,
     /// Codex 配置目录（`CODEX_HOME`）。
     pub codex_home: Option<PathBuf>,
@@ -735,7 +735,7 @@ fn describe_helper_bind_failure(
         return error.context(format!(
             "协议代理端口 {helper_port} 被其他进程占用，等待 {} 秒后仍未释放。\
              该端口写在 config.toml 的 base_url 里，不能自动改用其他端口；\
-             请退出仍在运行的 Codex++ 或占用该端口的程序后重试。",
+             请退出仍在运行的 Codex # 或占用该端口的程序后重试。",
             bind_retry_timeout_ms / 1000
         ));
     }
@@ -1102,7 +1102,7 @@ where
             } else {
                 let degraded = launch_status(
                     "running_degraded",
-                    "Codex launched; Codex++ enhancements are still waiting for the page bridge.",
+                    "Codex launched; Codex # enhancements are still waiting for the page bridge.",
                     debug_port,
                     helper_port,
                     &app_dir,
@@ -1124,7 +1124,7 @@ where
             timeline.mark("ready", 100);
             let status = launch_status(
                 "running",
-                "Codex++ launcher ready",
+                "Codex # launcher ready",
                 debug_port,
                 helper_port,
                 &app_dir,
@@ -1251,7 +1251,7 @@ impl LaunchHooks for DefaultLaunchHooks {
             Some(settings.codex_app_path.as_str()),
         )
         .ok_or_else(|| {
-            // issue #2204：原来四种失败原因（不存在 / 是 Codex++ 目录 / 无可执行文件 /
+            // issue #2204：原来四种失败原因（不存在 / 是 Codex # 目录 / 无可执行文件 /
             // 纯自动探测落空）共用一句「Codex App directory not found」，用户看不出
             // 该改什么。这里按来源细分，并保留原句前缀以便既有日志检索与用户既有
             // 报障文本仍能对上。
@@ -1437,7 +1437,7 @@ impl LaunchHooks for DefaultLaunchHooks {
             }
         }
         if cfg!(windows) && !isolated_multi_instance {
-            // issue #2789：Codex++ 以管理员身份运行时，Codex 会被 Chromium 经 explorer 降权
+            // issue #2789：Codex # 以管理员身份运行时，Codex 会被 Chromium 经 explorer 降权
             // 重启而脱离包上下文，这里补上豁免开关（见 `packaged_launch::DO_NOT_DE_ELEVATE_SWITCH`）。
             // 只影响打包版主实例这条分支；未提权时参数原样不变。
             let elevated = crate::windows_integration::current_process_is_elevated();
@@ -2143,7 +2143,7 @@ pub(crate) async fn handle_helper_connection_on(
     if listener == HelperListener::Wsl && !crate::wsl_network::wsl_listener_allows(path) {
         let body = serde_json::to_vec(&serde_json::json!({
             "status": "forbidden",
-            "message": "WSL 网卡上只开放 Codex++ 网关接口。"
+            "message": "WSL 网卡上只开放 Codex # 网关接口。"
         }))?;
         write_http_response(&mut stream, "403 Forbidden", "application/json; charset=utf-8", &body)
             .await?;
@@ -3326,7 +3326,7 @@ async fn handle_protocol_proxy_connection_inner(
             return Ok(());
         }
         let stream_prefix = std::mem::take(&mut upstream.stream_prefix);
-        // 拓展的网关响应流中间件：在 Codex++ 自己的转换之后、写给 Codex 之前改写事件。
+        // 拓展的网关响应流中间件：在 Codex # 自己的转换之后、写给 Codex 之前改写事件。
         let mut sink = ExtensionResponseSink::new(stream, path, request_json.as_ref()).await;
         let response_unmodified = sink.filter.is_none();
         let mut final_usage = None;
@@ -3554,7 +3554,7 @@ async fn handle_dictation_connection(
         let result = if !crate::dictation::valid_helper_token(token.as_deref()) {
             Err(crate::dictation::DictationError {
                 status: 403,
-                message: "语音请求未授权，请从 Codex++ 重新发起".to_string(),
+                message: "语音请求未授权，请从 Codex # 重新发起".to_string(),
             })
         } else {
             let settings = SettingsStore::default().load().unwrap_or_default();
@@ -4491,7 +4491,7 @@ static CONFIGURED_HTTP_BODY_BYTES: std::sync::atomic::AtomicUsize =
 /// 把设置里的请求体上限应用给正在运行的 helper。
 ///
 /// 启动流程在 helper 绑定端口前调用；管理器保存设置后也会调用，这样调大上限
-/// 不必重启 Codex++/Codex 就能让下一次请求生效。超出 32~512 MiB 的值会被夹取。
+/// 不必重启 Codex #/Codex 就能让下一次请求生效。超出 32~512 MiB 的值会被夹取。
 pub fn set_http_body_limit_bytes(bytes: usize) {
     CONFIGURED_HTTP_BODY_BYTES.store(
         normalize_http_body_bytes(bytes),
@@ -4578,7 +4578,7 @@ impl HttpRequestReadError {
         Self {
             status: "413 Payload Too Large",
             message: format!(
-                "HTTP 请求体超过 {limit_mib} MiB（{limit} 字节）上限：请在 Codex++「代理设置」调大「请求体上限」，或设置环境变量 CODEX_PLUS_MAX_HTTP_BODY_BYTES"
+                "HTTP 请求体超过 {limit_mib} MiB（{limit} 字节）上限：请在 Codex #「代理设置」调大「请求体上限」，或设置环境变量 CODEX_PLUS_MAX_HTTP_BODY_BYTES"
             ),
         }
     }
@@ -5442,7 +5442,7 @@ async fn stop_main_instances_blocking_debug_launch(
 /// 主实例的包上下文兜底启动（issue #2700）：AUMID 激活后进程秒退时，改用
 /// `Invoke-CommandInDesktopPackage` wrapper 带同一份参数拉起 exe，并等待调试端口就绪。
 ///
-/// issue #2764：同一份 wrapper 在用户的交互式 PowerShell 里能拉起 Codex，从 Codex++ 里却
+/// issue #2764：同一份 wrapper 在用户的交互式 PowerShell 里能拉起 Codex，从 Codex # 里却
 /// 不行。对照差异做了三处收敛：PowerShell 宿主激活后继续存活到端口可连（不再立刻退出）、
 /// 去掉会经 powershell → cmd 继承给 Codex 的 Electron/Node 运行时开关、按系统路径调用
 /// powershell.exe；并把激活的退出码、输出、命令形状与前后的 Codex 进程写进诊断日志。
@@ -6617,11 +6617,11 @@ pub async fn activate_packaged_app(
 fn packaged_activation_fallback_block_reason(is_elevated: bool) -> Option<&'static str> {
     if is_elevated {
         Some(
-            "Codex 打包应用激活失败，且 Codex++ 当前以管理员（提权）身份运行：\
+            "Codex 打包应用激活失败，且 Codex # 当前以管理员（提权）身份运行：\
              Windows 不允许提权进程激活 MSIX 打包应用，按路径启动的进程会因缺少\
              包身份立即退出。请取消可执行文件「属性 → 兼容性 → 以管理员身份运行\
              此程序」的勾选（或清除 AppCompatFlags\\Layers 中的 RUNASADMIN 标记），\
-             然后以普通权限重新启动 Codex++",
+             然后以普通权限重新启动 Codex #",
         )
     } else {
         None

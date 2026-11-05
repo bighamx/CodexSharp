@@ -1,4 +1,4 @@
-/** 本地网关：让 Claude Code、Grok 经 Codex++ 使用统一的供应商池，支持多 Key 轮换与模型组。 */
+/** 本地网关：让 Claude Code、Grok 经 Codex # 使用统一的供应商池，支持多 Key 轮换与模型组。 */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { invoke } from "@tauri-apps/api/core";
@@ -225,7 +225,7 @@ export function GatewayPage({
         {payload && !payload.helperRunning && payload.agents.some((agent) => agent.enabled) ? (
           <p className="gw-alert" role="alert">
             <AlertTriangle className="h-4 w-4" />
-            <span>{t("本地网关当前没有运行，走网关的 Agent 会连不上。请重新保存一次绑定或重启 Codex++。")}</span>
+            <span>{t("本地网关当前没有运行，走网关的 Agent 会连不上。请重新保存一次绑定或重启 Codex #。")}</span>
           </p>
         ) : null}
         {tab === "agents" ? <AgentsView busy={busy} notify={notify} onManage={() => setTab("providers")} onOpenCodexProviderSettings={onOpenCodexProviderSettings} payload={payload} run={run} /> : null}
@@ -765,8 +765,8 @@ function GatewayView({ payload, busy, run }: { payload: GatewayPayload | null; b
   );
   const keyRotationHint = mode === "roundRobin" ? t("每个请求换下一个 Key，用量更平均，但上游缓存命中会变低。") : t("同一会话固定一个 Key，出错才换；保住上游的提示词缓存。");
   const restoreHint = restoreOnExit
-    ? t("网关只在 Codex++ 运行时可用。退出时把 Agent 切回直连，下次启动再自动指回网关。")
-    : t("Agent 一直指着网关：退出 Codex++ 后连不上，再打开就恢复。安装更新前照样会切回直连。");
+    ? t("网关只在 Codex # 运行时可用。退出时把 Agent 切回直连，下次启动再自动指回网关。")
+    : t("Agent 一直指着网关：退出 Codex # 后连不上，再打开就恢复。安装更新前照样会切回直连。");
   const suffixHint = modelSuffix
     ? t("多家都有的模型，在 Codex 的模型列表和输入框里显示成「GPT-6 Astra（ChatGPT Pro）」，自动组显示「（自动）」。")
     : t("只显示模型名「GPT-6 Astra」，看不出是哪一家；Codex 选择器里仍按供应商分组。");
@@ -828,8 +828,8 @@ function GatewayView({ payload, busy, run }: { payload: GatewayPayload | null; b
               value={mode}
             />
           </CxRow>
-          <CxRow detail={restoreHint} title={t("退出 Codex++ 时恢复直连")} tooltip={restoreHint}>
-            <Switch disabled={busy !== null} label={t("退出 Codex++ 时恢复直连")} on={restoreOnExit} onToggle={() => saveOptions(mode, !restoreOnExit)} />
+          <CxRow detail={restoreHint} title={t("退出 Codex # 时恢复直连")} tooltip={restoreHint}>
+            <Switch disabled={busy !== null} label={t("退出 Codex # 时恢复直连")} on={restoreOnExit} onToggle={() => saveOptions(mode, !restoreOnExit)} />
           </CxRow>
           <CxRow detail={suffixHint} title={t("模型名后带供应商")} tooltip={suffixHint}>
             <Switch

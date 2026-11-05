@@ -1,7 +1,7 @@
 //! 拓展在 Codex 页面之外的两个时机：
 //!
 //! - **页面最早期脚本 `preload`**：经 CDP 的 `Page.addScriptToEvaluateOnNewDocument` 登记，每次 Codex 页面
-//!   新建文档时在 Codex 自己的脚本之前执行（与 Codex++ 的原生模块补丁、强制中文同一时机）。
+//!   新建文档时在 Codex 自己的脚本之前执行（与 Codex # 的原生模块补丁、强制中文同一时机）。
 //!   `reloadOnLaunch: true` 时启动 Codex 后整页重载一次，让脚本赶在第一份文档的 Codex 脚本之前。
 //! - **启动前后 `launch`**：`args` 追加到 Codex 的启动参数；`before` 在启动 Codex 之前、`after` 在 Codex
 //!   退出之后各跑一次（Node，默认导出函数，拿到 `{ event, codexHome, stateDir, appDir, config }`）。
@@ -44,7 +44,7 @@ const LAUNCH_ARG_MAX_LEN: usize = 256;
 /// 启动前后脚本的超时（秒）：挡在 Codex 启动之前，不能太久。
 pub const LAUNCH_MAX_TIMEOUT_SECS: u64 = 30;
 const LAUNCH_DEFAULT_TIMEOUT_SECS: u64 = 10;
-/// 这些参数由 Codex++ 自己管（调试端口、用户数据目录、远程调试来源），拓展不能改。
+/// 这些参数由 Codex # 自己管（调试端口、用户数据目录、远程调试来源），拓展不能改。
 const BLOCKED_ARG_PREFIXES: &[&str] = &[
     "--remote-debugging-port",
     "--remote-debugging-pipe",
@@ -133,7 +133,7 @@ pub fn parse_launch(root: &Path, value: Option<&Value>) -> anyhow::Result<Extens
     Ok(ExtensionLaunch { args, before: script("before")?, after: script("after")?, timeout_secs })
 }
 
-/// 启动参数只能是 `--名字` 或 `--名字=值`，不能带换行，不能改 Codex++ 自己管的参数。
+/// 启动参数只能是 `--名字` 或 `--名字=值`，不能带换行，不能改 Codex # 自己管的参数。
 fn validate_launch_arg(arg: &str) -> anyhow::Result<()> {
     let name = arg.split('=').next().unwrap_or_default();
     let valid_name = name.len() > 2
@@ -143,7 +143,7 @@ fn validate_launch_arg(arg: &str) -> anyhow::Result<()> {
         anyhow::bail!("launch.args 里的 {arg} 不合法：只能是 --名字 或 --名字=值，不超过 {LAUNCH_ARG_MAX_LEN} 个字符");
     }
     if BLOCKED_ARG_PREFIXES.iter().any(|blocked| name.eq_ignore_ascii_case(blocked)) {
-        anyhow::bail!("launch.args 不能设置 {name}：调试端口与用户数据目录由 Codex++ 管理");
+        anyhow::bail!("launch.args 不能设置 {name}：调试端口与用户数据目录由 Codex # 管理");
     }
     Ok(())
 }

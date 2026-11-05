@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // 清理 dist/ 下历史本地构建（dist/local-build-*），避免 Finder / Launchpad 里
-// 堆积一排同名 Codex++ 应用。
+// 堆积一排同名 Codex # 应用。
 //
 // 背景：每个本地构建副本都带独立的 bundle id，`open` 之后都会被 LaunchServices
-// 注册成一个独立应用；构建一次多一个，久了就搜出一大排 Codex++。
+// 注册成一个独立应用；构建一次多一个，久了就搜出一大排 Codex #。
 // 约定（见 AGENTS.md「改完即构建启动」）：本地实例固定为 dist/local-build/Codex++.app，
 // 不要再按任务名/时间戳新建目录。
 //

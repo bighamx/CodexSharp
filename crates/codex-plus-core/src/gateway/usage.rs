@@ -1,7 +1,7 @@
 //! 用量统计：每个请求结束时按「日期 × Agent × 供应商 × 模型」累加，存在 `<状态目录>/gateway-usage.json`。
 //!
 //! 请求日志会被裁剪到 1MB 左右，撑不起 30 天 / 全部的统计，所以单独存按天汇总的数字（不含请求内容）。
-//! 统计覆盖经过 Codex++ 的全部流量：网关里的 Agent 按自己的名字，Codex 自己的请求记为 `codex`。
+//! 统计覆盖经过 Codex # 的全部流量：网关里的 Agent 按自己的名字，Codex 自己的请求记为 `codex`。
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;

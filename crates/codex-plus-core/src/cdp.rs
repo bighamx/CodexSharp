@@ -718,7 +718,7 @@ mod extension_target_tests {
         assert_eq!(
             extension_cdp_kind(&target(
                 "manager",
-                "Codex++ 管理工具",
+                "Codex # 管理工具",
                 "http://127.0.0.1:1420/",
                 Some("ws://127.0.0.1:9229/devtools/page/4"),
             )),

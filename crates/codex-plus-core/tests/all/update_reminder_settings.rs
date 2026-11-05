@@ -1,4 +1,4 @@
-// Codex++ 更新提醒偏好（#1272）：「启动时自动检查更新」默认开，「跳过此版本」默认空；
+// Codex # 更新提醒偏好（#1272）：「启动时自动检查更新」默认开，「跳过此版本」默认空；
 // 两个键都要能整份保存，也要能经 `store.update()` 部分更新（管理器单独写入跳过的版本）。
 use codex_plus_core::settings::{BackendSettings, SettingsStore};
 use serde_json::json;

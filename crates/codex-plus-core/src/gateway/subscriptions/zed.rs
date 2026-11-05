@@ -888,7 +888,7 @@ async fn wait_browser(login: BrowserLogin) -> anyhow::Result<Value> {
                         "200 OK",
                         &[],
                         "text/html; charset=utf-8",
-                        &editor_kit::page("登录没有完成，请回到 Codex++ 重新登录。"),
+                        &editor_kit::page("登录没有完成，请回到 Codex # 重新登录。"),
                     )
                     .await;
                     return Err(error);

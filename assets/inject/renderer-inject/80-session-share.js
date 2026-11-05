@@ -275,7 +275,7 @@
   /**
    * 侧栏重建时过滤已删会话（#2671）。
    *
-   * 根因：本地删除走 Codex++ 后端直接删库/删文件，Codex 自己的会话列表缓存并不知道；
+   * 根因：本地删除走 Codex # 后端直接删库/删文件，Codex 自己的会话列表缓存并不知道；
    * 以前靠 refresh-recent-conversations-for-host 让 Codex 重读列表，新版 Codex 已没有
    * 这个请求，于是折叠再展开项目分组时，Codex 按缓存把这条会话重新渲染出来。
    * 样式表只能按行属性匹配，这里再用与删除按钮同一套 sessionRefFromRow 解析行身份

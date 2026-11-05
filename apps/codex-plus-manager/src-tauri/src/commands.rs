@@ -690,7 +690,7 @@ pub struct LaunchRequest {
 ///
 /// 这个入口故意不复用 `launch_codex_plus`：后者只管理默认 CODEX_HOME，且
 /// launcher/helper 的生命周期是单例。多开实例通过隐藏 worker 进程复用完整的
-/// Codex++ launcher/injection 链，并给每个供应商分配独立的 CODEX_HOME、SQLite、
+/// Codex # launcher/injection 链，并给每个供应商分配独立的 CODEX_HOME、SQLite、
 /// Electron user-data-dir 和 CDP/helper 端口。
 #[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -723,7 +723,7 @@ pub struct CodexMultiWorkerOptions {
     pub app_path: String,
     pub debug_port: u16,
     pub helper_port: u16,
-    /// 实例自己的 Codex++ 状态目录。
+    /// 实例自己的 Codex # 状态目录。
     ///
     /// 多开隔离原先靠给 worker 换 `HOME`，但这只在 Unix 成立：`directories` 在
     /// Windows 上用 `SHGetKnownFolderPath(FOLDERID_Profile)`，完全不读 `HOME`，
@@ -2220,7 +2220,7 @@ fn terminate_multi_worker(
 /// Hidden child process used by Codex multi-launch. Its environment is isolated
 /// before this function is called, so the normal launcher can safely use its
 /// existing default-home/settings/helper/bridge code without touching the main
-/// Codex++ instance.
+/// Codex # instance.
 ///
 /// 就绪校验（issue：多开在 Windows 上静默失败）：
 /// launcher 的 `start` 只保证「激活流程走完」，不代表 Codex 真的起来了。
@@ -2857,7 +2857,7 @@ pub fn launch_in_progress() -> bool {
 /// 临时状态。
 pub fn run_auto_takeover_launch(request: LaunchRequest) -> Result<(), String> {
     if crate::app_is_exiting() {
-        return Err("Codex++ 正在退出，未启动 Codex".to_string());
+        return Err("Codex # 正在退出，未启动 Codex".to_string());
     }
     let launch_options = codex_plus_launcher::LaunchOptions {
         app_dir: (!request.app_path.trim().is_empty())
@@ -3013,7 +3013,7 @@ fn restart_codex_plus_blocking(request: LaunchRequest) -> CommandResult<Value> {
     if let Err(error) = save_requested_launch_status(
         &request,
         "starting",
-        "Codex++ launcher is starting",
+        "Codex # launcher is starting",
         launch_started_at_ms,
     ) {
         return failed(
@@ -3217,9 +3217,9 @@ fn restart_stop_failure_message(error: &RestartStopError) -> String {
 ///
 /// helper 过去只随 `launch_and_inject` 的 Codex 会话启动、Codex 退出即关闭；
 /// 而 live `config.toml` 里写死了本地代理地址，于是终端 `codex`、IDE 插件等
-/// 不经过 Codex++ 启动的客户端会连到一个没人监听的端口。现在只要管理器在跑、
+/// 不经过 Codex # 启动的客户端会连到一个没人监听的端口。现在只要管理器在跑、
 /// 且当前供应商需要本地代理，就把 helper 托管在管理器进程里：Codex 会话退出
-/// 不影响它，只有 Codex++ 退出才停止。Claude 副本开着语音输入时同理常驻，
+/// 不影响它，只有 Codex # 退出才停止。Claude 副本开着语音输入时同理常驻，
 /// 它的转写也走这个 helper。
 ///
 /// 返回实际监听的端口；当前配置不需要本地代理或启动失败时返回 `None`。
@@ -3538,7 +3538,7 @@ fn spawn_codex_plus_launch_with(
     if let Err(error) = save_requested_launch_status(
         &request,
         "starting",
-        "Codex++ launcher is starting",
+        "Codex # launcher is starting",
         launch_started_at_ms,
     ) {
         return failed(
@@ -3675,9 +3675,9 @@ fn start_embedded_launcher_with(
     request: &LaunchRequest,
     replace_blocking_main_instance: bool,
 ) -> anyhow::Result<()> {
-    anyhow::ensure!(!crate::app_is_exiting(), "Codex++ 正在退出，未启动 Codex");
+    anyhow::ensure!(!crate::app_is_exiting(), "Codex # 正在退出，未启动 Codex");
     // 先让常驻 helper 占住协议代理端口：启动链路会识别并复用，Codex 会话退出
-    // 时就不再关闭它，从而实现「Codex++ 在跑，本地代理就一直可用」。
+    // 时就不再关闭它，从而实现「Codex # 在跑，本地代理就一直可用」。
     sync_resident_helper();
     codex_plus_launcher::start(codex_plus_launcher::LaunchOptions {
         app_dir: (!request.app_path.trim().is_empty())
@@ -4078,7 +4078,7 @@ pub fn find_desktop_codex_cli() -> CommandResult<Value> {
                 json!({ "path": path.to_string_lossy() }),
             ),
             None => failed(
-                "未找到可运行的桌面版内置 Codex CLI。请先通过 Codex++ 启动一次 Codex 桌面版后重试，\
+                "未找到可运行的桌面版内置 Codex CLI。请先通过 Codex # 启动一次 Codex 桌面版后重试，\
                  或将「Codex CLI 路径」留空自动查找。",
                 json!({ "path": null }),
             ),
@@ -4419,7 +4419,7 @@ pub fn save_settings(
             // 自动接管是常驻行为，保存后立刻生效，不必重启管理器。
             crate::auto_takeover::apply_enabled(settings.codex_app_auto_takeover);
             // 请求体上限是运行期策略：保存后立刻让正在运行的本地代理按新上限收请求，
-            // 不必重启 Codex++/Codex。等待下一次 helper 启动的路径也会读到同一设置。
+            // 不必重启 Codex #/Codex。等待下一次 helper 启动的路径也会读到同一设置。
             codex_plus_core::launcher::set_http_body_limit_bytes(
                 settings.helper_max_request_body_bytes(),
             );
@@ -5193,7 +5193,7 @@ fn managed_dream_skin_image_backup(
     state_dir: &Path,
 ) -> anyhow::Result<ManagedDreamSkinImageBackup> {
     if !codex_plus_core::dream_skin::is_managed_dream_skin_image(path, state_dir) {
-        anyhow::bail!("Dream Skin image is not managed by Codex++");
+        anyhow::bail!("Dream Skin image is not managed by Codex #");
     }
     Ok(ManagedDreamSkinImageBackup {
         path: path.to_path_buf(),
@@ -5756,7 +5756,7 @@ fn archive_one_local_session(path: &Path, session_id: &str, archived: bool) -> a
 ///
 /// 之前的写法是 normalize 成功才覆盖、失败就原样保留，于是误选的路径会被存进
 /// settings.json。而 launcher 拿到显式 --app-path 且无效时不回退自动探测，
-/// 结果就是启动永久失败、只能手改配置文件才能恢复（#1972：用户误选了 Codex++
+/// 结果就是启动永久失败、只能手改配置文件才能恢复（#1972：用户误选了 Codex #
 /// 自己的 codex-plus-plus.exe，因为文件选择器只按 exe 扩展名过滤）。
 ///
 /// 清空之后 resolve_codex_app_dir_with_saved 会走自动探测，至少还能起来。
@@ -7892,7 +7892,7 @@ pub async fn perform_update(
             app.exit(0);
         });
     } else if restored.load(Ordering::SeqCst) {
-        // 安装器没启动起来，Codex++ 继续运行：重新接回网关。
+        // 安装器没启动起来，Codex # 继续运行：重新接回网关。
         crate::gateway_commands::undo_restore_for_update();
     }
     result
@@ -7933,7 +7933,7 @@ where
     {
         Ok(result) => ok(
             if cfg!(target_os = "macos") {
-                "安装包已验证，Codex++ 将关闭以安装更新，完成后自动重启；失败时保留旧版。"
+                "安装包已验证，Codex # 将关闭以安装更新，完成后自动重启；失败时保留旧版。"
             } else {
                 "安装包已下载并启动，请按安装向导完成更新。"
             },
@@ -7963,7 +7963,7 @@ pub fn load_watcher_state() -> CommandResult<WatcherPayload> {
     ok("开机启动状态已加载。", watcher_payload())
 }
 
-/// 界面上的「开机打开 Codex++」开关：开启 = 注册并启用，关闭 = 注销并禁用。
+/// 界面上的「开机打开 Codex #」开关：开启 = 注册并启用，关闭 = 注销并禁用。
 #[tauri::command]
 pub fn set_watcher_enabled(enabled: bool) -> CommandResult<WatcherPayload> {
     let launcher_path =
@@ -8007,10 +8007,10 @@ pub fn set_watcher_start_codex(start_codex: bool) -> CommandResult<WatcherPayloa
 #[tauri::command]
 pub fn set_watcher_start_codex_on_open(enabled: bool) -> CommandResult<WatcherPayload> {
     match codex_plus_core::watcher::set_watcher_start_codex_on_open(enabled) {
-        Ok(()) if enabled => ok("打开 Codex++ 时将自动启动 Codex。", watcher_payload()),
-        Ok(()) => ok("已取消打开 Codex++ 时自动启动 Codex。", watcher_payload()),
+        Ok(()) if enabled => ok("打开 Codex # 时将自动启动 Codex。", watcher_payload()),
+        Ok(()) => ok("已取消打开 Codex # 时自动启动 Codex。", watcher_payload()),
         Err(error) => failed(
-            &format!("设置打开 Codex++ 时自动启动失败：{error}"),
+            &format!("设置打开 Codex # 时自动启动失败：{error}"),
             watcher_payload(),
         ),
     }
@@ -8524,7 +8524,7 @@ pub fn read_relay_files() -> CommandResult<RelayFilesPayload> {
 pub fn check_env_conflicts() -> CommandResult<EnvConflictsPayload> {
     let codex_home = codex_plus_core::relay_config::default_codex_home_dir();
     let conflicts = codex_plus_core::env_conflicts::detect_env_conflicts_for_home(&codex_home);
-    // Codex++ 不往 SSH 远端写配置；远端 Codex 若沿用本机 127.0.0.1 中转地址会连到服务器自己，
+    // Codex # 不往 SSH 远端写配置；远端 Codex 若沿用本机 127.0.0.1 中转地址会连到服务器自己，
     // 这里只读检测并把 ssh -R 转发做法交给供应商页提示。
     let ssh_remote_loopback =
         codex_plus_core::ssh_remote_loopback::inspect_ssh_remote_loopback_for_home(&codex_home);
@@ -8671,7 +8671,7 @@ pub fn switch_relay_profile(
         &settings.active_relay_id,
     ) {
         return failed(
-            "Codex 正由 Codex++ 网关接管：先在「供应商配置」顶部或「Agent 接入」里点「断开并还原」，再切换供应商。",
+            "Codex 正由 Codex # 网关接管：先在「供应商配置」顶部或「Agent 接入」里点「断开并还原」，再切换供应商。",
             relay_switch_payload(
                 store.load().unwrap_or_default(),
                 codex_plus_core::relay_config::relay_status_from_home(&home),
@@ -8706,14 +8706,14 @@ pub fn switch_relay_profile(
                     "liveBackupPath": outcome.live_backup_path.as_ref()
                 }),
             );
-            // 在 Codex 供应商页切到别的供应商等于断开网关，切回「Codex++ 网关」等于重新接入。
+            // 在 Codex 供应商页切到别的供应商等于断开网关，切回「Codex # 网关」等于重新接入。
             let _ = codex_plus_core::gateway::apply::note_codex_switched(
                 &codex_plus_core::gateway::store::GatewayStore::default(),
                 &result.settings.active_relay_id,
                 &previous_active_relay_id,
             );
             // 新配置已经写进 config.toml：需要本地代理时立即让它常驻，
-            // 这样不经过 Codex++ 启动的客户端也能直接用。
+            // 这样不经过 Codex # 启动的客户端也能直接用。
             sync_resident_helper();
             let imported_name = outcome.imported_profile_id.as_ref().and_then(|id| {
                 result
@@ -12836,7 +12836,7 @@ enabled = true
     }
 
     #[test]
-    /// #1972：用户误把 Codex++ 自己的 exe 选成了「Codex 应用路径」——文件选择器
+    /// #1972：用户误把 Codex # 自己的 exe 选成了「Codex 应用路径」——文件选择器
     /// 只按 exe 扩展名过滤，拦不住。以前无效路径会原样存进 settings.json，而
     /// launcher 拿到显式无效 --app-path 又不回退自动探测，于是启动永久失败，
     /// 只能手改配置文件才能恢复。
@@ -12856,7 +12856,7 @@ enabled = true
         // 清空而不是留着：留着就会被当成显式 --app-path 传下去，永久失败
         assert!(
             normalized.codex_app_path.is_empty(),
-            "指向 Codex++ 自身的路径不该落库，实际是 {}",
+            "指向 Codex # 自身的路径不该落库，实际是 {}",
             normalized.codex_app_path
         );
     }

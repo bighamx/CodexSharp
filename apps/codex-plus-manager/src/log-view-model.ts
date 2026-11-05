@@ -192,7 +192,7 @@ export function diagnosticFacts(report: string): DiagnosticFact[] {
     if (!status && !rest.length) return;
     facts.push({ label, status: status ? diagnosticStatusText(status) : undefined, value: rest.join(" · ") || undefined, tone: statusTone(status) });
   };
-  pushValue("Codex++ 版本", parsed.version);
+  pushValue("Codex # 版本", parsed.version);
   pushStatus("Codex 应用", pick(parsed, ["overview", "codex_app"]), ["path"]);
   pushValue("Codex 版本", pick(parsed, ["overview", "codex_version"]));
   pushStatus("静默启动入口", pick(parsed, ["overview", "silent_shortcut"]), ["path"]);

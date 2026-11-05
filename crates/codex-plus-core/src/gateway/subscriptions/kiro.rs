@@ -566,7 +566,7 @@ async fn wait_browser(http: &reqwest::Client, login: BrowserLogin) -> anyhow::Re
                     "404 Not Found",
                     &[],
                     html,
-                    &editor_kit::page("这个登录页不属于这次登录，请回到 Codex++ 重新开始。"),
+                    &editor_kit::page("这个登录页不属于这次登录，请回到 Codex # 重新开始。"),
                 )
                 .await;
                 continue;
@@ -576,7 +576,7 @@ async fn wait_browser(http: &reqwest::Client, login: BrowserLogin) -> anyhow::Re
                     .get("error_description")
                     .cloned()
                     .unwrap_or_else(|| error.clone());
-                editor_kit::respond(&mut stream, "200 OK", &[], html, &editor_kit::page("登录没有完成，请回到 Codex++ 重新登录。")).await;
+                editor_kit::respond(&mut stream, "200 OK", &[], html, &editor_kit::page("登录没有完成，请回到 Codex # 重新登录。")).await;
                 bail!("登录失败：{detail}");
             }
             let code = params.get("code").cloned().unwrap_or_default();
@@ -599,7 +599,7 @@ async fn wait_browser(http: &reqwest::Client, login: BrowserLogin) -> anyhow::Re
                     }),
                 )
                 .await;
-                let page = if tokens.is_ok() { "登录成功，可以回到 Codex++ 了。" } else { "登录没有完成，请回到 Codex++ 重新登录。" };
+                let page = if tokens.is_ok() { "登录成功，可以回到 Codex # 了。" } else { "登录没有完成，请回到 Codex # 重新登录。" };
                 editor_kit::respond(&mut stream, "200 OK", &[], html, &editor_kit::page(page)).await;
                 let base = json!({
                     "authMethod": "idc",
@@ -632,7 +632,7 @@ async fn wait_browser(http: &reqwest::Client, login: BrowserLogin) -> anyhow::Re
                         }),
                     )
                     .await;
-                    let page = if tokens.is_ok() { "登录成功，可以回到 Codex++ 了。" } else { "登录没有完成，请回到 Codex++ 重新登录。" };
+                    let page = if tokens.is_ok() { "登录成功，可以回到 Codex # 了。" } else { "登录没有完成，请回到 Codex # 重新登录。" };
                     editor_kit::respond(&mut stream, "200 OK", &[], html, &editor_kit::page(page)).await;
                     let base = json!({
                         "authMethod": "social",

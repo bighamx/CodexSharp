@@ -63,7 +63,7 @@ impl StatusStore {
     pub fn save_phase(&self, phase: &str, progress: u8) -> anyhow::Result<()> {
         let mut status = self.load_latest()?.unwrap_or_else(|| LaunchStatus {
             status: "starting".to_string(),
-            message: "Codex++ launcher is starting".to_string(),
+            message: "Codex # launcher is starting".to_string(),
             started_at_ms: current_timestamp_ms(),
             ..LaunchStatus::default()
         });
@@ -131,7 +131,7 @@ mod tests {
             &path,
             r#"{
   "status": "starting",
-  "message": "Codex++ launcher is starting",
+  "message": "Codex # launcher is starting",
   "started_at_ms": 1789783159114,
   "debug_port": 9229,
   "helper_port": 57321,
@@ -155,7 +155,7 @@ mod tests {
         store
             .save_latest(&LaunchStatus {
                 status: "starting".to_string(),
-                message: "Codex++ launcher is starting".to_string(),
+                message: "Codex # launcher is starting".to_string(),
                 started_at_ms: 12345,
                 debug_port: Some(9229),
                 helper_port: Some(57321),

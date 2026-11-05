@@ -138,7 +138,7 @@ pub fn satisfies(version: &str, range: &str) -> anyhow::Result<bool> {
     Ok(any)
 }
 
-/// 当前 Codex++ 的版本号。
+/// 当前 Codex # 的版本号。
 pub fn codexpp_version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }

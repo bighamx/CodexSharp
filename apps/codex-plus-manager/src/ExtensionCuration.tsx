@@ -123,9 +123,9 @@ export function CurationReviewDialog({ repo, onClose, onApproved, onOpenUrl }: {
                 {review.current ? <span>{tf("精选里当前锁定 {0}（{1}）", [review.current.tag ?? review.current.version, review.current.sha.slice(0, 7)])}</span> : null}
               </div>
               {review.canBeOfficial ? (
-                <label className="community-ext-dialog-enable" title={t("只给 Codex++ 自己维护的拓展用；审核通过的第三方拓展显示为「精选」")}>
+                <label className="community-ext-dialog-enable" title={t("只给 Codex # 自己维护的拓展用；审核通过的第三方拓展显示为「精选」")}>
                   <input checked={official} disabled={busy} onChange={(event) => setOfficial(event.currentTarget.checked)} type="checkbox" />
-                  {t("标为官方拓展（Codex++ 自己维护的）")}
+                  {t("标为官方拓展（Codex # 自己维护的）")}
                 </label>
               ) : null}
               <button className="community-ext-repo" onClick={() => onOpenUrl(`https://github.com/${review.repo}/tree/${review.sha}`)} type="button">

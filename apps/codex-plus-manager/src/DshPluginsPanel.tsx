@@ -167,7 +167,7 @@ export function DshPluginsPanel({ search = "" }: { search?: string } = {}) {
   const toolTotal = plugins.filter((plugin) => plugin.enabled).reduce((sum, plugin) => sum + plugin.toolCount, 0);
   const integration = snapshot?.integration;
   const missingNode = snapshot && !snapshot.toolchain.node;
-  const intro = t("导入 dsh（deepseek-harness）插件：工具插件经 Codex++ 托管的 MCP 在 Codex 里调用，skill 导入 Codex Skills，MCP 配置可一键复制导入；系统提示词与工具前后、回合前后的事件经自动生成的配套拓展转成网关 instructions 与 Codex 钩子。依赖 dsh agent 循环、会话或模型服务的插件无法在 Codex 里运行，会逐项说明原因。");
+  const intro = t("导入 dsh（deepseek-harness）插件：工具插件经 Codex # 托管的 MCP 在 Codex 里调用，skill 导入 Codex Skills，MCP 配置可一键复制导入；系统提示词与工具前后、回合前后的事件经自动生成的配套拓展转成网关 instructions 与 Codex 钩子。依赖 dsh agent 循环、会话或模型服务的插件无法在 Codex 里运行，会逐项说明原因。");
 
   return (
     <>
@@ -176,7 +176,7 @@ export function DshPluginsPanel({ search = "" }: { search?: string } = {}) {
         <CxBanner icon={<Plug />} title={t("没有找到 Node 运行时")} tone="warn" detail={t("没有找到 Node 运行时：请安装 Codex App（自带 Node）或 Node.js 后再导入。")} />
       ) : integration && !integration.registered ? (
         <CxBanner
-          detail={integration.status === "conflict" ? integration.message : t("工具插件需要先把 dsh 插件 MCP 接入 Codex（只写入 Codex++ 托管的一条 MCP 配置）。")}
+          detail={integration.status === "conflict" ? integration.message : t("工具插件需要先把 dsh 插件 MCP 接入 Codex（只写入 Codex # 托管的一条 MCP 配置）。")}
           icon={<Plug />}
           title={t("dsh 插件 MCP 未接入 Codex")}
           tone="warn"
@@ -302,7 +302,7 @@ function DshPluginCard({ plugin, busy, onRun }: { plugin: DshPlugin; busy: strin
   const remove = async () => {
     const confirmed = await appConfirm(
       plugin.managed
-        ? tf("移除 {0}？下载的包会移入 Codex++ 的备份目录。", [plugin.name])
+        ? tf("移除 {0}？下载的包会移入 Codex # 的备份目录。", [plugin.name])
         : tf("移除 {0}？只解除登记，不会删除你的本地目录。", [plugin.name]),
       { title: t("移除 dsh 插件"), confirmText: t("移除"), danger: true },
     );
@@ -507,8 +507,8 @@ function CompanionLine({ companion }: { companion: NonNullable<DshPlugin["compan
     <div className="dsh-plugin-companion">
       <span>
         {tf("配套拓展「{0}」：{1}。", [companion.id, parts.join("；")])}
-        {companion.instructions ? t("提示词只对经 Codex++ 本地代理 / 网关发出的请求生效。") : null}
-        {companion.hooks.length ? t("钩子需在 Codex 的 Hooks 设置里信任「Codex++ 拓展钩子」；插件在常驻进程里运行，内存状态跨事件保留。") : null}
+        {companion.instructions ? t("提示词只对经 Codex # 本地代理 / 网关发出的请求生效。") : null}
+        {companion.hooks.length ? t("钩子需在 Codex 的 Hooks 设置里信任「Codex # 拓展钩子」；插件在常驻进程里运行，内存状态跨事件保留。") : null}
       </span>
       {state ? <div className="dsh-plugins-warning">{state}</div> : null}
     </div>

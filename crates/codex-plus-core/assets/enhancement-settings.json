@@ -126,7 +126,7 @@
       "group": "plugins",
       "control": "bool",
       "title": "第三方模型回答完自动折叠过程",
-      "description": "给第三方模型的回复补上「最终回答 / 过程」标记，回答完后像官方模型一样把推理和命令过程收起来。只对经过 Codex++ 本地代理或网关的请求生效；个别上游不接受这个标记时请关闭。",
+      "description": "给第三方模型的回复补上「最终回答 / 过程」标记，回答完后像官方模型一样把推理和命令过程收起来。只对经过 Codex # 本地代理或网关的请求生效；个别上游不接受这个标记时请关闭。",
       "surfaces": ["manager", "codex"]
     },
     {
@@ -218,7 +218,7 @@
       "group": "chat",
       "control": "bool",
       "title": "容量错误自动重试",
-      "description": "模型容量不足（Selected model is at capacity）时自动点「重试」。Codex 原生只会自动重试 4 次且带 10/30/120/300 秒倒计时，之后只剩手动按钮；开启后由 Codex++ 立刻接管，原生倒计时也不等。",
+      "description": "模型容量不足（Selected model is at capacity）时自动点「重试」。Codex 原生只会自动重试 4 次且带 10/30/120/300 秒倒计时，之后只剩手动按钮；开启后由 Codex # 立刻接管，原生倒计时也不等。",
       "surfaces": ["manager", "codex"],
       "codexInputs": [
         {

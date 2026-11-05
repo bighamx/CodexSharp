@@ -900,7 +900,7 @@ pub fn is_linux_codex_desktop_process(
     }
 
     // 1. 过滤 Electron 子进程（如 --type=renderer, --type=gpu-process 等）
-    // 以及 Crashpad 崩溃收集进程、内置 CLI 和 Codex++ 自身
+    // 以及 Crashpad 崩溃收集进程、内置 CLI 和 Codex # 自身
     for token in argv {
         if token.starts_with("--type=") {
             return false;
@@ -1256,7 +1256,7 @@ pub fn install_watcher(launcher_path: &Path, debug_port: u16) -> anyhow::Result<
 #[cfg(target_os = "macos")]
 pub fn install_watcher(launcher_path: &Path, _debug_port: u16) -> anyhow::Result<()> {
     if !launcher_path.is_file() {
-        anyhow::bail!("找不到 Codex++ 可执行文件：{}", launcher_path.display());
+        anyhow::bail!("找不到 Codex # 可执行文件：{}", launcher_path.display());
     }
     let home = directories::BaseDirs::new()
         .map(|dirs| dirs.home_dir().to_path_buf())
@@ -2385,7 +2385,7 @@ pub fn find_macos_codex_processes_without_debug_port() -> Vec<u32> {
     )
 }
 
-/// 外部启动的判据：主进程参数里没有调试端口。Codex++ 拉起的主实例和多开实例
+/// 外部启动的判据：主进程参数里没有调试端口。Codex # 拉起的主实例和多开实例
 /// 都带各自的端口，不会落进这个集合，按它结束不会误杀多开。
 #[cfg(any(target_os = "macos", test))]
 fn macos_codex_process_ids_without_debug_port_with<'a>(
@@ -2569,7 +2569,7 @@ fn create_startup_shortcut(launcher_path: &Path, arguments: &str) -> anyhow::Res
         target: launcher_path.to_path_buf(),
         arguments: arguments.to_string(),
         working_directory: launcher_path.parent().map(Path::to_path_buf),
-        description: "打开 Codex++ 界面".to_string(),
+        description: "打开 Codex # 界面".to_string(),
         icon: None,
         show_minimized: false,
     })

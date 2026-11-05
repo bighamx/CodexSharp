@@ -9,11 +9,11 @@
 //! Codex 的原生 CU 客户端会校验这条链上的责任进程签名（`_senderResponsibleTeamID`
 //! 等字段）。实测（2026-10-24）：
 //!
-//! | 谁拉起 Codex++ | 责任进程 | 结果 |
+//! | 谁拉起 Codex # | 责任进程 | 结果 |
 //! |---|---|---|
 //! | 终端 / Claude.app 里的 shell | Claude.app（正式签名） | ✅ |
-//! | Claude 会话（经 `disclaimer`） | Codex++（本地构建是 ad-hoc，无 Team ID） | ❌ `bootstrapTimedOut` |
-//! | 管理器 GUI 自检 | Codex++ | ❌ `bootstrapTimedOut` |
+//! | Claude 会话（经 `disclaimer`） | Codex #（本地构建是 ad-hoc，无 Team ID） | ❌ `bootstrapTimedOut` |
+//! | 管理器 GUI 自检 | Codex # | ❌ `bootstrapTimedOut` |
 //!
 //! 只要让 OpenAI 签名的 `cua_node/bin/node` 成为**自己的**责任进程，三种情况都能通过。
 //! 这里用的 `responsibility_spawnattrs_setdisclaim` 是 libSystem 导出的符号，

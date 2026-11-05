@@ -347,7 +347,7 @@ async fn queue_times_out_with_a_local_rate_limit_error() {
         .downcast_ref::<LocalRateLimited>()
         .expect("超时返回本地限速错误");
     assert!(
-        limited.message.contains("Codex++ 本地限速"),
+        limited.message.contains("Codex # 本地限速"),
         "{}",
         limited.message
     );

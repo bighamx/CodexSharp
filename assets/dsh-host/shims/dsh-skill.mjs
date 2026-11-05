@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-skill 替身。
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-skill 替身。
 // skill 包把它声明为 peer 依赖，只用到几个常量与纯函数；真正的注册走宿主注入的 ctx.skills，
 // 宿主把注册的 skill 写成 SKILL.md 目录交给 Codex Skills。
 
@@ -29,7 +29,7 @@ export function renderSkillContent(skill) {
 /** dsh 的 skill 注册表在这里只是占位：插件拿到的是宿主注入的 ctx.skills。 */
 export class SkillRegistry {
   constructor() {
-    throw new Error('SkillRegistry is provided by the host as ctx.skills in Codex++')
+    throw new Error('SkillRegistry is provided by the host as ctx.skills in Codex #')
   }
 }
 

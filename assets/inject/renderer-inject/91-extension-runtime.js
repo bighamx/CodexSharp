@@ -37,7 +37,7 @@
   /**
    * 拓展间服务。名字是一个扁平命名空间：ctx.provide(name, value) 提供，声明了 inject 的拓展
    * 在依赖齐全时才应用；提供者卸载或被替换时，依赖方先卸载、回到挂起，提供者回来后自动
-   * 重新应用。内置服务（如 sessionQuery）由 Codex++ 提供，归属为 "builtin"。
+   * 重新应用。内置服务（如 sessionQuery）由 Codex # 提供，归属为 "builtin"。
    */
   const codexPlusServices = new Map();
   let codexPlusServiceSeq = 0;
@@ -99,7 +99,7 @@
     };
   }
 
-  /** 内置的只读会话查询服务：方法名与参数对齐会话查询接口，经桥接转到 Codex++。 */
+  /** 内置的只读会话查询服务：方法名与参数对齐会话查询接口，经桥接转到 Codex #。 */
   function codexPlusSessionQueryService() {
     const invoke = (method, params) => {
       const bridge = window.__codexSessionDeleteBridge;
@@ -260,7 +260,7 @@
     return { type: "message", role, content: [{ type: role === "assistant" ? "output_text" : "input_text", text: String(entry?.text ?? "") }] };
   }
 
-  /** 按方法名调用会话写入；params 形状见 codexPlusSessionsService。也给 Codex++ 进程经 CDP 调（后台、工具）。 */
+  /** 按方法名调用会话写入；params 形状见 codexPlusSessionsService。也给 Codex # 进程经 CDP 调（后台、工具）。 */
   async function codexPlusSessionsCall(name, params = {}) {
     const method = codexPlusSessionMethods[name];
     if (!method) throw new Error(`会话服务没有方法 ${name}`);
@@ -629,7 +629,7 @@
   }
 
   /**
-   * Codex++ 后台经 CDP 发给拓展的公开事件（只认 codexpp/ 前缀），例如会话索引修复结束的
+   * Codex # 后台经 CDP 发给拓展的公开事件（只认 codexpp/ 前缀），例如会话索引修复结束的
    * `codexpp/session-index-repaired`。拓展用 ctx.on 订阅。
    */
   window.__codexPlusEmitHostEvent = (event, payload) => {
@@ -989,9 +989,9 @@
     // 生效配置（清单 config 默认值叠加用户在管理器 / 对话里设置的值）。改配置会热重载拓展，这里是只读快照。
     let config = Object.freeze({ ...(manifest?.config && typeof manifest.config === "object" ? manifest.config : {}) });
     const configHandlers = new Set();
-    // 常驻后台：call 调方法（首次调用时 Codex++ 启动后台进程），on 订阅后台 emit 的事件（长轮询，
+    // 常驻后台：call 调方法（首次调用时 Codex # 启动后台进程），on 订阅后台 emit 的事件（长轮询，
     // 随实例卸载停止；on 本身不启动后台）。走内部桥接路由，不经拓展路由白名单，key 固定为本脚本。
-    // 用过后台的实例卸载时通知 Codex++ 停掉它；带实例标识，热重载时不会误停新实例拉起的后台。
+    // 用过后台的实例卸载时通知 Codex # 停掉它；带实例标识，热重载时不会误停新实例拉起的后台。
     const backendHandlers = new Map();
     const backendInstance = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
     let backendPolling = false;
@@ -1040,7 +1040,7 @@
         backendPolling = false;
       }
     };
-    // 调模型：经 Codex++ 协议代理用当前供应商（不跑拓展网关中间件）。
+    // 调模型：经 Codex # 协议代理用当前供应商（不跑拓展网关中间件）。
     const llm = Object.freeze({
       complete(options) {
         const payload = typeof options === "string" ? { input: options } : options ?? {};
@@ -1296,7 +1296,7 @@
         return track(() => window.clearInterval(timer));
       },
       /**
-       * 跟着 Codex++ 的页面扫描跑：Codex 的界面变了（会话切换、侧栏重建、输入框重建……）时调用 handler，
+       * 跟着 Codex # 的页面扫描跑：Codex 的界面变了（会话切换、侧栏重建、输入框重建……）时调用 handler，
        * 按帧合并、页面隐藏时不跑。phase：deferred（默认，完整扫描）或 light（每次变化都跑的轻量扫描，handler 要便宜）。
        * handler 插进页面的节点必须带 data-codex-plus-ext 属性，否则会触发自喂扫描循环。返回的撤销函数带 run()：立即跑一次。
        */

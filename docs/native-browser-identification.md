@@ -20,14 +20,14 @@ it does not create a separate Chrome opt-in. The persistent identification
 disclosure below applies to either browser.
 
 Saving does not patch a running service or restart an application. The next
-Codex++ launcher takes a settings snapshot and applies compatibility before
+Codex # launcher takes a settings snapshot and applies compatibility before
 launching Codex when a supported runtime already exists. Restarting an old
 launcher is necessary when installing this version; activating an existing
 instance does not start another runtime owner.
 
 **Persistent effect:** native controlled-tab requests can carry an
 `x-browser-agent: ChatGPT/<session-id>` header to destination websites. The native
-extension retains identification enablement. Disabling this Codex++ option or
+extension retains identification enablement. Disabling this Codex # option or
 restoring the service does **not** turn off identification already retained by
 the extension. Site restrictions, enterprise policy, native operation approvals,
 and user-stop handling remain in the original execution path.
@@ -218,14 +218,14 @@ fixed admission list). Restoration recomputes the
 minimal transformation and requires it to equal the recorded candidate; hashes
 alone are insufficient. Both formats remain recoverable without starting Node,
 with a missing descriptor, or after other runtime components have changed.
-Deleted service caches are not recreated. Older Codex++ builds and the standalone
+Deleted service caches are not recreated. Older Codex # builds and the standalone
 browser unlocker v0.1.0 do not understand schema 2: restore with this or a newer
-compatible Codex++ before downgrading or switching recovery tools. Future
+compatible Codex # before downgrading or switching recovery tools. Future
 helper or insertion-format changes must retain or version the schema-2
 reconstruction algorithm so existing journals remain recoverable. Do not delete
 the journal to suppress a conflict.
 
-To disable the adapter, save the option as off and restart Codex++ and Codex.
+To disable the adapter, save the option as off and restart Codex # and Codex.
 The new launcher disables the helper control file and restores known candidates.
 Already-original files keep their modification times; deleted caches are not
 recreated. Backups are retained. If recovery reports a conflict, preserve the

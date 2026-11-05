@@ -233,8 +233,8 @@ pub fn serve() -> anyhow::Result<()> {
 /// - 环境只给原生 server 需要的那几项，不继承调用方的（Claude 的环境里有用户的 Key）。
 /// - 中间不经过 shell：服务端校验**直接父进程**的签名，多插一层就会失效。
 /// - 必须放弃责任归属（disclaim），让 node 成为自己的 responsible process。否则
-///   Codex++ 被 Claude 的 `disclaimer` 或管理器 GUI 拉起时，责任进程是 ad-hoc 签名的
-///   Codex++，原生客户端报 `bootstrapTimedOut`。见 `disclaimed_spawn` 顶部的实测表。
+///   Codex # 被 Claude 的 `disclaimer` 或管理器 GUI 拉起时，责任进程是 ad-hoc 签名的
+///   Codex #，原生客户端报 `bootstrapTimedOut`。见 `disclaimed_spawn` 顶部的实测表。
 fn spawn_child(
     runtime: &RuntimeLocation,
     shim: &std::path::Path,

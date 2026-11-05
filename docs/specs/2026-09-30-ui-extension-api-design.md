@@ -1,7 +1,7 @@
 # UI 能力开放给拓展（用户脚本）——现状梳理与设计方案
 
 日期：2026-09-30
-目标：把 Codex++ 注入的 UI 能力（菜单项、导航入口、会话行按钮、浮层面板 tab、toast、整页视图）暴露给第三方用户脚本调用
+目标：把 Codex # 注入的 UI 能力（菜单项、导航入口、会话行按钮、浮层面板 tab、toast、整页视图）暴露给第三方用户脚本调用
 相关文件：`assets/inject/renderer-inject/`、`assets/inject/floating-panel/`、`crates/codex-plus-core/src/user_scripts.rs`
 状态：设计稿，未实施
 

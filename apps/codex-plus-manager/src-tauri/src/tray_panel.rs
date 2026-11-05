@@ -163,7 +163,7 @@ fn round_corners<R: Runtime>(app: &AppHandle<R>, window: &tauri::WebviewWindow<R
 fn create<R: Runtime>(app: &AppHandle<R>) -> Option<tauri::WebviewWindow<R>> {
     let window =
         WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App("/index.html#tray-panel".into()))
-            .title("Codex++")
+            .title("Codex #")
             .inner_size(WIDTH, HEIGHT)
             .decorations(false)
             .resizable(false)

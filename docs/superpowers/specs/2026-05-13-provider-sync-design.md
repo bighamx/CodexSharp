@@ -2,25 +2,25 @@
 
 ## Goal
 
-Add an optional Codex++ startup sync that keeps existing Codex conversations visible after the user changes `model_provider`.
+Add an optional Codex # startup sync that keeps existing Codex conversations visible after the user changes `model_provider`.
 
 ## User experience
 
-Codex++ settings gains a `Provider 同步` toggle. The toggle is off by default.
+Codex # settings gains a `Provider 同步` toggle. The toggle is off by default.
 
-When the toggle is off, Codex++ launch behavior is unchanged.
+When the toggle is off, Codex # launch behavior is unchanged.
 
-When the toggle is on, Codex++ runs provider sync before launching Codex. The sync targets the current root `model_provider` from `~/.codex/config.toml`; it does not switch providers or edit `config.toml`.
+When the toggle is on, Codex # runs provider sync before launching Codex. The sync targets the current root `model_provider` from `~/.codex/config.toml`; it does not switch providers or edit `config.toml`.
 
-If sync is skipped because another sync is locked, SQLite is busy, or session files are in use, Codex++ writes the reason to `~/.codex-session-delete/launcher.log` and continues launching Codex. If sync starts writing and then cannot safely restore or finish, launch fails and the error is written to the launcher log.
+If sync is skipped because another sync is locked, SQLite is busy, or session files are in use, Codex # writes the reason to `~/.codex-session-delete/launcher.log` and continues launching Codex. If sync starts writing and then cannot safely restore or finish, launch fails and the error is written to the launcher log.
 
 ## Architecture
 
-Implement the feature inside Codex++ as Python code. Do not depend on the external Node.js CLI from `Dailin521/codex-provider-sync`, because Codex++ should not require Node 24 or a separate global package.
+Implement the feature inside Codex # as Python code. Do not depend on the external Node.js CLI from `Dailin521/codex-provider-sync`, because Codex # should not require Node 24 or a separate global package.
 
 Add three focused areas:
 
-- `codex_session_delete/settings_store.py` stores backend-readable Codex++ settings in `~/.codex-session-delete/settings.json`.
+- `codex_session_delete/settings_store.py` stores backend-readable Codex # settings in `~/.codex-session-delete/settings.json`.
 - `codex_session_delete/provider_sync.py` ports the needed provider sync behavior to Python.
 - Existing launcher and bridge code call the sync and expose settings to the injected menu.
 
@@ -34,7 +34,7 @@ Store backend settings at:
 ~/.codex-session-delete/settings.json
 ```
 
-Initial content is implicit; if the file is missing or malformed, Codex++ uses defaults:
+Initial content is implicit; if the file is missing or malformed, Codex # uses defaults:
 
 ```json
 {
@@ -127,9 +127,9 @@ Automated tests should cover:
 
 Manual verification should cover:
 
-1. Turn on `Provider 同步` in the Codex++ menu.
+1. Turn on `Provider 同步` in the Codex # menu.
 2. Close Codex.
 3. Change `model_provider` in `~/.codex/config.toml`.
-4. Launch Codex++.
+4. Launch Codex #.
 5. Confirm older conversations remain visible in Codex Desktop and `/resume`.
 6. Confirm lock-existing behavior still launches Codex and writes a launcher log entry.

@@ -16,7 +16,7 @@
   ```
 
   记下 `PackageFullName` 与 `Application Id`（预期是 `App`），后面要用。
-- 打开 Codex++ 管理工具的「设置 → 日志」，能实时看到 `codex-plus.log`；
+- 打开 Codex # 管理工具的「设置 → 日志」，能实时看到 `codex-plus.log`；
   日志与状态文件在 `%USERPROFILE%\.codex-session-delete\`。
 - 准备好**两个**不同供应商身份（例如 DeepSeek 与 Zhipu GLM），都能单开跑通。
 - 需要抓进程命令行时用：
@@ -40,11 +40,11 @@
 
 | # | 操作 | 预期 |
 |---|---|---|
-| 2.1 | 多开页点供应商 A 的「启动」 | 90 秒内出现第二个 Codex 窗口（标题带 `Codex++ 多开 · <身份>`） |
+| 2.1 | 多开页点供应商 A 的「启动」 | 90 秒内出现第二个 Codex 窗口（标题带 `Codex # 多开 · <身份>`） |
 | 2.2 | 多开列表 | 该实例显示**运行中**，PID / CDP / API 三列有值 |
 | 2.3 | 用上面 `Get-CimInstance` 抓命令行 | 必须能看到 `--remote-debugging-port=<端口>`、`--user-data-dir=<实例目录>`，端口与列表里 CDP 一致 |
 | 2.4 | 看 `%USERPROFILE%\.codex-session-delete\codex-plus.log` | 有 `launcher.packaged_multi_instance_activated`；**不应**出现 `launcher.packaged_multi_instance_fallback`（出现了说明降级了，请把该行连同上下文回我） |
-| 2.5 | 增强是否注入成功 | 多开窗口里能打开 Codex++ 的增强界面（不是裸 Codex） |
+| 2.5 | 增强是否注入成功 | 多开窗口里能打开 Codex # 的增强界面（不是裸 Codex） |
 
 **关键失败表现**：点了没窗口、列表却显示运行中 → 说明激活那条路没走通；
 90 秒后列表变「启动失败」并给出原因 → 把 `launch-result.json` 一起回我。
@@ -87,7 +87,7 @@
 4. `-PreventBreakaway` 的包身份是否真的传到 `start` 出来的孙进程（文档说「所有子进程」，
    但令牌「相似但不同」）。
 5. 用户名含中文/非 ASCII 时，cmd 按 OEM 代码页解析 `.cmd` 是否正确。
-6. **以管理员身份运行 Codex++ 时**：提权上下文激活 MSIX 会失败（issue #2351 的已知限制），
+6. **以管理员身份运行 Codex # 时**：提权上下文激活 MSIX 会失败（issue #2351 的已知限制），
    这时应看到明确的失败提示，而不是静默卡住。
 7. 同一台机器上**从未装过 Store 版**（免安装/自解包形态）时，多开不走包上下文，
    直接按路径启动——若此时 `--user-data-dir` 未被 Electron 尊重导致第二实例只是聚焦第一个窗口，

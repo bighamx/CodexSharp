@@ -3,7 +3,7 @@
 //! - 接入：调规格里的写入函数，把改到的文件落盘；落盘前先存档（每个文件接入前的原文 + 改到的键），
 //!   存档放在 `<状态目录>/backups/agent-<id>-before-gateway.json`，只给本人读写。
 //! - 断开：按存档把网关改过的键改回去，接入期间 Agent 自己写的其它内容保留。
-//! - 漂移：存档还在（Codex++ 认为它接在网关上），但配置文件里已经找不到网关地址。
+//! - 漂移：存档还在（Codex # 认为它接在网关上），但配置文件里已经找不到网关地址。
 
 use std::path::PathBuf;
 
@@ -134,7 +134,7 @@ pub fn forget(ctx: &ApplyContext, spec: &AgentSpec) {
     stash::remove_stash(&stash_path(ctx, spec.id));
 }
 
-/// Codex++ 的记录里它还接在网关上（存档还在）。
+/// Codex # 的记录里它还接在网关上（存档还在）。
 pub fn recorded(ctx: &ApplyContext, spec: &AgentSpec) -> bool {
     stash_path(ctx, spec.id).exists()
 }

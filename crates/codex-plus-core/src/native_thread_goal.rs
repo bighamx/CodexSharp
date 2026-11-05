@@ -55,7 +55,7 @@ impl GoalForwardError {
     fn message(self) -> &'static str {
         match self {
             Self::InvalidRequest => "会话目标请求无效，请重新设置目标",
-            Self::EnhancementsDisabled => "Codex++ 增强已关闭",
+            Self::EnhancementsDisabled => "Codex # 增强已关闭",
             Self::RuntimeReloadRequired => "会话目标组件已更新，请刷新或重新打开此窗口后重试",
             _ => "会话所在窗口暂不可用，请稍后重试设置目标",
         }

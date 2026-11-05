@@ -575,7 +575,7 @@ export function apply(ctx) {
     assert!(skill_md.starts_with("---\nname: \"dsh-badge\"\ndescription: \"Add the badge: use on every PR.\"\n---"));
     assert!(skill_md.contains("Add the badge."));
     assert!(badge_dir.join("badge.png").is_file(), "资源目录的文件一并带上");
-    assert!(dirs.iter().all(|dir| dir.starts_with(plugins.root())), "写在 Codex++ 自己的目录里");
+    assert!(dirs.iter().all(|dir| dir.starts_with(plugins.root())), "写在 Codex # 自己的目录里");
     let (name, description) =
         codex_plus_core::skills::parse_skill_frontmatter(&skill_md, "fallback");
     assert_eq!((name.as_str(), description.as_str()), ("dsh-badge", "Add the badge: use on every PR."));
@@ -659,7 +659,7 @@ fn dsh_skill_files_in_referenced_dependencies_are_scanned_with_limits() {
     }
 }
 
-/// 系统提示词与能对上 Codex 钩子的 dsh 事件：导入后生成配套拓展包，经 Codex++ 的钩子分发与网关中间件
+/// 系统提示词与能对上 Codex 钩子的 dsh 事件：导入后生成配套拓展包，经 Codex # 的钩子分发与网关中间件
 /// 跑通插件的监听器（拦截、补上下文、拒绝输入、要求继续），并随插件启停、配置与移除同步。
 #[tokio::test]
 async fn dsh_events_and_system_prompt_run_through_companion_extension() {
@@ -1023,7 +1023,7 @@ fn dsh_schedule_webhook_and_jobs_services() {
     let stored = std::fs::read_to_string(plugins.root().join("data").join(&record.id).join("schedules.json")).unwrap();
     assert!(stored.contains("看看构建"), "{stored}");
 
-    // 后台：tick 还没到点不触发；webhook 交给规则（没有 Codex++ 宿主时新建会话失败，记成 error）。
+    // 后台：tick 还没到点不触发；webhook 交给规则（没有 Codex # 宿主时新建会话失败，记成 error）。
     let script = format!(
         "const {{ default: create }} = await import({}); const m = create(); const ticked = await m.tick(); const hook = await m.http({{ method: 'POST', path: '/webhook/demo/push', headers: {{}}, body: JSON.stringify({{ action: 'go', ref: 'main' }}) }}); const other = await m.http({{ method: 'POST', path: '/webhook/nope', headers: {{}}, body: '{{}}' }}); process.stdout.write(JSON.stringify({{ ticked, hook, other }})); process.exit(0)",
         json!(url_of(&dir.join("backend/main.mjs")))
@@ -1033,7 +1033,7 @@ fn dsh_schedule_webhook_and_jobs_services() {
     assert_eq!(result["ticked"], json!([]), "{} {}", String::from_utf8_lossy(&output.stdout), String::from_utf8_lossy(&output.stderr));
     assert_eq!(result["hook"]["status"], 202, "{result}");
     assert_eq!(result["hook"]["json"]["started"][0]["rule"], "demo-rule");
-    assert!(result["hook"]["json"]["started"][0]["error"].as_str().unwrap().contains("Codex++"), "{result}");
+    assert!(result["hook"]["json"]["started"][0]["error"].as_str().unwrap().contains("Codex #"), "{result}");
     assert_eq!(result["other"]["status"], 404);
 
     // 规则匹配：daily / weekly / cron 按时区，every 按上次触发时间。
@@ -1510,7 +1510,7 @@ async fn dsh_web_routes_mcp_resources_attachments_and_file_references() {
     assert_eq!(result["reply"], json!({ "status": 201, "headers": { "content-type": "text/plain" }, "body": "hi POST there" }), "{}", String::from_utf8_lossy(&output.stderr));
     assert_eq!(result["missing"], 404);
 
-    // WebSocket 升级：Codex++ 本地代理的 /ext/<配套拓展>/ws 原样转到常驻进程里的 Node http 服务，插件自己的处理器完成握手与收发。
+    // WebSocket 升级：Codex # 本地代理的 /ext/<配套拓展>/ws 原样转到常驻进程里的 Node http 服务，插件自己的处理器完成握手与收发。
     crate::common::with_extension_backend_cleanup(&[&manager], async {
         use futures_util::{FutureExt, SinkExt, StreamExt};
         use std::panic::AssertUnwindSafe;
@@ -1949,7 +1949,7 @@ fn dsh_common_ecosystem_idioms_load_and_run() {
     assert_eq!(probe["throttled"], 1, "throttle 一秒内只跑一次：{probe}");
     assert_eq!(probe["text"], "echo:hi", "registerAdapter 注册的供应商接管 ctx.llm.stream：{probe}");
     assert_eq!(probe["models"], json!(["echo-1"]));
-    assert_eq!(probe["providers"], json!(["Codex（经 Codex++）", "Echo"]));
+    assert_eq!(probe["providers"], json!(["Codex（经 Codex #）", "Echo"]));
     assert_eq!(probe["ids"], json!(["c1", "high"]));
     assert_eq!(probe["never"], "unreachable variant in probe: \"x\"");
     assert_eq!(probe["userAgent"], true);

@@ -193,7 +193,7 @@ pub(crate) fn disconnect_codex(
     )
 }
 
-/// 两段提交：先写 Codex++ 托管上下文，再写 Codex live 配置；live 失败时只回滚本次写入的上下文。
+/// 两段提交：先写 Codex # 托管上下文，再写 Codex live 配置；live 失败时只回滚本次写入的上下文。
 fn commit_managed_change(
     spec: &codex_plus_core::managed_mcp::ManagedMcp,
     settings_store: &SettingsStore,
@@ -203,7 +203,7 @@ fn commit_managed_change(
 ) -> anyhow::Result<()> {
     let settings = settings_store
         .load()
-        .with_context(|| format!("无法读取 Codex++ 托管配置，未{verb}"))?;
+        .with_context(|| format!("无法读取 Codex # 托管配置，未{verb}"))?;
     let before = settings.relay_context_config_contents.clone();
     let updated = transform(&before)?;
     let changed = updated != before;
@@ -305,7 +305,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let executable = dir
             .path()
-            .join("Codex++ \"local\".app")
+            .join("Codex # \"local\".app")
             .join("CodexPlusPlus");
         let state_dir = dir.path().join("collaboration state");
         let config = mcp_configuration(&executable, &state_dir).unwrap();

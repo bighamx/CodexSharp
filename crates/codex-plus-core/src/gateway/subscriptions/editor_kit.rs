@@ -295,7 +295,7 @@ pub(crate) async fn respond(
 /// 回给浏览器的一句话页面。
 pub(crate) fn page(text: &str) -> Vec<u8> {
     format!(
-        "<!doctype html><meta charset=\"utf-8\"><title>Codex++</title><body style=\"font-family:system-ui;padding:48px;text-align:center\"><h2>{text}</h2></body>"
+        "<!doctype html><meta charset=\"utf-8\"><title>Codex #</title><body style=\"font-family:system-ui;padding:48px;text-align:center\"><h2>{text}</h2></body>"
     )
     .into_bytes()
 }

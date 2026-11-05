@@ -136,7 +136,7 @@ fn manager_keeps_a_visible_brand_tray_and_click_menu_when_hiding_the_macos_dock_
     assert!(lib_rs.contains(".icon_as_template(true)"));
     assert!(lib_rs.contains("tauri::include_image!(\"icons/icon.png\")"));
     assert!(lib_rs.contains(".show_menu_on_left_click(true)"));
-    assert!(lib_rs.contains(".tooltip(\"Codex++\")"));
+    assert!(lib_rs.contains(".tooltip(\"Codex #\")"));
 }
 
 // 返回 needle 之前文本最近的 #[cfg(...)] 属性。前提是设置语句与其平台门控
@@ -314,14 +314,14 @@ fn macos_packager_builds_one_visible_native_gui_with_legacy_update_shim() {
     assert!(script.contains("BINARY_DIR=\"${BINARY_DIR:-$ROOT/target/release}\""));
     assert!(script.contains("CodexPlusPlus-${VERSION}-macos-${ARCH}.dmg"));
     assert!(script.contains(
-        "create_app \"Codex++\" \"CodexPlusPlus\" \"$BINARY_DIR/codex-plus-plus\" \"com.bigpizzav3.codexplusplus\" \"false\""
+        "create_app \"Codex #\" \"CodexPlusPlus\" \"$BINARY_DIR/codex-plus-plus\" \"com.bigpizzav3.codexplusplus\" \"false\""
     ));
     assert!(script.contains(
-        "create_app \"Codex++ 管理工具\" \"CodexPlusPlusManager\" \"$BINARY_DIR/codex-plus-legacy-shim\" \"com.bigpizzav3.codexplusplus.manager\" \"true\""
+        "create_app \"Codex # 管理工具\" \"CodexPlusPlusManager\" \"$BINARY_DIR/codex-plus-legacy-shim\" \"com.bigpizzav3.codexplusplus.manager\" \"true\""
     ));
-    assert!(script.contains("printf '%s\\n' \"Codex++ 管理工具.app\" > \"$STAGE/.hidden\""));
+    assert!(script.contains("printf '%s\\n' \"Codex # 管理工具.app\" > \"$STAGE/.hidden\""));
     assert!(script.contains("chflags hidden \"$STAGE/Codex++ 管理工具.app\""));
-    assert!(script.contains("set visible of item \"Codex++ 管理工具.app\" to false"));
+    assert!(script.contains("set visible of item \"Codex # 管理工具.app\" to false"));
     assert!(script.contains("<key>CodexPlusUnifiedApp</key>"));
 }
 

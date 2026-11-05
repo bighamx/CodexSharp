@@ -125,7 +125,7 @@ export default (payload, {{ event }}) => {{
         &[("hooks/step.mjs", &script)],
     );
     let pre = dispatch(&manager, "PreModelRequest", json!({"hook_event_name": "PreModelRequest", "session_id": "s1", "turn_id": "t1", "model": "gpt-x"})).await.unwrap();
-    assert_eq!(pre, json!({}), "Codex 不采用这两个事件的输出，Codex++ 也不回任何字段");
+    assert_eq!(pre, json!({}), "Codex 不采用这两个事件的输出，Codex # 也不回任何字段");
     let skipped = dispatch(&manager, "PreModelRequest", json!({"model": "other"})).await.unwrap();
     assert_eq!(skipped, json!({}));
     dispatch(&manager, "PostModelRequest", json!({"model": "gpt-x", "status": "completed", "token_usage": {"total_tokens": 11}})).await.unwrap();

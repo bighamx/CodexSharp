@@ -1,13 +1,13 @@
-// dsh 插件的替身服务：让依赖 sessions / agents / sessionProjections / llm / fs / shell 等服务的插件也能在 Codex++ 里加载。
+// dsh 插件的替身服务：让依赖 sessions / agents / sessionProjections / llm / fs / shell 等服务的插件也能在 Codex # 里加载。
 //
-// dsh 的 agent 循环、会话存储不在 Codex++ 手里，这里的做法是：
+// dsh 的 agent 循环、会话存储不在 Codex # 手里，这里的做法是：
 //   - 会话镜像（SessionMirror）：钩子常驻进程把 Codex 钩子事件翻成 dsh 的会话日志事件（turn/start、user/message、
 //     tool/call、tool/result、turn/end、compaction/*），追加到每个 Codex 会话的镜像里，再按 dsh 的语义派发
 //     `session/event`、`tools/result`、`agent/status`、`agent/created`；插件自己 append 的领域事件（如 todo/write）
 //     同样进镜像。镜像按会话写到插件数据目录，常驻进程重启后接着用。sessionProjections 在镜像上折叠。
-//   - agents：每个镜像会话一个 agent 替身；steer / inject 在钩子事件里翻成钩子输出，钩子之外经 Codex++ 往
+//   - agents：每个镜像会话一个 agent 替身；steer / inject 在钩子事件里翻成钩子输出，钩子之外经 Codex # 往
 //     Codex 会话里插话（steer）或排到下一次提交（inject）。
-//   - llm / sessionQuery / userQuestions / 读写 Codex 会话：经 host-call.mjs 调 Codex++。
+//   - llm / sessionQuery / userQuestions / 读写 Codex 会话：经 host-call.mjs 调 Codex #。
 //   - fs / subprocess / shell / web / credentials / storageDomain：本机 Node 实现，不做沙箱（与 dsh 本地实现一致）。
 // 做不到的部分（新建 dsh 会话、PTY、沙箱策略、adapter 注册……）调用时抛错并说明原因。
 
@@ -452,13 +452,13 @@ export class AgentRegistry {
         if (wakeup && status === 'idle') agent.followup(message)
         else agent.inject(message)
       },
-      /** 排一个新回合：经 Codex++ 在这个会话里发起一轮。 */
+      /** 排一个新回合：经 Codex # 在这个会话里发起一轮。 */
       followup(message) {
         void hostCall('sessions', 'startTurn', { id: session.id, input: messageText(message) }).catch((error) => {
           console.error(`[dsh-host] agent.followup 转给 Codex 失败：${error?.message ?? error}`)
         })
       },
-      /** 中止正在跑的那一轮：经 Codex++ 中断 Codex 会话里进行中的回合。 */
+      /** 中止正在跑的那一轮：经 Codex # 中断 Codex 会话里进行中的回合。 */
       cancel() {
         void hostCall('sessions', 'interrupt', { id: session.id }).then(() => agent.setStatus('idle'), (error) => {
           console.error(`[dsh-host] agent.cancel 转给 Codex 失败：${error?.message ?? error}`)
@@ -512,7 +512,7 @@ export class AgentRegistry {
       withInitiator: (agent, fn) => fn(),
       withoutInitiator: (fn) => fn(),
       /**
-       * 新建 agent：给了 sessionId 就挂到那个 Codex 会话上；没给就先经 Codex++ 新建一个 Codex 会话。
+       * 新建 agent：给了 sessionId 就挂到那个 Codex 会话上；没给就先经 Codex # 新建一个 Codex 会话。
        * agent 仍是替身——跑模型的是 Codex 自己的循环，替身负责 steer / inject / followup / cancel 与事件。
        */
       async create(options = {}) {
@@ -534,10 +534,10 @@ export class AgentRegistry {
 }
 
 // ---------------------------------------------------------------------------
-// 经 Codex++ 的服务
+// 经 Codex # 的服务
 // ---------------------------------------------------------------------------
 
-/** Codex++ 会话事件 → dsh 会话日志事件（尽量对上 dsh 的类型与 data 形状）。 */
+/** Codex # 会话事件 → dsh 会话日志事件（尽量对上 dsh 的类型与 data 形状）。 */
 export function mapCodexEvents(events) {
   const out = []
   let turn = 0
@@ -690,7 +690,7 @@ export function createSessionQuery(mirror) {
 }
 
 /**
- * ctx.llm：stream 经 Codex++ 协议代理发请求，边收边把文字 / 推理增量翻成 dsh 的流式块（宿主调用通道的行式流）；
+ * ctx.llm：stream 经 Codex # 协议代理发请求，边收边把文字 / 推理增量翻成 dsh 的流式块（宿主调用通道的行式流）；
  * 工具调用与用量在回复结束后给出。插件经 registerAdapter 注册的模型供应商（provider 对得上时）直接用它的 stream。
  */
 export function createLlm() {
@@ -810,7 +810,7 @@ export function createLlm() {
       })()
     },
     listProviders() {
-      return [{ id: 'codex', name: 'Codex（经 Codex++）' }, ...[...adapters.values()].map((adapter) => ({ id: adapter.id, name: adapter.name }))]
+      return [{ id: 'codex', name: 'Codex（经 Codex #）' }, ...[...adapters.values()].map((adapter) => ({ id: adapter.id, name: adapter.name }))]
     },
     async listModels(provider) {
       const adapter = adapterFor(provider)
@@ -828,7 +828,7 @@ export function createLlm() {
     },
     /**
      * 插件注册模型供应商：ctx.llm.stream({ provider }) 对得上时直接用它的 stream（同一个宿主进程里）。
-     * Codex 自己的模型请求不经过它——要给 Codex 加供应商，请在 Codex++ 拓展清单里声明 providers。
+     * Codex 自己的模型请求不经过它——要给 Codex 加供应商，请在 Codex # 拓展清单里声明 providers。
      */
     // dsh 的写法：registerAdapter(providers, adapter)，adapter 是 LlmAdapter 子类（providerInfo / listModels /
     // resolveModel / stream(options)）；返回的撤销函数带 replace(next) 换一组 provider。也认早期的 { id, stream } 单对象写法。
@@ -843,7 +843,7 @@ export function createLlm() {
         if (!list.length) throw new Error('an adapter must register at least one provider')
         for (const provider of list) {
           if (!provider) throw new Error('adapter provider names must be non-empty')
-          if (provider === 'codex') throw new Error('provider codex 由 Codex++ 提供，不能顶替')
+          if (provider === 'codex') throw new Error('provider codex 由 Codex # 提供，不能顶替')
           if (adapters.has(provider) && !owned.has(provider)) throw new Error(`an adapter for provider "${provider}" is already registered`)
         }
         for (const provider of owned) adapters.delete(provider)
@@ -1149,7 +1149,7 @@ export function createSubprocess() {
       return { platform: process.platform === 'win32' ? 'windows' : 'posix', defaultShell: process.env.SHELL }
     },
     async spawnTerminal() {
-      throw new Error('Codex++ 里没有终端（PTY）服务')
+      throw new Error('Codex # 里没有终端（PTY）服务')
     },
   }
 }
@@ -1238,7 +1238,7 @@ export function createWeb() {
       return { url: response.url, statusCode: response.status, body: { kind: type.includes('html') ? 'html' : 'text', content: content.slice(0, limit) }, truncated: content.length > limit }
     },
     async search() {
-      throw new WebError('Codex++ 里没有联网搜索服务', 'WEB_PROVIDER_UNAVAILABLE')
+      throw new WebError('Codex # 里没有联网搜索服务', 'WEB_PROVIDER_UNAVAILABLE')
     },
     registerFetchProvider() {
       return () => {}
@@ -1265,7 +1265,7 @@ export function createCredentials(config, { dataDir, emit = () => {} } = {}) {
     }
   }
   const writeStore = (store) => {
-    if (!path) throw new Error('凭据需要插件数据目录（只在 Codex++ 起的插件进程里可写）')
+    if (!path) throw new Error('凭据需要插件数据目录（只在 Codex # 起的插件进程里可写）')
     mkdirSync(dirname(path), { recursive: true })
     writeFileSync(path, JSON.stringify(store), { mode: 0o600 })
   }
@@ -1495,7 +1495,7 @@ function normalizeSchedule(input, now = Date.now()) {
   }
   if (input?.every_seconds !== undefined) {
     const seconds = Number(input.every_seconds)
-    if (!(seconds >= 60)) throw new ScheduleInputError('every_seconds 至少 60（Codex++ 每分钟检查一次）')
+    if (!(seconds >= 60)) throw new ScheduleInputError('every_seconds 至少 60（Codex # 每分钟检查一次）')
     return { ...base, kind: 'every', everySeconds: seconds }
   }
   if (input?.daily) {
@@ -1627,7 +1627,7 @@ export function createSchedule(dataDir, emit) {
 }
 
 // ---------------------------------------------------------------------------
-// webhookRuntime：外部请求（Codex++ 后台的 /ext/<拓展>/webhook/<kind>）触发新会话
+// webhookRuntime：外部请求（Codex # 后台的 /ext/<拓展>/webhook/<kind>）触发新会话
 // ---------------------------------------------------------------------------
 
 export function createWebhookRuntime() {
@@ -1696,7 +1696,7 @@ function processAlive(pid) {
 }
 
 /**
- * dsh 的 jobs：任务在启动它的进程里跑；`dir`（所有插件、所有 Codex++ 起的 Node 进程共用）里写每个任务的快照，
+ * dsh 的 jobs：任务在启动它的进程里跑；`dir`（所有插件、所有 Codex # 起的 Node 进程共用）里写每个任务的快照，
  * 别的进程（MCP 进程、各包的常驻进程）的 list / get / read / wait 读快照，kill 写一个停止请求文件，由跑任务的进程接手。
  * 不给 dir 时只在当前进程里登记。
  */
@@ -1924,7 +1924,7 @@ export function createWorkspaceRegistry() {
   }
   const ensure = () => (loaded ??= refresh().catch(() => cache))
   const readOnly = (name) => async () => {
-    throw new Error(`workspaceRegistry.${name} 在 Codex++ 里不可用：工作区由 Codex 的会话目录归出来，是只读的`)
+    throw new Error(`workspaceRegistry.${name} 在 Codex # 里不可用：工作区由 Codex 的会话目录归出来，是只读的`)
   }
   void ensure()
   return {
@@ -1980,7 +1980,7 @@ export function createStorage(domain) {
 export function createSpillStore(dataDir) {
   return {
     async saveText(input = {}) {
-      if (!dataDir) throw new Error('spillStore 需要插件数据目录（只在 Codex++ 起的插件进程里可用）')
+      if (!dataDir) throw new Error('spillStore 需要插件数据目录（只在 Codex # 起的插件进程里可用）')
       const owner = String(input.owner?.sessionId ?? 'unknown').replace(/[^\w.-]/g, '_')
       const name = String(input.suggestedName ?? 'output.txt').replace(/[^\w.-]/g, '_').slice(0, 80) || 'output.txt'
       const dir = join(dataDir, 'spill', owner)
@@ -2017,7 +2017,7 @@ export function createShellEnv() {
   }
 }
 
-/** 会话标题（dsh 的 sessionTitle）：改名经 Codex++ 改 Codex 会话的名字；自动生成标题交给 Codex 自己。 */
+/** 会话标题（dsh 的 sessionTitle）：改名经 Codex # 改 Codex 会话的名字；自动生成标题交给 Codex 自己。 */
 export function createSessionTitle() {
   const titles = new Map()
   return {
@@ -2056,14 +2056,14 @@ export function createTokenMeter() {
   }
 }
 
-/** 会话遥测（dsh 的 sessionTelemetry）：Codex++ 不上报，记录直接丢弃。 */
+/** 会话遥测（dsh 的 sessionTelemetry）：Codex # 不上报，记录直接丢弃。 */
 export function createSessionTelemetry() {
   return { sharing: 'disabled', emit() {}, flush() {}, async shutdown() {} }
 }
 
 
 // ---------------------------------------------------------------------------
-// 近似实现的运行时服务：planMode、goals、subagents（Codex 的 agent 循环不在 Codex++ 手里，按钩子与会话写入近似）
+// 近似实现的运行时服务：planMode、goals、subagents（Codex 的 agent 循环不在 Codex # 手里，按钩子与会话写入近似）
 // ---------------------------------------------------------------------------
 
 /** 计划模式下 Codex 里拒绝的写类工具。 */
@@ -2151,7 +2151,7 @@ export function createGoals({ maxRounds = 8, emit = () => {} } = {}) {
 }
 
 /**
- * 子 agent（dsh 的 subagents）：在 Codex++ 里新建一个 Codex 会话跑子任务，等它这一轮结束再取最后一条回复。
+ * 子 agent（dsh 的 subagents）：在 Codex # 里新建一个 Codex 会话跑子任务，等它这一轮结束再取最后一条回复。
  * 不是 Codex 原生的子 agent 树；provider 只有 codex，不能注册别的 provider。
  */
 export function createSubagents({ emit = () => {}, pollMs = 1500, timeoutMs = 15 * 60 * 1000 } = {}) {
@@ -2175,7 +2175,7 @@ export function createSubagents({ emit = () => {}, pollMs = 1500, timeoutMs = 15
     list: () => ['codex'],
     getProvider: (name) => (name === 'codex' ? { name: 'codex' } : undefined),
     registerProvider() {
-      throw new Error('Codex++ 里子 agent 只能跑在 Codex 会话上，不能注册别的 provider')
+      throw new Error('Codex # 里子 agent 只能跑在 Codex 会话上，不能注册别的 provider')
     },
     resolveMaxDepth: () => 1,
     async start(name, request = {}) {
@@ -2238,7 +2238,7 @@ const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024
 export function createAttachments(dataDir) {
   const root = dataDir ? join(dataDir, 'attachments') : undefined
   const pathOf = (id) => {
-    if (!root) throw new AttachmentError('附件需要插件数据目录（只在 Codex++ 起的插件进程里可用）', 'NO_STORE')
+    if (!root) throw new AttachmentError('附件需要插件数据目录（只在 Codex # 起的插件进程里可用）', 'NO_STORE')
     if (!/^[\w-]+$/.test(String(id))) throw new AttachmentError(`附件 id 不合法：${id}`, 'INVALID_ID')
     return join(root, String(id))
   }

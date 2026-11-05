@@ -37,7 +37,7 @@
 查询驱动扫描，每十秒最多刷新一次；空闲计时器只释放内存，不扫描会话。
 `scan.processing=true` 时可能仍返回上一快照，应等待本轮刷新完成。
 
-派生证据与计数冲突保护保存在 Codex++ 设置目录的
+派生证据与计数冲突保护保存在 Codex # 设置目录的
 `usage-history/<home-id>/usage-provider-cache.sqlite`，不同 Codex home 分开。
 原生 SQLite 日志尊重显式的 `CODEX_SQLITE_HOME`，不能退回另一实例目录。
 缓存不可用时保守报告完整性，不能把缺失事件解释为零消费。

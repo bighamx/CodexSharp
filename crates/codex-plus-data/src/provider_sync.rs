@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const DEFAULT_PROVIDER: &str = "openai";
-/// Codex++ 受管会话连接使用的内部别名供应商（渲染层 managed session connection
+/// Codex # 受管会话连接使用的内部别名供应商（渲染层 managed session connection
 /// 只在单个会话的连接覆盖里临时声明它）。历史会话的 session_meta 会记下这个名字，
 /// 但它不是用户的供应商，不能作为把历史会话迁移过去的「同步目标」（#2791）。
 const MANAGED_SESSION_PROVIDER_ALIAS: &str = "codex_plus_managed";
@@ -301,7 +301,7 @@ pub fn recover_provider_sync_from_backup(
         anyhow::bail!("recovery backup is outside managed backup root");
     }
     let metadata: Value = serde_json::from_slice(&fs::read(backup.join("metadata.json"))?)?;
-    if metadata["managedBy"] != "Codex++ provider sync" || metadata["namespace"] != "provider-sync"
+    if metadata["managedBy"] != "Codex # provider sync" || metadata["namespace"] != "provider-sync"
     {
         anyhow::bail!("unmanaged provider sync backup");
     }
@@ -2022,7 +2022,7 @@ fn resolve_provider_sync_target_snapshot(
         }
         if is_provider_sync_internal_alias(trimmed) {
             return Err(format!(
-                "Provider sync target {trimmed:?} is an internal Codex++ session alias"
+                "Provider sync target {trimmed:?} is an internal Codex # session alias"
             ));
         }
     }
@@ -2076,7 +2076,7 @@ fn revalidate_provider_sync_target_snapshot(
     Ok(())
 }
 
-/// 是否为 Codex++ 内部会话别名供应商；这类 id 不进入同步目标列表，也不能被显式选为目标。
+/// 是否为 Codex # 内部会话别名供应商；这类 id 不进入同步目标列表，也不能被显式选为目标。
 pub fn is_provider_sync_internal_alias(value: &str) -> bool {
     value.trim() == MANAGED_SESSION_PROVIDER_ALIAS
 }
@@ -4374,7 +4374,7 @@ fn create_backup_with_session_meta_lines<'a>(
             "dbFiles": db_files,
             "dbSources": db_sources,
             "changedSessionFiles": changed_session_files,
-            "managedBy": "Codex++ provider sync"
+            "managedBy": "Codex # provider sync"
         }))?
         .as_bytes(),
     )?;
@@ -4871,7 +4871,7 @@ fn create_session_index_cleanup_backup(
         "createdAt": chrono::Utc::now().to_rfc3339(),
         "snapshotSha256": plan.snapshot_sha256,
         "prunedSessionIndexEntries": removed_entries,
-        "managedBy": "Codex++ provider sync"
+        "managedBy": "Codex # provider sync"
     }))
     .map_err(|error| cleanup_apply_error(error, Some(backup_dir.clone())))?;
     fs::write(backup_dir.join("metadata.json"), metadata)
@@ -6578,7 +6578,7 @@ pub fn pending_recovery_journal(home: &Path) -> Option<PathBuf> {
             Some(metadata) => metadata,
             None => return Some(journal),
         };
-        if metadata.get("managedBy").and_then(Value::as_str) != Some("Codex++ provider sync") {
+        if metadata.get("managedBy").and_then(Value::as_str) != Some("Codex # provider sync") {
             return Some(journal);
         }
         let finished = fs::read(&journal)
@@ -6615,7 +6615,7 @@ fn prune_backups(home: &Path) -> anyhow::Result<()> {
         let Ok(value) = serde_json::from_str::<Value>(&text) else {
             continue;
         };
-        if value.get("managedBy").and_then(Value::as_str) == Some("Codex++ provider sync") {
+        if value.get("managedBy").and_then(Value::as_str) == Some("Codex # provider sync") {
             let journal = path.join("recovery-journal.json");
             if journal.exists() {
                 let completed = fs::read(&journal)
@@ -6676,7 +6676,7 @@ mod safe_database_backup_tests {
         assert_eq!(pending_recovery_journal(&home), Some(journal.clone()));
         fs::write(
             backup.join("metadata.json"),
-            br#"{"managedBy":"Codex++ provider sync"}"#,
+            br#"{"managedBy":"Codex # provider sync"}"#,
         )
         .unwrap();
         fs::write(&journal, b"broken journal").unwrap();

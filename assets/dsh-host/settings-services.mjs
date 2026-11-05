@@ -1,8 +1,8 @@
-// Codex++ 兼容宿主的 settings / loader / sessionPersistence 替身。
+// Codex # 兼容宿主的 settings / loader / sessionPersistence 替身。
 // settings：按命名空间（默认是插件自己那一行的 id）存一份 { value, revision }，初始值取该行的配置，
 //   改动经 mutate / update 原子写到插件数据目录的 settings/ 下；管理器里改配置不会同步回来。
 // loader：只告诉插件宿主里有哪些行。
-// sessionPersistence：Codex 的会话日志不在 Codex++ 手里，findLog 一律说没有，插件就不会去删 Codex 的目录。
+// sessionPersistence：Codex 的会话日志不在 Codex # 手里，findLog 一律说没有，插件就不会去删 Codex 的目录。
 
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

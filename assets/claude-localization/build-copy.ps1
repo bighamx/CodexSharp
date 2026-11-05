@@ -26,12 +26,12 @@ function Find-Ion([string]$root) {
   foreach ($candidate in @((Join-Path $root 'resources\ion-dist'), (Join-Path $root 'ion-dist'))) {
     if (Test-Path (Join-Path $candidate 'index.html')) { return $candidate }
   }
-  # 新版 Claude 把本地界面打包成 ion-dist.asar（#2884）：词表注入与校验由 Codex++ 完成。
+  # 新版 Claude 把本地界面打包成 ion-dist.asar（#2884）：词表注入与校验由 Codex # 完成。
   if (Test-Path -LiteralPath (Join-Path $root 'resources\ion-dist.asar') -PathType Leaf) { return $null }
   throw "找不到 Claude 本地界面 ion-dist"
 }
 
-# Electron fuse（含 EnableNodeCliInspectArguments）由 Codex++ 在复制完成后改写并复核，
+# Electron fuse（含 EnableNodeCliInspectArguments）由 Codex # 在复制完成后改写并复核，
 # 逐字节扫描上百 MB 的 exe 在 PowerShell 里太慢；官方安装目录始终只读不改。
 
 function Copy-Catalogs([string]$ion) {
@@ -74,9 +74,9 @@ if (Test-Path $copyRoot) { throw '构建目标必须是新的暂存目录' }
 New-Item -ItemType Directory -Force (Split-Path $copyRoot -Parent) | Out-Null
 $null = & robocopy.exe $sourceRoot $copyRoot /E /R:1 /W:1 /NFL /NDL /NJH /NJS /NP
 if ($LASTEXITCODE -gt 7) {
-  $hint = $(if ($sourceRoot -match '\\WindowsApps\\') { '；商店版（MSIX）Claude 位于受保护的 WindowsApps 目录，请用安装 Claude 的同一账户运行 Codex++，不要以管理员或其他用户身份运行' } else { '' })
+  $hint = $(if ($sourceRoot -match '\\WindowsApps\\') { '；商店版（MSIX）Claude 位于受保护的 WindowsApps 目录，请用安装 Claude 的同一账户运行 Codex #，不要以管理员或其他用户身份运行' } else { '' })
   throw "复制 Windows Claude 副本失败（robocopy 退出码：$LASTEXITCODE），可能没有读取 $sourceRoot 的权限或磁盘空间不足$hint"
 }
 $ion = Find-Ion $copyRoot
-if ($ion) { Copy-Catalogs $ion } else { Write-Output 'ion-dist.asar 由 Codex++ 处理' }
+if ($ion) { Copy-Catalogs $ion } else { Write-Output 'ion-dist.asar 由 Codex # 处理' }
 Write-Output 'Windows Claude 副本已创建，官方 app.asar 未修改'

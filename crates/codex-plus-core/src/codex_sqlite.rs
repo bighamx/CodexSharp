@@ -363,7 +363,7 @@ pub fn backfill_thread_models_to_default(
     Ok(updated)
 }
 
-/// 待迁移记录放在 codex home 下，与受管 catalog 同级；只由 Codex++ 读写。
+/// 待迁移记录放在 codex home 下，与受管 catalog 同级；只由 Codex # 读写。
 const PENDING_THREAD_MODEL_MIGRATION_FILE: &str = "codex-plus-pending-thread-model-migration.json";
 
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]

@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-token-meter/estimate 替身。
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-token-meter/estimate 替身。
 // 与 dsh 的固定密度估算一致（每 4 个字符 1 个 token，每块 4 个结构开销、每条消息 4 个角色开销），纯函数，
 // 插件用它给消息 / 内容块粗估 token 数；宿主的 ctx.tokenMeter 也按字数粗估。
 

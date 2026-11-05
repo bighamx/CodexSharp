@@ -14,7 +14,7 @@ use super::{
 };
 
 #[cfg(target_os = "macos")]
-const LEGACY_MANAGER_BUNDLE_NAME: &str = "Codex++ 管理工具.app";
+const LEGACY_MANAGER_BUNDLE_NAME: &str = "Codex # 管理工具.app";
 
 pub fn build_app_bundle(options: &InstallOptions, _manager: bool) -> MacosAppBundle {
     // 保留 manager 参数供已有调用方使用；安装计划始终只有同一个原生界面 app。
@@ -165,7 +165,7 @@ pub fn native_application_bundle_from_executable(executable: &Path) -> anyhow::R
         &app.join("Contents/MacOS").join(MACOS_APP_EXECUTABLE),
     ) {
         anyhow::bail!(
-            "当前可执行文件不是 Codex++ 原生界面的主程序：{}",
+            "当前可执行文件不是 Codex # 原生界面的主程序：{}",
             executable.display()
         );
     }
@@ -194,18 +194,18 @@ pub(super) fn validate_native_bundle(app: &Path) -> anyhow::Result<()> {
         || !plist_true_value(&plist, "CodexPlusUnifiedApp")
     {
         anyhow::bail!(
-            "macOS app 不是完整的 Codex++ 原生界面包，请重新安装：{}",
+            "macOS app 不是完整的 Codex # 原生界面包，请重新安装：{}",
             app.display()
         );
     }
     let executable = app.join("Contents/MacOS").join(MACOS_APP_EXECUTABLE);
     let metadata = fs::metadata(&executable)?;
     if !metadata.is_file() || metadata.len() < 1024 {
-        anyhow::bail!("Codex++ 可执行文件缺失或无效：{}", executable.display());
+        anyhow::bail!("Codex # 可执行文件缺失或无效：{}", executable.display());
     }
     if !fs::canonicalize(&executable)?.starts_with(fs::canonicalize(app)?) {
         anyhow::bail!(
-            "Codex++ 可执行文件越出 app 包目录：{}",
+            "Codex # 可执行文件越出 app 包目录：{}",
             executable.display()
         );
     }
@@ -224,7 +224,7 @@ pub(super) fn validate_native_bundle(app: &Path) -> anyhow::Result<()> {
             | 0xbfbafeca
     ) {
         anyhow::bail!(
-            "Codex++ 可执行文件不是 Mach-O；不会生成脚本入口：{}",
+            "Codex # 可执行文件不是 Mach-O；不会生成脚本入口：{}",
             executable.display()
         );
     }
@@ -309,7 +309,7 @@ fn info_plist() -> String {
   <array>
     <dict>
       <key>CFBundleURLName</key>
-      <string>Codex++ Links</string>
+      <string>Codex # Links</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>codexplusplus</string>

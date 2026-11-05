@@ -3,7 +3,7 @@
 //
 // 固定使用 dist/local-build/Codex++.app：
 //   - 只替换 Contents/MacOS/CodexPlusPlus，保留 bundle 的 Info.plist / LSEnvironment / state，
-//     这样每次构建都复用同一个应用身份和测试配置，不会在 Finder / Launchpad 里多出一个 Codex++。
+//     这样每次构建都复用同一个应用身份和测试配置，不会在 Finder / Launchpad 里多出一个 Codex #。
 //   - 图标源（src-tauri/icons/icon-macos.png）变了（按内容指纹判断），按打包脚本同样的方式重新生成 .icns，
 //     否则换了 logo 之后 Dock 里还是旧图标。只换这一个文件，不动 Info.plist 与 bundle 身份。
 //   - 旧的历史构建交给 scripts/prune-local-builds.mjs 移入废纸篓。

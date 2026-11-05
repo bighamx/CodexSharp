@@ -7,11 +7,11 @@
  *
  * 为什么不点亮官方听写：官方听写的开关来自部署配置，服务地址固定为
  * `<inference.baseUrl>/user/dictation`（WebSocket），3p/gateway 部署下由第三方网关决定，
- * 我们既没有那个协议，也不该把聊天入口指到别处。所以自己录音，交给 Codex++ 已经配好的
+ * 我们既没有那个协议，也不该把聊天入口指到别处。所以自己录音，交给 Codex # 已经配好的
  * ASR（本地 SenseVoice 或用户配置的 OpenAI 兼容接口），只借用官方的输入框。
  *
  * 通道：页面 → window.__claudeCnDictationCall（CDP binding）→ 主进程 hook →
- *       Codex++ helper /dictation/transcribe → 文本 → window.__claudeCnDictationDeliver。
+ *       Codex # helper /dictation/transcribe → 文本 → window.__claudeCnDictationDeliver。
  *
  * 生命周期：宿主是 React 应用，输入框和工具条会被反复重建。这里不缓存 DOM，靠
  * MutationObserver 重挂；注册的状态都挂在 window 上，注入多次只有第一份生效。

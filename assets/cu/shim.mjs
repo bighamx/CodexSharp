@@ -1,4 +1,4 @@
-// Codex++ Computer Use 直通 shim。
+// Codex # Computer Use 直通 shim。
 //
 // 由 `/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node` 执行，
 // 再把 stdio 原样交给原生 CU server（`SkyComputerUseClient mcp`）。

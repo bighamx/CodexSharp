@@ -4,7 +4,7 @@
    * 数据全部来自 Codex 自己写的 rollout 记录（`event_msg.token_count`），中文档口径
    * 与 Codex 一致：缓存命中 = cached_input_tokens / input_tokens，上下文占用 =
    * last_token_usage.total_tokens / model_context_window。这里的 model_context_window
-   * 正是 Codex++ 注入 model_catalog_json 后 Codex 认到的每模型窗口，所以按模型配置
+   * 正是 Codex # 注入 model_catalog_json 后 Codex 认到的每模型窗口，所以按模型配置
    * 窗口的功能会直接反映在这一项上。
    *
    * 为什么不复用 `/thread-usage-history`：那条路由按会话整读 rollout 并解析全部行，
@@ -13,7 +13,7 @@
    *
    * 节点放进公开插槽 composer.below 给的容器（输入框下方、卡片外）；没有插槽容器时紧跟在
    * 输入卡片（[data-composer-surface-variant]）之后。旧版 Codex 没有这个属性，退回旧类名或输入框所在的 form，
-   * 会话 id 退回 Codex++ 认的当前会话，挂不上时写诊断日志（issue #2753）。
+   * 会话 id 退回 Codex # 认的当前会话，挂不上时写诊断日志（issue #2753）。
    * 节点带 data-codex-plus-ext，扫描调度器会把它排除在
    * 自喂循环之外（issue #1960）。
    *
@@ -21,7 +21,7 @@
    * codexPlusUsageHost 传进来（ctx.call / codexPlus.currentSession）。
    */
   const codexPlusUsageOwner = "usage-statusline";
-  /** main.js 在拓展装上时填好：调清单里声明的路由、写诊断日志、取 Codex++ 认的当前会话 id。 */
+  /** main.js 在拓展装上时填好：调清单里声明的路由、写诊断日志、取 Codex # 认的当前会话 id。 */
   const codexPlusUsageHost = {
     call: () => Promise.reject(new Error("用量状态栏还没装上")),
     diagnose: () => {},
@@ -252,7 +252,7 @@
   }
 
   /**
-   * 旧版 Codex 的当前会话：Codex++ 认的当前会话（侧边栏当前行 + 地址栏，删除 / 导出也靠它），
+   * 旧版 Codex 的当前会话：Codex # 认的当前会话（侧边栏当前行 + 地址栏，删除 / 导出也靠它），
    * 由 main.js 经 codexPlus.currentSession() 提供。
    */
   function codexPlusUsageLegacyThreadId() {

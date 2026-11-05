@@ -1,5 +1,5 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-tools 替身。
-// 插件包把 dsh-tools 声明为 peer 依赖、由宿主提供；Codex++ 不带 dsh 运行时，这里实现插件真正会用到的部分：
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-tools 替身。
+// 插件包把 dsh-tools 声明为 peer 依赖、由宿主提供；Codex # 不带 dsh 运行时，这里实现插件真正会用到的部分：
 // defineTool（参数属性表 → JSON Schema，执行前做轻量校验）与几个常量。语义对齐 dsh 的 defineTool：
 // execute 返回规范值，output.render 再把值转成给模型的内容块。
 
@@ -163,7 +163,7 @@ export function defineTool(options) {
 /** dsh 的工具注册表类型在这里只是占位：插件拿到的是宿主注入的 ctx.tools。 */
 export class ToolRegistry {
   constructor() {
-    throw new Error('ToolRegistry is provided by the host as ctx.tools in Codex++')
+    throw new Error('ToolRegistry is provided by the host as ctx.tools in Codex #')
   }
 }
 
@@ -330,7 +330,7 @@ export function assertObjectJsonSchema(schema) {
 
 // PTC 模式（模型写程序调用工具）的 SDK 文本：只在 dsh 装了 ptcRuntime、提示词里有 tools:sdk 段时才会生成。
 // Codex 没有 run_code 与 PTC 运行时，这一步不会走到；真被调用时说明原因，而不是给出一段 Codex 用不上的 SDK。
-const NO_PTC = 'Codex++ 里没有 run_code（PTC 模式）运行时，不生成工具 SDK 文本'
+const NO_PTC = 'Codex # 里没有 run_code（PTC 模式）运行时，不生成工具 SDK 文本'
 export function renderToolsSdk() {
   throw new Error(NO_PTC)
 }

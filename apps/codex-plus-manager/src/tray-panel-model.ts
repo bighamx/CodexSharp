@@ -62,7 +62,7 @@ export function codexState(overview: TrayOverview | null): CodexState {
   return "stopped";
 }
 
-/** Codex 在运行且 Codex++ 的调试连接已连上（增强功能生效）。 */
+/** Codex 在运行且 Codex # 的调试连接已连上（增强功能生效）。 */
 export function codexEnhanced(overview: TrayOverview | null): boolean {
   return codexState(overview) === "running" && overview?.runtime_health?.debugger?.status === "connected";
 }

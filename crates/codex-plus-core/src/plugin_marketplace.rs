@@ -310,7 +310,7 @@ fn local_openai_curated_remote_marketplace_root(home: &Path) -> anyhow::Result<O
     // 认新旧两种名（zip 里自带旧名、历史目录也是旧名），也认任何**非保留名**：
     // 快照里完全可能是第三方工具或用户自己写进去的名字，而 config 注册名必须以
     // 它为准（#2138）。旧的「只认 CODEX_PLUS_MARKETPLACE / LEGACY_REMOTE」白名单
-    // 会把这类目录整个判成「不存在」，于是永远走不到注册那一步——市场在 Codex++
+    // 会把这类目录整个判成「不存在」，于是永远走不到注册那一步——市场在 Codex #
     // 里看着有、在 codex CLI 里完全没有。
     // 保留名（`openai-*`）仍然拒绝：注册在它下面会被 codex 静默忽略
     // （#1974 / #1968）。
@@ -339,7 +339,7 @@ async fn initialize_openai_curated_marketplace_from_github(home: &Path) -> anyho
 
 async fn download_openai_plugins_zip() -> anyhow::Result<Vec<u8>> {
     let client =
-        crate::http_client::proxied_client(&format!("Codex++/{}", crate::version::VERSION))?;
+        crate::http_client::proxied_client(&format!("Codex #/{}", crate::version::VERSION))?;
     let bytes = client
         .get(OPENAI_PLUGINS_ZIP_URL)
         .header(reqwest::header::ACCEPT, "application/zip")

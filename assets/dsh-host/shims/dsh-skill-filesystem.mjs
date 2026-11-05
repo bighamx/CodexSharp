@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-skill-filesystem 替身：按目录扫描 SKILL.md。
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-skill-filesystem 替身：按目录扫描 SKILL.md。
 // dsh 的文件系统 skill 提供方还会监听目录变化并默认扫描一批默认根目录；这里只扫 customSkillDirs，
 // 不监听（插件改完目录自己调 control.invalidate()，宿主下次 list 时重新扫）。
 

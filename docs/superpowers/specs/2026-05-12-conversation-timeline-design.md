@@ -14,7 +14,7 @@ Clicking a marker smoothly scrolls the conversation to the corresponding user me
 
 ## Architecture
 
-Implement the feature in `codex_session_delete/inject/renderer-inject.js` as renderer-side DOM injection, matching the existing Codex++ enhancement pattern.
+Implement the feature in `codex_session_delete/inject/renderer-inject.js` as renderer-side DOM injection, matching the existing Codex # enhancement pattern.
 
 The feature does not add a backend API and does not modify the Codex app bundle. It injects:
 

@@ -43,7 +43,7 @@ pub async fn run_runner(node: &Path, runner: &str, input: &Value, limit: Duratio
 /// 之后放一行 `/*HOST_CLIENT*/`，由 [`with_host_client`] 替换成这段代码。
 pub const HOST_CLIENT_JS: &str = r#"
 const write = (value) => process.stdout.write(JSON.stringify(value) + "\n");
-// 向 Codex++ 发起宿主调用（例如只读会话查询），回复按 hostReply 对应。
+// 向 Codex # 发起宿主调用（例如只读会话查询），回复按 hostReply 对应。
 const hostPending = new Map();
 let hostSeq = 0;
 const host = (service, method, params) => new Promise((resolve, reject) => {
@@ -161,7 +161,7 @@ const sessions = Object.freeze({
   interrupt: (id, turnId) => host("sessions", "interrupt", { id, turnId }),
   compact: (id) => host("sessions", "compact", { id }),
 });
-// 拓展自己调模型：经 Codex++ 协议代理用当前供应商。complete({ input, model?, instructions?, reasoningEffort? })。
+// 拓展自己调模型：经 Codex # 协议代理用当前供应商。complete({ input, model?, instructions?, reasoningEffort? })。
 const llm = Object.freeze({
   complete: (options) => host("llm", "complete", typeof options === "string" ? { input: options } : options ?? {}),
   listModels: () => host("llm", "listModels", {}),
@@ -187,7 +187,7 @@ pub fn with_host_client(runner: &str) -> String {
 }
 
 /// 带宿主调用的运行方式：stdin 第一行写 `input` 且保持打开；运行器中途可以写
-/// `{ host, service, method, params }` 请求 Codex++（目前是只读会话查询），回复以
+/// `{ host, service, method, params }` 请求 Codex #（目前是只读会话查询），回复以
 /// `{ hostReply, result | error }` 写回 stdin；最后一行 `{ final: 结果 }` 即运行结果。
 pub async fn run_runner_with_host(
     node: &Path,

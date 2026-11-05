@@ -6,7 +6,7 @@
 // 新增开关时只改那份 JSON（并在 i18n-en.ts 补英文），不要在任何一侧再写一份文案。
 import catalogJson from "../../../crates/codex-plus-core/assets/enhancement-settings.json" with { type: "json" };
 
-/** 在哪一侧显示：manager = 管理器增强页，codex = 注入 Codex 的 Codex++ 设置页。 */
+/** 在哪一侧显示：manager = 管理器增强页，codex = 注入 Codex 的 Codex # 设置页。 */
 export type EnhancementSurface = "manager" | "codex";
 export type EnhancementPlatform = "windows" | "macos" | "linux";
 /** bool = 开关；select = 下拉（需带 options）。 */

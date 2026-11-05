@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-client-connection 替身（宿主半边）。
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-client-connection 替身（宿主半边）。
 // 插件从这个包 import 的多是协议常量与 RPC 信封的校验器（自己在 webServer 路由里解析 /api 请求时用）；
 // 连接服务本身由宿主经 ctx.connection 提供，这里不导出 HostConnectionService / Peer。
 // 校验器只实现 zod 的 parse / safeParse 两个入口，信封形状与 dsh 的 rpc-schema 一致。

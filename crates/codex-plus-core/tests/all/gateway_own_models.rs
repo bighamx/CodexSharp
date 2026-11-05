@@ -1,4 +1,4 @@
-//! Agent 自带的模型（直连，不经 Codex++）：列出哪些、直连的是谁，选中后断开网关并写进 Agent 自己的配置。
+//! Agent 自带的模型（直连，不经 Codex #）：列出哪些、直连的是谁，选中后断开网关并写进 Agent 自己的配置。
 
 use codex_plus_core::gateway::apply::{ApplyContext, ProviderInput, create_provider, enable_binding};
 use codex_plus_core::gateway::own_models::{own_models, set_shown, use_own_model};

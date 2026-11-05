@@ -27,7 +27,7 @@ async fn handle(action: &str, payload: Value) -> anyhow::Result<Value> {
         "prepare" => {
             let repo = text(&payload, "repo")?;
             if curated_filter().await.is_blocked(repo) {
-                anyhow::bail!("{repo} 已被 Codex++ 下架，不能安装");
+                anyhow::bail!("{repo} 已被 Codex # 下架，不能安装");
             }
             store.prepare(&endpoints, &manager, repo).await
         }

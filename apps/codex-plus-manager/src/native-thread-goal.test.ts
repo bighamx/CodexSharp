@@ -311,7 +311,7 @@ describe("native thread goal forwarding", () => {
     const generic = "会话所在窗口暂不可用，请稍后重试设置目标";
     const cases: Array<[unknown, string, string]> = [
       ["goal-invalid-request", "goal-invalid-request", "会话目标请求无效，请重新设置目标"],
-      ["goal-enhancements-disabled", "goal-enhancements-disabled", "Codex++ 增强已关闭"],
+      ["goal-enhancements-disabled", "goal-enhancements-disabled", "Codex # 增强已关闭"],
       ["goal-runtime-reload-required", "goal-runtime-reload-required", "会话目标组件已更新，请刷新或重新打开此窗口后重试"],
       ...["goal-probe-failed", "goal-owner-unavailable", "goal-native-getter-ambiguous",
         "goal-owner-changed", "goal-request-id-conflict", "goal-request-limit", "goal-forward-failed"]

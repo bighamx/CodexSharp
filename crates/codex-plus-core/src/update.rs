@@ -477,7 +477,7 @@ fn update_http_client() -> anyhow::Result<reqwest::Client> {
     // 直连会一直超时，用户看到的是「检查更新成功但下载/安装失败」（#1329）。
     // 复用统一构造器，保留原有连接/总超时语义。
     crate::http_client::proxied_client_with_timeouts(
-        &format!("Codex++/{}", crate::version::VERSION),
+        &format!("Codex #/{}", crate::version::VERSION),
         UPDATE_CONNECT_TIMEOUT,
         UPDATE_DOWNLOAD_TIMEOUT,
     )

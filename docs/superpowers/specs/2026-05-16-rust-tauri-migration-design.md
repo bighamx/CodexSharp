@@ -1,13 +1,13 @@
-# Codex++ Rust/Tauri Migration Design
+# Codex # Rust/Tauri Migration Design
 
 ## Summary
 
-Codex++ will fully replace the current Python backend with Rust and add a Tauri management console. The existing Codex App enhancement model remains: Codex++ launches Codex with CDP flags, injects a bridge plus `renderer-inject.js`, and handles local operations such as delete, undo, export, move, settings, status, provider sync, and user scripts.
+Codex # will fully replace the current Python backend with Rust and add a Tauri management console. The existing Codex App enhancement model remains: Codex # launches Codex with CDP flags, injects a bridge plus `renderer-inject.js`, and handles local operations such as delete, undo, export, move, settings, status, provider sync, and user scripts.
 
 The final user experience has two desktop entry points:
 
-- **Codex++**: a no-window silent launcher. Double-clicking it starts enhanced Codex directly.
-- **Codex++ 管理工具**: a visible Tauri management app for install, uninstall, update, settings, logs, diagnostics, shortcut repair, and optional manual launch.
+- **Codex #**: a no-window silent launcher. Double-clicking it starts enhanced Codex directly.
+- **Codex # 管理工具**: a visible Tauri management app for install, uninstall, update, settings, logs, diagnostics, shortcut repair, and optional manual launch.
 
 There is no separate user-facing CLI. Launch behavior belongs to the silent launcher, and management features belong to the Tauri console.
 
@@ -25,7 +25,7 @@ There is no separate user-facing CLI. Launch behavior belongs to the silent laun
 - Replacing `renderer-inject.js` with a full Tauri-native Codex UI.
 - Moving session management into the Tauri app as a standalone conversation browser.
 - Providing a separate user-facing CLI.
-- Requiring the management tool to stay open while Codex++ is running.
+- Requiring the management tool to stay open while Codex # is running.
 
 ## Architecture
 
@@ -49,7 +49,7 @@ The Rust project will be organized as a workspace:
 - `codex-plus-launcher`
   - No-window silent launcher binary.
   - Supports internal launch configuration such as app path, database path, backup path, debug port, and helper port.
-  - Used by the `Codex++` desktop entry point.
+  - Used by the `Codex #` desktop entry point.
 
 - `codex-plus-tauri`
   - Visible management console.
@@ -63,9 +63,9 @@ The Rust project will be organized as a workspace:
 
 ## Entry Points
 
-### Codex++
+### Codex #
 
-The `Codex++` desktop entry point is silent:
+The `Codex #` desktop entry point is silent:
 
 1. It starts the no-window Rust launcher.
 2. It does not show a Tauri management window.
@@ -74,17 +74,17 @@ The `Codex++` desktop entry point is silent:
 5. It injects `renderer-inject.js`.
 6. It stays alive until Codex exits.
 
-### Codex++ 管理工具
+### Codex # 管理工具
 
 The management tool opens a Tauri window and owns management workflows:
 
-- Install and uninstall Codex++ entry points.
+- Install and uninstall Codex # entry points.
 - Check for updates and perform updates.
 - Edit backend settings.
 - View latest launch status.
 - Open logs and copy diagnostics.
-- Repair or recreate the silent `Codex++` shortcut.
-- Optionally launch or repair a running Codex++ session.
+- Repair or recreate the silent `Codex #` shortcut.
+- Optionally launch or repair a running Codex # session.
 
 The management tool is not required during normal use.
 
@@ -92,7 +92,7 @@ The management tool is not required during normal use.
 
 Silent launch flow:
 
-1. User double-clicks `Codex++`.
+1. User double-clicks `Codex #`.
 2. The no-window Rust launcher starts without a visible management UI.
 3. Rust chooses available loopback ports for CDP and helper/bridge runtime.
 4. If Provider Sync is enabled, Rust updates local Codex metadata before launch.
@@ -116,7 +116,7 @@ Bridge request flow:
 
 Management tool flow:
 
-1. User opens `Codex++ 管理工具`.
+1. User opens `Codex # 管理工具`.
 2. Tauri UI calls Rust commands.
 3. Commands call shared core/data modules.
 4. UI displays results for install, update, settings, logs, diagnostics, repair, and launch actions.
@@ -153,19 +153,19 @@ Management diagnostics:
 Windows install creates two desktop shortcuts:
 
 - `Codex++.lnk`: silent launcher, no management window.
-- `Codex++ 管理工具.lnk`: opens the Tauri management console.
+- `Codex # 管理工具.lnk`: opens the Tauri management console.
 
 Windows packaging uses separate entry binaries so window behavior is predictable:
 
-- `codex-plus-plus.exe`: no-window silent launcher for the `Codex++` shortcut.
-- `codex-plus-plus-manager.exe`: Tauri management console for `Codex++ 管理工具`.
+- `codex-plus-plus.exe`: no-window silent launcher for the `Codex #` shortcut.
+- `codex-plus-plus-manager.exe`: Tauri management console for `Codex # 管理工具`.
 
-Windows uninstall removes both shortcuts and the uninstall registry entry. Optional data removal deletes Codex++-owned data such as logs, settings, and backups.
+Windows uninstall removes both shortcuts and the uninstall registry entry. Optional data removal deletes Codex #-owned data such as logs, settings, and backups.
 
 macOS install provides equivalent two-entry behavior with two app bundles:
 
 - `Codex++.app`: silent launch wrapper.
-- `Codex++ 管理工具.app`: visible management console.
+- `Codex # 管理工具.app`: visible management console.
 
 Updates are initiated from the management console. No separate command-line update entry point is provided.
 

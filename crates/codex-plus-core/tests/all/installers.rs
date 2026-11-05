@@ -15,7 +15,7 @@ fn windows_entrypoint_plan_has_one_gui_executable_and_shortcut() {
         remove_owned_data: false,
     };
     let plan = build_windows_entrypoint_plan(&options);
-    // 快捷方式显示名换成 Codex #；安装目录仍是 Codex++。
+    // 快捷方式显示名换成 Codex #；安装目录与 bundle 名仍是 Codex++。
     assert!(plan.silent_shortcut.ends_with("Codex #.lnk"));
     assert_eq!(plan.silent_shortcut, plan.manager_shortcut);
     assert_eq!(plan.launcher_path, "C:/Tools/codex-plus-plus.exe");
@@ -166,6 +166,7 @@ fn windows_installer_migrates_existing_shortcuts_without_reviving_deleted_ones()
         let text = text.replace("\r\n", "\n");
 
         // 正式键 + 旧版键；快捷方式改名不影响卸载登记的键名。
+        // 卸载登记的键名不随快捷方式改名。
         for key in ["CodexPlusPlus", "Codex++"] {
             let read = format!(
                 r#"ReadRegStr $ExistingInstall HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{key}" "InstallLocation""#
@@ -477,7 +478,7 @@ mod macos_install {
         let error =
             codex_plus_core::install::macos::native_application_bundle_from_executable(&auxiliary)
                 .unwrap_err();
-        assert!(error.to_string().contains("不是 Codex++ 原生界面的主程序"));
+        assert!(error.to_string().contains("不是 Codex # 原生界面的主程序"));
     }
 
     #[test]
@@ -506,7 +507,7 @@ mod macos_install {
         let error =
             codex_plus_core::install::macos::install_app_bundles(&options(root.path(), &files[1]))
                 .unwrap_err();
-        assert!(error.to_string().contains("Codex++ 原生界面包"));
+        assert!(error.to_string().contains("Codex # 原生界面包"));
         assert_eq!(snapshot(&files), before);
     }
 

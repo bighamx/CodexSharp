@@ -15,7 +15,7 @@ use super::store::GatewaySettings;
 use crate::protocol_proxy::ProxySessionHeaders;
 use crate::tools::ToolId;
 
-const POLICY_MARKER: &str = "[Codex++ inherited model]";
+const POLICY_MARKER: &str = "[Codex # inherited model]";
 const RETENTION_SECONDS: i64 = 90 * 24 * 60 * 60;
 const CLEANUP_INTERVAL_SECONDS: u64 = 60 * 60;
 static LAST_CLEANUP: AtomicU64 = AtomicU64::new(0);

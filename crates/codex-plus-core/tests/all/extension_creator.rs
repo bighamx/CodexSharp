@@ -612,7 +612,7 @@ async fn extension_declared_tools_are_listed_and_callable() {
     assert!(names.contains(&"calc__add".to_string()) && names.contains(&"codexpp_extension_write".to_string()));
     let add = list["result"]["tools"].as_array().unwrap().iter().find(|tool| tool["name"] == "calc__add").unwrap();
     assert_eq!(add["inputSchema"]["required"], json!(["a", "b"]));
-    assert!(add["description"].as_str().unwrap().contains("[Codex++ 拓展 calc]"));
+    assert!(add["description"].as_str().unwrap().contains("[Codex # 拓展 calc]"));
 
     let response = handle_request(&creator, json!({"jsonrpc": "2.0", "id": 10, "method": "tools/call", "params": {"name": "calc__add", "arguments": {"a": 2, "b": 3}}})).await.unwrap();
     assert_eq!(response["result"]["isError"], false);
@@ -968,7 +968,7 @@ async fn guide_covers_the_public_extension_surface() {
     let (_, guide) = call(&creator(&temp), "codexpp_extension_guide", json!({})).await;
     let guide = guide["guide"].as_str().unwrap();
     // 写入工具的参数说明里引用到的指南小节，指南里都要有。
-    for section in ["## 管理器面板", "## 顶替 Codex++ 内置功能", "## 关掉 Codex++ 网关的内置环节", "## 在拓展包里带 dsh 插件", "## 用了第三方库的界面（打包产物）", "## 赶在 Codex 之前（preload）与启动前后（launch）"] {
+    for section in ["## 管理器面板", "## 顶替 Codex # 内置功能", "## 关掉 Codex # 网关的内置环节", "## 在拓展包里带 dsh 插件", "## 用了第三方库的界面（打包产物）", "## 赶在 Codex 之前（preload）与启动前后（launch）"] {
         assert!(guide.contains(section), "指南缺少「{section}」");
     }
     for api in ["ctx.onScan", "settings/changed", "placement: \"inline\"", "window.codexPlusManager", "builtin:key-cooldown"] {

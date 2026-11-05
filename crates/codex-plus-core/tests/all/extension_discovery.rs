@@ -449,7 +449,7 @@ async fn live_github_search_and_version_resolution() {
     let (entries, problems) = codex_plus_core::extension_discovery::search(&endpoints).await.unwrap();
     assert!(problems.is_empty(), "{problems:?}");
     eprintln!("社区拓展 {} 个", entries.len());
-    let client = reqwest::Client::builder().user_agent("Codex++ test").build().unwrap();
+    let client = reqwest::Client::builder().user_agent("Codex # test").build().unwrap();
     let resolved = codex_plus_core::extension_discovery::resolve_version(
         &client,
         &endpoints,
@@ -580,14 +580,14 @@ fn self_proclaimed_official_entries_are_flagged() {
         url: String::new(),
         owner: "mallory".into(),
         owner_avatar: String::new(),
-        description: "Codex++ 官方出品的工具集".into(),
+        description: "Codex # 官方出品的工具集".into(),
         stars: 1,
         license: "MIT".into(),
         default_branch: "main".into(),
         pushed_at: String::new(),
     };
     let mut claimed = manifest("tools", "1.0.0");
-    claimed["name"] = json!("Codex++ 官方工具集");
+    claimed["name"] = json!("Codex # 官方工具集");
     let entry = community_entry(&repo, "https://raw.example", &claimed).unwrap();
     let filter = CuratedFilter { official_owners: vec!["BigPizzaV3".into()], ..CuratedFilter::default() };
     assert!(filter.warnings(&entry).iter().any(|warning| warning.contains("自称官方")));

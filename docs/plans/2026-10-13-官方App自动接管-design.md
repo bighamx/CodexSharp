@@ -4,7 +4,7 @@
 范围：`crates/codex-plus-core/src/{launcher,watcher,ports,status,auto_takeover}.rs`、`apps/codex-plus-launcher/src/main.rs`、`apps/codex-plus-manager/src-tauri/src/{lib,commands,auto_takeover}.rs`、`apps/codex-plus-manager/src/App.tsx`
 状态：设计稿 v2，未实施（待确认）
 
-**一句话**：用户自己双击 / Dock / `open -a` 启动官方 App 时，Codex++ 自动把它接管过来——已在运行且没带调试端口的，先优雅退出再带调试参数重开，然后照常 CDP 注入，效果与「从管理工具点启动」完全一致。
+**一句话**：用户自己双击 / Dock / `open -a` 启动官方 App 时，Codex # 自动把它接管过来——已在运行且没带调试端口的，先优雅退出再带调试参数重开，然后照常 CDP 注入，效果与「从管理工具点启动」完全一致。
 
 > 依据：本设计经两轮独立对抗性审查（`work/review-auto-takeover-code.md`、`work/review-auto-takeover-design.md`）修订，两份调研见 `work/research-auto-takeover-macos.md`、`work/research-auto-takeover-settings.md`。v2 修正了 v1 的 4 处硬伤：会话归属无法自证、有任务在跑的闸门无执行路径、多开判据不存在、SIGTERM 目标 PID 无来源。
 
@@ -52,7 +52,7 @@ D2/D3/D4/D5 都需要独立修复；D1 的修法与它们绑定（先能读出�
 
 **目标**
 
-1. 官方 App 由用户自己启动时（Dock / Spotlight / `open -a`），Codex++ 在数秒内自动接管，不必再从管理工具点启动。
+1. 官方 App 由用户自己启动时（Dock / Spotlight / `open -a`），Codex # 在数秒内自动接管，不必再从管理工具点启动。
 2. 接管在跑且无调试端口的实例时，允许**自动重启**它（已确认的产品决策），全程状态可见。
 3. 接管后与既有链路完全一致（CDP 注入、协议代理、供应商同步、watchdog、`latest-status.json`）。
 4. 默认关闭（opt-in）；任何异常都不产生重启循环；用户能随时关闭、跳过本次、立即接管。
@@ -72,7 +72,7 @@ D2/D3/D4/D5 都需要独立修复；D1 的修法与它们绑定（先能读出�
 
 候选：管理器内轮询 / launchd LaunchAgent / NSWorkspace 通知。选第一个：零新依赖（macOS 目标下 core crate 目前没有任何原生 crate）、能直接复用 `LaunchOptions`/`LaunchHooks`/`StatusStore`、有现成先例（`lib.rs:522-540` 的 300ms 轮询线程）。
 
-代价：**只有管理器活着才生效**。macOS 没有开机启动实现（`watcher::install_watcher` 非 Windows 直接 bail，`watcher.rs:529-532`），所以诚实表述是「**开启后，仅在 Codex++ 正在运行时生效**」，并配合登录项引导（§3.9）。
+代价：**只有管理器活着才生效**。macOS 没有开机启动实现（`watcher::install_watcher` 非 Windows 直接 bail，`watcher.rs:529-532`），所以诚实表述是「**开启后，仅在 Codex # 正在运行时生效**」，并配合登录项引导（§3.9）。
 
 ### 3.2 架构
 
@@ -294,14 +294,14 @@ pause_auto_takeover_for_instance() -> CommandResult<AutoTakeoverPayload>
 
 注册到 `lib.rs:102-239` 的 `generate_handler!`（漏注册没有测试兜底——全仓 `generate_handler` 只出现一次，建议顺手加一条「命令名集合」断言）。
 
-**UI 落点：维护页**（`MaintenanceScreen`，`App.tsx:7489`），与「开机打开 Codex++」并列新增卡：
+**UI 落点：维护页**（`MaintenanceScreen`，`App.tsx:7489`），与「开机打开 Codex #」并列新增卡：
 
 - 标题 `自动接管官方 App`（**新 key**，不复用死键 `t("自动接管")`）；
 - 状态行：`未开启 / 监听中 / 正在接管 / 已接管（增强未开启）/ 已暂停（原因）/ 已降级（原因）`；
 - 明细行：实际调试端口、最后接管时间、上次跳过原因、1 小时内重启次数；
 - 开关用维护页既有 `check-row`（`App.tsx:7530-7533`），不用 `FeatureToggle`；
 - 两个按钮：`立即接管` / `本次不接管`；
-- 未检测到登录项时提示「仅在 Codex++ 运行时生效」，并并列展示「开机打开 Codex++」卡与一键跳转（`open "x-apple.systempreferences:com.apple.LoginItems-Settings.extension"`）。
+- 未检测到登录项时提示「仅在 Codex # 运行时生效」，并并列展示「开机打开 Codex #」卡与一键跳转（`open "x-apple.systempreferences:com.apple.LoginItems-Settings.extension"`）。
 
 **为什么不放增强页**：`enhancement-settings.test.ts:193` 断言 `EnhanceScreen` **恰好 3 个 tabpanel**，`:99` 要求其中每个 `FeatureToggle` 的 `disabled` 必须是 `!masterEnabled`；且「接管」与「增强」正交。放维护页同时避开两条硬契约。
 
@@ -331,7 +331,7 @@ pause_auto_takeover_for_instance() -> CommandResult<AutoTakeoverPayload>
 | 场景 | 结果 |
 | --- | --- |
 | 用户自己双击（裸启动，无调试端口） | `cdp_ready=false`、`other_instance=false` → **`takeover`** ✅ |
-| Codex++ 带参启动后（有调试端口） | `cdp_ready=true` → **`wait(already_attached)`** ✅ |
+| Codex # 带参启动后（有调试端口） | `cdp_ready=true` → **`wait(already_attached)`** ✅ |
 | App 未运行 | `NotRunning` → **`wait(app_not_running)`** ✅ |
 
 无 GUI 环境下的判据验证工具：`cargo run --example takeover_probe -- <app_dir> [port]`
@@ -391,7 +391,7 @@ pause_auto_takeover_for_instance() -> CommandResult<AutoTakeoverPayload>
 **第 6 步：文档 + 构建启动（硬性要求）**
 - `README.md:123-164`、`README_EN.md:42-53`/`:88-99`、`CHANGELOG.md:3-25`、`docs/release/v<下一版本>-notes.md`。
 - `npm run vite:build` → `cargo build --release -p codex-plus-manager` → 原地替换固定 `dist/local-build/Codex++.app`（不要按任务新建 `dist/local-build-*`）→ `codesign --force --deep --sign -` → `open`，确认进程与 `manager.start` 日志正常；收尾跑 `node scripts/prune-local-builds.mjs --apply`。
-- 端到端实测（需用户在场）：关掉 Codex++ → 双击官方 App → 观察全流程与耗时；再验「本次不接管」与失败路径。
+- 端到端实测（需用户在场）：关掉 Codex # → 双击官方 App → 观察全流程与耗时；再验「本次不接管」与失败路径。
 
 ---
 
@@ -407,8 +407,8 @@ pause_auto_takeover_for_instance() -> CommandResult<AutoTakeoverPayload>
 | A6 | 退出失败 | 15 s 未退出 → `takeover.quit_timeout` + `Degraded` + 可读原因；滑动 1 小时内 `takeover.restart_requested` ≤6，第 7 次被拒且状态为 `Degraded` |
 | A7 | 有任务在跑（`defer` 策略） | 跑一个 ≥60 s 的生成任务 → 双击无端口 App → 30 s 内无 `takeover.restart_requested`，状态行显示等待原因 |
 | A8 | 点「本次不接管」 | 同一 `InstanceKey=(pid,lstart)` 生命周期内不再尝试（管理器重启后仍生效）；用户重启 App（新 lstart）后恢复 |
-| A9 | 管理器未运行 | 不发生接管；`takeover.*` 事件为零（诚实表述：本功能仅在 Codex++ 运行时生效） |
-| A9b | 开关开启但无登录项 | 维护页状态行显示「仅在 Codex++ 运行时生效」+ 一键跳转登录项设置；跳转返回后 ≤5 s 状态刷新 |
+| A9 | 管理器未运行 | 不发生接管；`takeover.*` 事件为零（诚实表述：本功能仅在 Codex # 运行时生效） |
+| A9b | 开关开启但无登录项 | 维护页状态行显示「仅在 Codex # 运行时生效」+ 一键跳转登录项设置；跳转返回后 ≤5 s 状态刷新 |
 | A10 | 管理器重启（App 仍带我们的端口在跑、helper 已死） | **不立即 quit 重启**：先 `resume_if_running`（`lib.rs:99` 的启动兜底 → `commands.rs` `resume_existing_codex_background`），失败则提示；断言无 `takeover.restart_requested` |
 | A11 | 存在多开实例 | 跳过并记 `Skip("multi_instance")`；多开实例不被 quit |
 | A12 | 9229 被第三方占用 | 实际端口取自动换位后的值；不产生第二次接管 |

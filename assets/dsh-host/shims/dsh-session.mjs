@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-session 替身。
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-session 替身。
 // 插件多半只拿品牌类型的校验函数与常量；会话本身由宿主注入的 ctx.sessions 提供（Codex 会话的镜像，见 services.mjs）。
 
 export const SESSION_FORMAT_VERSION = 4
@@ -33,7 +33,7 @@ export function deriveEventMessage(event) {
 
 export class Session {
   constructor() {
-    throw new Error('Session is provided by the host as ctx.sessions in Codex++')
+    throw new Error('Session is provided by the host as ctx.sessions in Codex #')
   }
 }
 

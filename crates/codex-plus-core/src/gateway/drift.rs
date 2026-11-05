@@ -1,6 +1,6 @@
 //! 已接入网关的 Agent，配置是否还指向网关。
 //!
-//! 别的工具（例如 CC Switch）接管了 Agent 的配置后，Agent 的请求就不再经过 Codex++，
+//! 别的工具（例如 CC Switch）接管了 Agent 的配置后，Agent 的请求就不再经过 Codex #，
 //! 网关这边却还以为「已接入」。这里读 Agent 的配置文件做判断，界面据此提示并给「重新接入」。
 
 use std::path::Path;

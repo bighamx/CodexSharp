@@ -14,7 +14,7 @@ pub const SPEC: ManagedMcp = ManagedMcp {
     server_id: SERVER_ID,
     flag: "--codex-plus-agent-mcp",
     label: "协作 MCP",
-    comment: "Managed by Codex++: agent collaboration MCP",
+    comment: "Managed by Codex #: agent collaboration MCP",
     lock_file: ".codex-plus-agent-mcp.lock",
     backup_dir: ".codex-plus-agent-mcp-backups",
     legacy: &[],

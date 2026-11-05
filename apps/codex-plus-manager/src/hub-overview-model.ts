@@ -1,4 +1,4 @@
-/** 网关总览（Agent → Codex++ → 供应商池）的纯数据整理，页面只负责画。 */
+/** 网关总览（Agent → Codex # → 供应商池）的纯数据整理，页面只负责画。 */
 import {
   glanceAgents,
   maskAccountName,

@@ -576,7 +576,7 @@ fn renderer_after_document_ready(script: &str) -> String {
 /// Page.reload、启动壳自救重载等每次新文档都会在根节点建立前执行它。这时
 /// `document.documentElement` 为空，皮肤 API 引导里的 `root.style.setProperty` 和
 /// `observer.observe(document.documentElement)` 直接抛错，整个皮肤运行时没装上，
-/// 页面里只剩 Codex++ 的其它增强，看起来就是「重启 Codex 后皮肤不生效」。
+/// 页面里只剩 Codex # 的其它增强，看起来就是「重启 Codex 后皮肤不生效」。
 /// 实时注入（Runtime.evaluate，body 已在）仍立即执行；没开皮肤时为空串，不加任何包装。
 fn dream_skin_target_runtime_after_document_ready(settings: &BackendSettings) -> String {
     let runtime = dream_skin_target_runtime_script(settings, false);

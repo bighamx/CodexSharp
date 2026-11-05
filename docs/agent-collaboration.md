@@ -1,12 +1,12 @@
 # 在 Codex 中使用外部子 Agent
 
-Codex++ 最左侧的「Agent 协作」入口提供「子 Agent 设置」。日常任务在 Codex 对话里发起，管理器负责默认 Agent、CLI 路径、模型与接入配置。
+Codex # 最左侧的「Agent 协作」入口提供「子 Agent 设置」。日常任务在 Codex 对话里发起，管理器负责默认 Agent、CLI 路径、模型与接入配置。
 
 ## 日常用法
 
 1. 打开「子 Agent 设置」，启用协作及需要使用的 Agent，选择默认 Agent，保存配置。
-2. 点击「一键接入并刷新」。配置只管理 `codex_plus_collaboration` 条目，并同步到 Codex++ 的托管 MCP 配置，后续切换供应商仍会保留。
-3. 检查独立的运行刷新状态。存在 Codex++ 原生连接时会重载本机 MCP 配置、检查子 Agent 工具并刷新 `/mcp` 的列表缓存；刷新后的工具从下一轮消息起可用。缺少连接时，先用 Codex++ 启动或接管 Codex，再点「刷新 Codex 工具」，也可在 Codex 手动重新加载 MCP。
+2. 点击「一键接入并刷新」。配置只管理 `codex_plus_collaboration` 条目，并同步到 Codex # 的托管 MCP 配置，后续切换供应商仍会保留。
+3. 检查独立的运行刷新状态。存在 Codex # 原生连接时会重载本机 MCP 配置、检查子 Agent 工具并刷新 `/mcp` 的列表缓存；刷新后的工具从下一轮消息起可用。缺少连接时，先用 Codex # 启动或接管 Codex，再点「刷新 Codex 工具」，也可在 Codex 手动重新加载 MCP。
 4. 直接向 Codex 说明任务，例如：
 
    - 「让 DeepSeek 实现这个功能，你负责检查结果。」
@@ -30,7 +30,7 @@ Codex 获得异步任务 ID 后可以继续独立工作，再通过等待或查�
 - 默认 Agent 仅影响未明确指定目标的委派。默认目标未启用时会报错，显式点名其他已启用目标仍然可用。
 - Codex、Claude Code 可选填模型；留空沿用原生 CLI 默认模型。DeepSeek 可填写 `provider/model` 模型路由，例如 `deepseek-account/deepseek-flash`；账户登录使用 `deepseek-account`，API 密钥使用 `deepseek-official`。模型名称需在对应供应商中可用，留空沿用 DSH headless 的默认路由。
 - 可执行文件路径留空时自动发现，填写时必须是绝对路径。检测到文件不代表已登录或模型可用。
-- DeepSeek 可选择「复用 DSH 已保存的登录与密钥」，默认关闭。开启后由 dsh 自行读取原生认证，Codex++ 只保存此开关，不读取或保存登录与密钥；此开关不会自动选择 DeepSeek 桌面当前使用的模型。
+- DeepSeek 可选择「复用 DSH 已保存的登录与密钥」，默认关闭。开启后由 dsh 自行读取原生认证，Codex # 只保存此开关，不读取或保存登录与密钥；此开关不会自动选择 DeepSeek 桌面当前使用的模型。
 - 每个 Agent 可在「同时执行任务数」中设置并发上限（1–4，默认 1）。同一 Agent 运行中的任务数小于上限、且前面没有更早的排队任务时，新任务直接启动；达到上限后，新任务不会被拒绝，而是进入该 Agent 的队列：委派工具立即返回 `taskId`，状态为 `queued`，`progress` 说明前面还有几个任务要先结束；任一运行中的任务结束（完成、失败、取消或中断）后按提交顺序自动启动下一个。并发和排队是叠加关系：上限为 1 时与只排队、逐个执行的行为完全一致。
 - 并发上限对同一 Agent 的所有任务统一生效，不区分来自哪个会话或进程：同一个 Codex 会话连续派发多个互不依赖的任务、多个会话或客户端同时派发，都共用这个上限和同一个队列。是否轮到在同一个数据库写事务里判断并认领，多个进程同时判断也不会超过上限。
 - 并发执行的每个任务都有独立的 CLI 进程、原生会话和 `taskId`，`wait_task`、`get_task`、`cancel_task` 只作用于传入的那个任务。CLI 直接在各自的工作目录中修改文件，协作服务不做隔离：可能同时运行的任务应使用不同的工作目录（例如各自的 git worktree）。同一工作目录还有其他任务可能同时运行时不会拒绝，只在委派返回的 `cwdWarning` 和任务启动时的 `progress` 中提示一句。
@@ -53,10 +53,10 @@ DSH headless 默认使用环境凭据。若已在 DeepSeek Harness 中登录或�
 
 「手动接入与配置导出」中保留 MCP 配置。Codex 使用 TOML 片段，Claude Code 及兼容客户端可使用 `mcpServers` JSON；DSH 按其 MCP 配置格式填写同一 command/args。只有显式点击「一键接入并刷新」才会修改 Codex 的接入配置，保存子 Agent 参数不会自动改外部客户端；单独的「刷新 Codex 工具」不写配置文件。
 
-配置指向当前运行的 Codex++ 可执行文件，参数为：
+配置指向当前运行的 Codex # 可执行文件，参数为：
 
 ```text
---codex-plus-agent-mcp --state-dir <Codex++ 状态目录的绝对路径>
+--codex-plus-agent-mcp --state-dir <Codex # 状态目录的绝对路径>
 ```
 
 该模式在 GUI 与单实例检查之前启动，只在 stdout 输出 MCP JSONL。所有客户端使用同一状态目录时共享协作开关、任务和结果。移动或删除本地构建后，需要重新生成指向有效可执行文件的配置。
@@ -90,7 +90,7 @@ DSH headless 默认使用环境凭据。若已在 DeepSeek Harness 中登录或�
 
 ## 存储和边界
 
-任务与配置保存在 Codex++ 状态目录下的 `agent-collaboration.sqlite3`，独立于现有 `settings.json` 与原生会话数据库。任务记录上限 1000 条，单条提示词最多 64 KiB，最终答案最多 256 KiB；超限明确报错。界面展示活跃任务及最近历史，最多 50 条。记录不会自动删除。
+任务与配置保存在 Codex # 状态目录下的 `agent-collaboration.sqlite3`，独立于现有 `settings.json` 与原生会话数据库。任务记录上限 1000 条，单条提示词最多 64 KiB，最终答案最多 256 KiB；超限明确报错。界面展示活跃任务及最近历史，最多 50 条。记录不会自动删除。
 
 当前通过 MCP 把原生 CLI 作为外部子 Agent 调用，不属于 Codex 原生 `spawn_agent` 子树；不会接管已打开的其他桌面会话。MCP 会如实返回 `desktopSessionWake: false`。这些边界不影响在 Codex 对话中委派并收取结果。
 

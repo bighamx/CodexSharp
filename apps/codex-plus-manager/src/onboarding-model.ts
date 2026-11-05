@@ -20,20 +20,20 @@ export const TOUR_STORAGE_KEY = "codex-plus-plus.onboarding";
 export const TOUR_STEPS: TourStep[] = [
   {
     id: "welcome",
-    title: "欢迎使用 Codex++",
-    body: "Codex++ 给 Codex、Claude Code 等 Agent 加上拓展和增强，并让它们经同一个本地网关接入任意供应商。花半分钟认识一下侧栏。",
+    title: "欢迎使用 Codex #",
+    body: "Codex # 给 Codex、Claude Code 等 Agent 加上拓展和增强，并让它们经同一个本地网关接入任意供应商。花半分钟认识一下侧栏。",
   },
   {
     id: "management",
     target: "management",
     title: "万物皆拓展",
-    body: "Codex++ 的增强能力都以拓展开放：在这里启用内置拓展、安装社区拓展，或在 Codex 对话里说一句就造一个自己的。下面是 MCP、Skills 和会话。",
+    body: "Codex # 的增强能力都以拓展开放：在这里启用内置拓展、安装社区拓展，或在 Codex 对话里说一句就造一个自己的。下面是 MCP、Skills 和会话。",
   },
   {
     id: "hub",
     target: "hub",
     title: "聚合网关",
-    body: "任意 Agent 经 Codex++ 接入任意供应商：一个 Agent 可以同时用多家，按模型路由、出错自动换下一家。总览里一屏看全谁在用、走哪家。",
+    body: "任意 Agent 经 Codex # 接入任意供应商：一个 Agent 可以同时用多家，按模型路由、出错自动换下一家。总览里一屏看全谁在用、走哪家。",
   },
   {
     id: "providers",
@@ -76,7 +76,7 @@ export function tourSteps(soloName: string | null, enhanceOnly = false): TourSte
   if (!soloName) return TOUR_STEPS;
   const override: Record<string, Partial<Pick<TourStep, "title" | "body">>> = {
     welcome: {
-      body: "Codex++ 给 {0} 加上拓展和增强，并让它经本地网关接入任意供应商。花半分钟认识一下侧栏。",
+      body: "Codex # 给 {0} 加上拓展和增强，并让它经本地网关接入任意供应商。花半分钟认识一下侧栏。",
     },
     "agents-connect": {
       title: "第二步：让 {0} 走网关",
@@ -94,9 +94,9 @@ export function tourSteps(soloName: string | null, enhanceOnly = false): TourSte
  * 只用增强功能时的步骤：没有网关、供应商池和 Agent 接入，这三步去掉，其余换成不提供应商的说法。
  */
 const ENHANCE_OVERRIDES: Record<string, Pick<TourStep, "body">> = {
-  welcome: { body: "Codex++ 给 Codex 和 Claude Code 加上增强、皮肤、拓展等功能，供应商仍由你自己的工具管理。花半分钟认识一下侧栏。" },
+  welcome: { body: "Codex # 给 Codex 和 Claude Code 加上增强、皮肤、拓展等功能，供应商仍由你自己的工具管理。花半分钟认识一下侧栏。" },
   agents: { body: "点开 Codex 或 Claude Code，在它下面的页面里启用所需增强；Codex 行的播放键可以启动或停止 Codex。" },
-  management: { body: "Codex++ 的增强能力都以拓展开放：在这里启用内置拓展、安装社区拓展，或在对话里造一个自己的。MCP、Skills 和会话就在它下面。" },
+  management: { body: "Codex # 的增强能力都以拓展开放：在这里启用内置拓展、安装社区拓展，或在对话里造一个自己的。MCP、Skills 和会话就在它下面。" },
 };
 const ENHANCE_HIDDEN_STEPS = new Set(["hub", "providers", "agents-connect"]);
 const ENHANCE_TOUR_STEPS: TourStep[] = TOUR_STEPS

@@ -457,7 +457,7 @@ pub async fn computer_use_preview_request_permission() -> CommandResult<Value> {
     {
         Ok(true) => ok("已获得屏幕录制权限。", json!({ "granted": true })),
         Ok(false) => failed(
-            "还没有屏幕录制权限：在 系统设置 → 隐私与安全性 → 屏幕录制 里勾选 Codex++，然后重启应用。",
+            "还没有屏幕录制权限：在 系统设置 → 隐私与安全性 → 屏幕录制 里勾选 Codex #，然后重启应用。",
             json!({ "granted": false }),
         ),
         Err(error) => failed(&error, json!({ "granted": false })),

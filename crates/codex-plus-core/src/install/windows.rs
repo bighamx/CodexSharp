@@ -78,7 +78,7 @@ pub fn install_shortcuts(options: &InstallOptions) -> anyhow::Result<()> {
             create_entrypoint_shortcut(
                 PathBuf::from(&plan.silent_shortcut),
                 PathBuf::from(&plan.launcher_path),
-                "Open Codex++",
+                "Open Codex #",
                 PathBuf::from(&plan.silent_icon_path),
             )
         },
@@ -122,7 +122,7 @@ pub fn uninstall_shortcuts(options: &InstallOptions) -> anyhow::Result<()> {
     let _ = std::fs::remove_file(&plan.silent_shortcut);
     // 旧版入口名：升级或卸载后都不要在桌面上留一个 Codex++.lnk。
     if let Some(parent) = Path::new(&plan.silent_shortcut).parent() {
-        for name in [super::LEGACY_SHORTCUT_FILE, "Codex++ 管理工具.lnk"] {
+        for name in [super::LEGACY_SHORTCUT_FILE, "Codex # 管理工具.lnk"] {
             let _ = std::fs::remove_file(parent.join(name));
         }
     }
@@ -189,7 +189,7 @@ fn write_uninstall_registration(plan: &WindowsEntrypointPlan) -> anyhow::Result<
         .to_string_lossy()
         .to_string();
     for (name, value) in [
-        ("DisplayName", APP_NAME.to_string()),
+        ("DisplayName", super::DISPLAY_NAME.to_string()),
         ("DisplayVersion", crate::version::VERSION.to_string()),
         ("Publisher", "BigPizzaV3".to_string()),
         ("DisplayIcon", plan.manager_icon_path.clone()),
@@ -206,7 +206,7 @@ fn write_uninstall_registration(plan: &WindowsEntrypointPlan) -> anyhow::Result<
 fn register_url_protocol(manager_path: &str) -> anyhow::Result<()> {
     register_url_protocol_key(
         URL_PROTOCOL_SUBKEY,
-        "URL:Codex++ Import Protocol",
+        "URL:Codex # Import Protocol",
         manager_path,
     )?;
     register_url_protocol_key(

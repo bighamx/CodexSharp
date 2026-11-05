@@ -36,7 +36,7 @@ export function CuPipWindow() {
     <div className="cu-pip">
       <header className="cu-pip-head" data-tauri-drag-region>
         <span className="cu-pip-dot" aria-hidden="true" />
-        <strong className="cu-pip-brand" data-tauri-drag-region>Codex++ Computer Use</strong>
+        <strong className="cu-pip-brand" data-tauri-drag-region>Codex # Computer Use</strong>
         {name
           ? <span className="cu-pip-app" data-tauri-drag-region title={`${t("正在操作")}：${target.title || name}`}>{name}</span>
           : null}

@@ -15,6 +15,8 @@ pub const APP_BINARY: &str = "codex-plus-plus";
 pub const APP_BUNDLE_ID: &str = "com.bigpizzav3.codexplusplus";
 pub const MACOS_APP_EXECUTABLE: &str = "CodexPlusPlus";
 pub const SILENT_NAME: &str = "Codex++";
+/// 卸载登记、任务栏等面向用户看到的名称；安装目录与快捷方式文件名沿用 APP_NAME/SHORTCUT_FILE，避免破坏存量安装。
+pub const DISPLAY_NAME: &str = "Codex #";
 pub const MANAGER_NAME: &str = "Codex++ 管理工具";
 pub const SILENT_BINARY: &str = "codex-plus-plus";
 pub const MACOS_SILENT_EXECUTABLE: &str = "CodexPlusPlus";
@@ -83,7 +85,7 @@ impl ShortcutState {
     }
 }
 
-/// 入口文件名：桌面与开始菜单里的快捷方式。显示名是 Codex #，落盘的安装目录仍沿用 Codex++。
+/// 入口文件名：桌面与开始菜单里的快捷方式。显示名是 Codex #，落盘的安装目录仍沿用 Codex #。
 pub const SHORTCUT_FILE: &str = "Codex #.lnk";
 /// 旧版入口名：升级时用来判断「用户本来有没有桌面图标」，删掉后按新名字重建。
 pub const LEGACY_SHORTCUT_FILE: &str = "Codex++.lnk";
@@ -224,7 +226,7 @@ fn platform_install(options: &InstallOptions) -> anyhow::Result<()> {
     #[cfg(not(any(windows, target_os = "macos", target_os = "linux")))]
     {
         let _ = options;
-        anyhow::bail!("当前平台暂不支持安装 Codex++ 入口")
+        anyhow::bail!("当前平台暂不支持安装 Codex # 入口")
     }
 }
 
@@ -247,7 +249,7 @@ fn platform_uninstall(options: &InstallOptions) -> anyhow::Result<()> {
     #[cfg(not(any(windows, target_os = "macos", target_os = "linux")))]
     {
         let _ = options;
-        anyhow::bail!("当前平台暂不支持卸载 Codex++ 入口")
+        anyhow::bail!("当前平台暂不支持卸载 Codex # 入口")
     }
 }
 

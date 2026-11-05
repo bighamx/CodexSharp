@@ -1,7 +1,7 @@
 //! 「对话造拓展」的管理器入口：把拓展创作 MCP 接入 Codex，以及 MCP 进程本身。
 //!
 //! 接入流程与协作 MCP 共用 [`crate::agent_collaboration_commands::connect_codex`]：
-//! 先写 Codex++ 托管上下文（切换供应商时不会丢），再原子写 Codex live 配置，失败只回滚本条。
+//! 先写 Codex # 托管上下文（切换供应商时不会丢），再原子写 Codex live 配置，失败只回滚本条。
 //! 不造拓展时可以取消接入（条目置为 `enabled = false`），Codex 新对话就不再带上这组工具的说明。
 
 use std::ffi::OsString;

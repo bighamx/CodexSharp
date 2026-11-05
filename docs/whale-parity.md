@@ -1,6 +1,6 @@
 # 鲸鱼挂件完整功能验收
 
-参考版本：MeteorNOX/DeepSeek-Balance-Whale-Widget `fce34e3abd1fe8b616e287b9864305c7f0be81a0`。目标宿主是 Codex++；DSH 的会话、凭据和账单数据接到 Codex++ 对应服务。
+参考版本：MeteorNOX/DeepSeek-Balance-Whale-Widget `fce34e3abd1fe8b616e287b9864305c7f0be81a0`。目标宿主是 Codex #；DSH 的会话、凭据和账单数据接到 Codex # 对应服务。
 
 原版界面引擎保留独立原始文件，Codex 适配从生成脚本产出；关闭和重复注入的清理由宿主运行时负责。以下功能已接入。自动化覆盖生命周期、保存后读回、真实媒体资源、事件去重、定价、用量和账本；浏览器验证覆盖菜单、音效试听、波形裁剪、角色/GIF导入、泡泡编辑、吸附和历史翻页搜索。
 
@@ -36,4 +36,4 @@
 
 验证材料：`whale-widget.test.ts`、`full_whale_contract.rs`、`whale_full` / `whale` 单元测试、`whale_history` 用量测试以及浏览器本地测试页。供应商协议使用合成 HTTP 响应校验，未连接用户账户；实际余额与额度取决于所选供应商提供的数据。
 
-Codex 宿主适配：凭据通过已有供应商配置复用；原版 DSH 登录态由 Codex++ 的对应供应商配置代替。当前远程会话不读取相同 ID 的本地日志，全机统计明确为本机来源。
+Codex 宿主适配：凭据通过已有供应商配置复用；原版 DSH 登录态由 Codex # 的对应供应商配置代替。当前远程会话不读取相同 ID 的本地日志，全机统计明确为本机来源。

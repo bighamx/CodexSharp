@@ -125,7 +125,7 @@ pub(crate) async fn handle(
     let gateway = GatewayStore::default().load().unwrap_or_default().with_extension_providers();
     let Some(binding) = gateway.active_binding(&agent) else {
         let message = format!(
-            "Codex++ 网关模式没有为 {} 开启，请在 Codex++ 里打开网关模式或切回直连供应商",
+            "Codex # 网关模式没有为 {} 开启，请在 Codex # 里打开网关模式或切回直连供应商",
             crate::tools::tool_display_name(&agent)
         );
         return write_error(stream, &agent, 503, &message).await;
@@ -147,7 +147,7 @@ pub(crate) async fn handle(
             stream,
             &agent,
             401,
-            "网关 token 无效，请在 Codex++ 里重新应用网关模式",
+            "网关 token 无效，请在 Codex # 里重新应用网关模式",
         )
         .await;
     }
@@ -363,7 +363,7 @@ async fn handle_images(
                 .map(|slot| (key, slot))
         }) else {
             last_error = format!(
-                "{} 的 Key 都在冷却、熔断中或达到了 Codex++ 本地限速上限",
+                "{} 的 Key 都在冷却、熔断中或达到了 Codex # 本地限速上限",
                 target.relay.name
             );
             continue;
@@ -1361,7 +1361,7 @@ async fn handle_models(
                         "owned_by": "codex-plus"
                     });
                     if id != *model {
-                        row["description"] = json!("经 Codex++ 网关转发");
+                        row["description"] = json!("经 Codex # 网关转发");
                     }
                     row
                 })

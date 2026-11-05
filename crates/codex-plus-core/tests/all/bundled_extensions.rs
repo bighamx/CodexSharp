@@ -1,4 +1,4 @@
-//! 随 Codex++ 发布的官方拓展包（来源 `bundled`）：Agent 桌宠从内置功能改成了拓展包。
+//! 随 Codex # 发布的官方拓展包（来源 `bundled`）：Agent 桌宠从内置功能改成了拓展包。
 use codex_plus_core::bundled_extensions::{AGENT_PET_KEY, agent_pet_files, agent_pet_settings_html, materialize};
 use codex_plus_core::settings::{AgentPetSettings, BackendSettings};
 use codex_plus_core::user_scripts::UserScriptManager;

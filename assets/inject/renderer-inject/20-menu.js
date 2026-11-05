@@ -434,7 +434,7 @@
     return "Codex 首页会根据项目文件和已连接应用生成「下一步做什么」的建议，会在后台持续调用模型、消耗 token。中转模式下 Codex 设置页隐藏了这个开关，可以在这里关闭。";
   }
 
-  /** 增强面板里的一行：直接读写 Codex 自己的设置，不经过 Codex++ 后端。 */
+  /** 增强面板里的一行：直接读写 Codex 自己的设置，不经过 Codex # 后端。 */
   function renderCodexAmbientSuggestionsRow() {
     const state = codexAmbientSuggestionsState;
     const pending = state.status === "idle" || state.status === "loading" || state.status === "saving";

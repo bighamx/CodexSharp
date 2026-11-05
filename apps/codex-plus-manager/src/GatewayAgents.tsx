@@ -289,7 +289,7 @@ function AgentRow({
             open={pickerOpen}
             payload={payload}
           />
-          <Switch disabled={busy !== null} label={tf("{0} 接入 Codex++", [agent.name])} on={connected} onToggle={toggle} />
+          <Switch disabled={busy !== null} label={tf("{0} 接入 Codex #", [agent.name])} on={connected} onToggle={toggle} />
           <button
             aria-expanded={expanded}
             aria-label={isClaude ? t("档位") : t("详情")}
@@ -692,8 +692,8 @@ export function Floating({
   );
 }
 
-/** 模型列表：左侧全部 / 收藏 / 按供应商跳转，右侧分组列出模型；顶部是「默认（不经 Codex++）」与「断开」。
- * 传了 `own` 与 `onPickOwn` 时，池里的模型后面再列一组 Agent 自带的模型（直连，不经 Codex++）。 */
+/** 模型列表：左侧全部 / 收藏 / 按供应商跳转，右侧分组列出模型；顶部是「默认（不经 Codex #）」与「断开」。
+ * 传了 `own` 与 `onPickOwn` 时，池里的模型后面再列一组 Agent 自带的模型（直连，不经 Codex #）。 */
 export function ModelList({
   payload,
   exclude,
@@ -826,8 +826,8 @@ export function ModelList({
                     {item.custom ? <small>{t("自定义模型 ID")}</small> : item.sub && item.sub !== section.title ? <small>{item.sub}</small> : null}
                   </span>
                   {item.direct ? (
-                    <em className="gw-mp-direct" title={tf("{0} 用自己的登录或 Key 直接向 {1} 要这个模型，不经 Codex++。选它会断开 Codex++ 并还原接入前的设置。", [ownAgent ?? "Agent", item.direct])}>
-                      {t("直连，不经 Codex++")}
+                    <em className="gw-mp-direct" title={tf("{0} 用自己的登录或 Key 直接向 {1} 要这个模型，不经 Codex #。选它会断开 Codex # 并还原接入前的设置。", [ownAgent ?? "Agent", item.direct])}>
+                      {t("直连，不经 Codex #")}
                     </em>
                   ) : null}
                   {item.direct ? null : <button
@@ -914,16 +914,16 @@ function ImageModelRow({ agent, payload, busy, run }: { agent: string; payload: 
   );
 }
 
-/** Agent 详情里的「自带模型」：模型下拉里列不列 Agent 自己的模型（直连，不经 Codex++）。 */
+/** Agent 详情里的「自带模型」：模型下拉里列不列 Agent 自己的模型（直连，不经 Codex #）。 */
 function OwnModelsRow({ agent, payload, busy, run }: { agent: GatewayAgentView; payload: GatewayPayload | null; busy: string | null; run: Run }) {
   const own = agent.ownModels;
   if (!own) return null;
   const shown = !(payload?.gateway.hideOwnModels ?? []).includes(agent.agent);
   return (
     <SetLine
-      hint={tf("直连 {0} · {1} 个，不经 Codex++", [own.vendor, String(own.models.length)])}
+      hint={tf("直连 {0} · {1} 个，不经 Codex #", [own.vendor, String(own.models.length)])}
       title={tf("显示 {0} 自带的模型", [agent.name])}
-      tooltip={tf("{0} 用自己的登录或 Key 直接向 {1} 要的模型，不经 Codex++。关掉后模型下拉只列网关的模型；{0} 现在用着的那个照样显示。", [agent.name, own.vendor])}
+      tooltip={tf("{0} 用自己的登录或 Key 直接向 {1} 要的模型，不经 Codex #。关掉后模型下拉只列网关的模型；{0} 现在用着的那个照样显示。", [agent.name, own.vendor])}
     >
       <Switch
         disabled={busy !== null}
@@ -980,11 +980,11 @@ function ModelPicker({
         className="gw-mp-action"
         data-active={!connected && !own}
         onClick={onDisconnect}
-        title={connected ? tf("断开 Codex++，还原 {0} 接入之前的设置", [agent.name]) : tf("{0} 自带的默认值", [agent.name])}
+        title={connected ? tf("断开 Codex #，还原 {0} 接入之前的设置", [agent.name]) : tf("{0} 自带的默认值", [agent.name])}
         type="button"
       >
         <AgentIcon agent={agent.agent} className="gw-popover-agent" />
-        {t("用默认（不经 Codex++）")}
+        {t("用默认（不经 Codex #）")}
         {!connected && !own ? <Check className="h-3.5 w-3.5" /> : null}
       </button>
     </>
@@ -993,7 +993,7 @@ function ModelPicker({
     <div className="gw-picker">
       <button aria-expanded={open} aria-haspopup="listbox" className="gw-picker-button" onClick={() => onOpenChange(!open)} ref={buttonRef} type="button">
         {showDefault || own ? <AgentIcon agent={agent.agent} className="gw-picker-agent" /> : <ModelViewGlyph view={display} />}
-        <span title={own ? tf("{0} 自带的模型，直连 {1}，不经 Codex++", [agent.name, agent.ownModels?.vendor ?? ""]) : undefined}>
+        <span title={own ? tf("{0} 自带的模型，直连 {1}，不经 Codex #", [agent.name, agent.ownModels?.vendor ?? ""]) : undefined}>
           {own ?? (showDefault ? t("默认") : display.title || t("选择模型"))}
         </span>
         {showDefault || own ? null : <AutoTag view={display} />}

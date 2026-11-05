@@ -16,7 +16,7 @@ const IMAGE_LIMIT: usize = 10 * 1024 * 1024;
 const LICENSE_LIMIT: usize = 65_536;
 const SIGNATURE_LIMIT: usize = 4096;
 
-// 包导入的 Dream Skin 兼容级别独立于 Codex++ 产品版本和 Codex Desktop build。
+// 包导入的 Dream Skin 兼容级别独立于 Codex # 产品版本和 Codex Desktop build。
 // 与内置上游 v1.5.20 渲染资源及 Safe CSS 桥接同步（issue #2541）；提高前须验证配套能力。
 pub const DREAM_SKIN_PACKAGE_CLIENT_VERSION: &str = "1.5.20";
 
@@ -950,7 +950,7 @@ fn validate_manifest(manifest: &DreamSkinPackageManifest, platform: &str) -> any
     }
     if compare_semver(&manifest.min_client_version, DREAM_SKIN_PACKAGE_CLIENT_VERSION).is_gt() {
         bail!(
-            "主题包要求 Dream Skin 兼容版本 {}，当前支持 {}（Codex++ {}）。minClientVersion 应填写 Dream Skin 引擎版本，不是 Codex Desktop build；请使用兼容的主题包或联系发布者确认版本标注。",
+            "主题包要求 Dream Skin 兼容版本 {}，当前支持 {}（Codex # {}）。minClientVersion 应填写 Dream Skin 引擎版本，不是 Codex Desktop build；请使用兼容的主题包或联系发布者确认版本标注。",
             manifest.min_client_version,
             DREAM_SKIN_PACKAGE_CLIENT_VERSION,
             crate::version::VERSION

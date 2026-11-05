@@ -350,7 +350,7 @@
     return `<span class="codex-session-action-glyph">${glyph}</span>`;
   }
 
-  /** 拓展行操作的回调参数。归档页的行未必读得到会话 id，resolve() 必要时问 Codex++ 按标题找。 */
+  /** 拓展行操作的回调参数。归档页的行未必读得到会话 id，resolve() 必要时问 Codex # 按标题找。 */
   function sessionRowActionContext(row, extra = {}) {
     const archived = extra.archived === true;
     const ref = archived ? archivedRefFromRow(row) : sessionRefFromRow(row);

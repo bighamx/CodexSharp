@@ -1,5 +1,5 @@
 /**
- * Codex++ 拓展接口类型定义。
+ * Codex # 拓展接口类型定义。
  *
  * 用法：在脚本开头加一行引用即可获得补全与类型检查。
  *
@@ -69,7 +69,7 @@ interface CodexPlusRowActionDefinition {
     title: string;
     /** 是不是归档页的行。 */
     archived: boolean;
-    /** 归档页的行未必读得到会话 id：按标题问 Codex++ 解析。 */
+    /** 归档页的行未必读得到会话 id：按标题问 Codex # 解析。 */
     resolve(): Promise<{ session_id: string; title: string }>;
     close: () => void;
     button?: HTMLElement;
@@ -129,7 +129,7 @@ interface CodexPlusExtensionApi {
   services(): Array<{ name: string; owner: string }>;
   /** 当前打开的 Codex 会话 id；首页、新对话还没有 id 时为空串。 */
   currentSessionId(): string;
-  /** 内置拓展的现状：Codex++ 自带功能也挂在拓展内核上，可停用、可被 replaces 顶替。 */
+  /** 内置拓展的现状：Codex # 自带功能也挂在拓展内核上，可停用、可被 replaces 顶替。 */
   builtins(): Array<{ id: string; name: string; active: boolean; disabled: boolean; replacedBy: string | null }>;
 
   /** @deprecated 早期名称，等同于 {@link CodexPlusExtensionApi.extension}。 */
@@ -213,7 +213,7 @@ interface CodexPlusExtensionApi {
   /**
    * 主动上报失败。
    *
-   * 脚本初始化期间的同步错误由 Codex++ 自动捕获，但 `await` 之后的异步错误不会，
+   * 脚本初始化期间的同步错误由 Codex # 自动捕获，但 `await` 之后的异步错误不会，
    * 需要用这个方法上报，管理页才能显示出来。
    */
   fail(error: unknown): void;
@@ -494,7 +494,7 @@ interface CodexPlusSessions {
   compact(id: string): Promise<unknown>;
 }
 
-/** 拓展调模型（经 Codex++ 协议代理，用当前供应商）。 */
+/** 拓展调模型（经 Codex # 协议代理，用当前供应商）。 */
 interface CodexPlusLlm {
   complete(options: string | {
     input: string | Array<{ role?: "user" | "assistant" | "developer" | "system"; content: string | unknown[] } | string>;
@@ -649,7 +649,7 @@ interface CodexPlusExtensionContext {
   setTimeout(handler: (...args: any[]) => void, delay?: number, ...args: unknown[]): CodexPlusDispose;
   setInterval(handler: (...args: any[]) => void, delay?: number, ...args: unknown[]): CodexPlusDispose;
   /**
-   * 跟着 Codex++ 的页面扫描跑（Codex 界面变了时调用，按帧合并、页面隐藏时不跑）。phase：deferred（默认）或 light（每次变化都跑）。
+   * 跟着 Codex # 的页面扫描跑（Codex 界面变了时调用，按帧合并、页面隐藏时不跑）。phase：deferred（默认）或 light（每次变化都跑）。
    * 插进页面的节点必须带 data-codex-plus-ext 属性。返回的撤销函数带 run()：立即跑一次。
    */
   onScan(handler: () => void, options?: { phase?: "deferred" | "light" }): CodexPlusDispose & { run(): void };
@@ -690,7 +690,7 @@ interface CodexPlusManagerPublicData {
   installedSkills: { skills: Array<{
     id: string; name: string; enabled: boolean; bundled: boolean; managed: boolean; agents: string[]; contentHash: string;
   }> };
-  /** 仅 Codex++ 市场托管的插件，不是全部 Codex 插件。 */
+  /** 仅 Codex # 市场托管的插件，不是全部 Codex 插件。 */
   installedPlugins: { plugins: Array<{ id: string; name: string; version: string; source: "public" | "full"; enabled: boolean }> };
   /** 已落盘快照，不刷新租约，不读取未 checkpoint 的 WAL。 */
   agentCollaboration: {

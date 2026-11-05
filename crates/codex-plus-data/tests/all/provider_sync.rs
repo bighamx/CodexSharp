@@ -25,7 +25,7 @@ fn pending_full_sync_journal_blocks_both_remote_control_writers_without_changes(
     let rollout=home.join("sessions/rollout-thread-1.jsonl");write_rollout(&rollout,"openai","thread-1","C:/workspace");
     let before_db=fs::read(&db).unwrap();let before_rollout=fs::read(&rollout).unwrap();
     let backup=home.join("backups_state/provider-sync/unfinished");fs::create_dir_all(&backup).unwrap();
-    fs::write(backup.join("metadata.json"),br#"{"version":2,"managedBy":"Codex++ provider sync","namespace":"provider-sync"}"#).unwrap();
+    fs::write(backup.join("metadata.json"),br#"{"version":2,"managedBy":"Codex # provider sync","namespace":"provider-sync"}"#).unwrap();
     let journal=backup.join("recovery-journal.json");fs::write(&journal,br#"{"version":1,"state":"prepared","entries":[]}"#).unwrap();
     let catalog=run_remote_control_session_catalog_recovery_for_thread_with_target(Some(&home),"thread-1","apigather");
     let finalization=run_remote_control_session_finalization_for_thread_with_target(Some(&home),"thread-1","apigather");
@@ -3332,7 +3332,7 @@ fn provider_sync_backup_metadata_contains_reference_fields_and_managed_marker() 
     assert_eq!(metadata["codexHome"], home.to_string_lossy().to_string());
     assert_eq!(metadata["targetProvider"], "apigather");
     assert_eq!(metadata["changedSessionFiles"], 1);
-    assert_eq!(metadata["managedBy"], "Codex++ provider sync");
+    assert_eq!(metadata["managedBy"], "Codex # provider sync");
     assert!(metadata["createdAt"].as_str().unwrap().contains('T'));
     assert!(
         metadata["dbFiles"]
@@ -3639,7 +3639,7 @@ fn provider_sync_restores_global_state_when_later_step_fails() {
     fs::create_dir_all(home.join("backups_state/provider-sync/blocker")).unwrap();
     fs::write(
         home.join("backups_state/provider-sync/blocker/metadata.json"),
-        json!({"managedBy": "Codex++ provider sync"}).to_string(),
+        json!({"managedBy": "Codex # provider sync"}).to_string(),
     )
     .unwrap();
 
@@ -3671,7 +3671,7 @@ fn provider_sync_skips_when_home_missing_or_lock_exists_and_prunes_backups() {
         fs::create_dir_all(&backup).unwrap();
         fs::write(
             backup.join("metadata.json"),
-            json!({"managedBy": "Codex++ provider sync"}).to_string(),
+            json!({"managedBy": "Codex # provider sync"}).to_string(),
         )
         .unwrap();
     }

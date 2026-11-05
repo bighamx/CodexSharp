@@ -1,6 +1,12 @@
+/*
+ * 本文件由 bighamx 修改（2026-11-04）：
+ * - App.tsx：移除首页（原「推荐内容」并入的落脚页）的赞助商推荐区块与广告拉取
+ * - HubOverview.tsx / HubOverview.css：把拓扑卡抽成 HubTopologyCard 供总览与首页共用，并加上首页的宽松尺寸
+ * 修改版整体仍以 GNU AGPL v3.0 授权，许可证见仓库根目录 LICENSE。
+ */
 import { flowProviderSlot } from "./flow-provider-colors";
 import "./flow-provider-colors.css";
-/** 网关总览：今日数字一排；任意 Agent → Codex++ → 任意供应商的三列拓扑；最近请求列表。 */
+/** 网关总览：今日数字一排；任意 Agent → Codex # → 任意供应商的三列拓扑；最近请求列表。 */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { ArrowUpRight, ChevronDown, Plus } from "lucide-react";
@@ -91,7 +97,7 @@ export function HubOverview({
   const routeRecords = routeRecordsByEntry(payload, feed);
 
 
-  // 参照 Cursor 的 Customize：顶部一排今日数字，中间一张拓扑卡（Codex++ 的卖点：任意 Agent → 网关 → 多家供应商），
+  // 参照 Cursor 的 Customize：顶部一排今日数字，中间一张拓扑卡（Codex # 的卖点：任意 Agent → 网关 → 多家供应商），
   // 下面「最近请求」一个列表。现状说明不再单独写一段，拓扑图自己就说明了。
   return (
     <div className="hub-page cx-page">
@@ -381,7 +387,7 @@ function FlowStreamLayer({ routes, paths, pathRefs }: {
 }
 
 /**
- * 网关拓扑卡：任意 Agent → Codex++ → 任意供应商，连线上的光点跟真实请求走。
+ * 网关拓扑卡：任意 Agent → Codex # → 任意供应商，连线上的光点跟真实请求走。
  *
  * 总览和首页共用。首页传 `roomy`：走旧版（紧凑布局之前）的宽松尺寸，
  * 节点更高、行距更大，正好填上移走推荐位后空出来的地方。
@@ -450,7 +456,7 @@ export function HubTopologyCard({
           <div className="hub-core-head">
             <img alt="" src={APP_LOGO_URL} />
             <span>
-              <strong>Codex++</strong>
+              <strong>Codex #</strong>
               <span className="hub-addr">
                 <i className="hub-dot" data-tone={payload?.helperRunning ? "ok" : "off"} />
                 {payload ? `127.0.0.1:${payload.port}` : t("读取中…")}
@@ -463,8 +469,8 @@ export function HubTopologyCard({
             title={!payload
               ? t("正在读取网关状态…")
               : solo
-                ? tf("{0} 通过 Codex++ 使用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [agentName(solo), providers.length])
-                : tf("{0} 个 Agent 通过 Codex++ 共用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [connected, providers.length])}
+                ? tf("{0} 通过 Codex # 使用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [agentName(solo), providers.length])
+                : tf("{0} 个 Agent 通过 Codex # 共用 {1} 个供应商。请求按模型名路由，Key 冷却或供应商熔断时自动换上游。", [connected, providers.length])}
           >
             {[
               t("按模型名路由"),

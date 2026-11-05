@@ -1,6 +1,6 @@
   // Agent 桌宠（图片桌宠）：Codex 窗口里一个可拖动的小角色，按下以底边为支点压扁、松开回弹，并播放按压 / 松开音。
   // 只用公开拓展接口：容器来自 overlay 插槽，设置来自本拓展的 config（管理器「Agent 桌宠」页写入），
-  // 图片与下载 / 自定义音效经路由 `/agent-pet/image`、`/agent-pet/sound` 由 Codex++ 联网下载、校验、缓存后以 data URI 返回，
+  // 图片与下载 / 自定义音效经路由 `/agent-pet/image`、`/agent-pet/sound` 由 Codex # 联网下载、校验、缓存后以 data URI 返回，
   // 内嵌的两组音效随拓展包的 assets/ 下发。一律直接从字节解码，不依赖 fetch(data:)。
   // `kind` 为 whaleWidget（大肥鱼）时这里不挂载，由 whale.js 显示完整鲸鱼挂件。
   const codexPlusAgentPetPositionKey = "codexPlus.agentPet.position.v1";
@@ -115,7 +115,7 @@
       }
     }
 
-    // 与 Codex++ `agent_pet::load_sound` 返回的 key 同一规则：自定义音效带文件名，换了文件就重新取。
+    // 与 Codex # `agent_pet::load_sound` 返回的 key 同一规则：自定义音效带文件名，换了文件就重新取。
     function soundKey(current) {
       return current.soundSet === "custom"
         ? `custom:${current.customSoundPress}:${current.customSoundRelease}`
@@ -134,7 +134,7 @@
       }
     }
 
-    // 下载 / 自定义音效：向 Codex++ 要一次，失败 30 秒后再试。
+    // 下载 / 自定义音效：向 Codex # 要一次，失败 30 秒后再试。
     function requestSounds(context, current) {
       const key = soundKey(current);
       if (pet.soundKey === key) return;

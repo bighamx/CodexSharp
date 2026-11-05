@@ -1,6 +1,6 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-llm 替身。
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-llm 替身。
 // 覆盖插件常用的导出：构造消息的函数、错误类、把流式块拼回内容块的 BlockAssembler，以及几个判断函数。
-// 模型调用本身走宿主注入的 ctx.llm（经 Codex++ 协议代理用当前供应商）；adapter 注册、图片下放等
+// 模型调用本身走宿主注入的 ctx.llm（经 Codex # 协议代理用当前供应商）；adapter 注册、图片下放等
 // 只属于 dsh 运行时的能力不提供，插件用到别的导出时会在分析阶段判为不兼容。
 
 import { randomUUID } from 'node:crypto'
@@ -246,7 +246,7 @@ export function callConfigEquals(a, b) {
   return a.stop.length === b.stop.length && a.stop.every((item, index) => item === b.stop[index])
 }
 
-/** Codex++ 里没有 dsh 的 agent 循环：请求都不是它组装的。 */
+/** Codex # 里没有 dsh 的 agent 循环：请求都不是它组装的。 */
 const AGENT_LOOP_REQUESTS = new WeakSet()
 export const markAgentLoopRequest = (request) => (AGENT_LOOP_REQUESTS.add(request), request)
 export const isAgentLoopRequest = (request) => AGENT_LOOP_REQUESTS.has(request)
@@ -269,7 +269,7 @@ export function assertUsableApiKey(raw, pkg, ref) {
 }
 
 const DEFAULT_RETRYABLE_CODES = Object.freeze([EMPTY_RESPONSE_CODE, 'RATE_LIMIT', 'SERVER', 'TIMEOUT', 'TRANSPORT'])
-/** 供应商的重试策略：补默认值并冻结（Codex++ 不替插件执行它，只让构造供应商的代码照常跑通）。 */
+/** 供应商的重试策略：补默认值并冻结（Codex # 不替插件执行它，只让构造供应商的代码照常跑通）。 */
 export function resolveRetryPolicy(config, path = 'retryPolicy') {
   const backoff = Object.freeze({ initialDelayMs: 500, maxDelayMs: 10_000, jitterRatio: 0.1, ...(config?.backoff ?? {}) })
   if (config === undefined || config.mode === 'normal') {

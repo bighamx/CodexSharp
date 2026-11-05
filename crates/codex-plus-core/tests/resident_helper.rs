@@ -65,7 +65,7 @@ fn resident_helper_stays_up_across_codex_session_lifecycle() {
     resident_helper::ensure_resident_helper(port).unwrap();
     assert_eq!(resident_helper::resident_helper_port(), Some(port));
 
-    // 模拟一次 Codex++ 启动会话：start_helper 复用常驻实例；会话收尾时
+    // 模拟一次 Codex # 启动会话：start_helper 复用常驻实例；会话收尾时
     // shutdown_helper 不能把常驻 helper 或它的听写凭据带走。
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()

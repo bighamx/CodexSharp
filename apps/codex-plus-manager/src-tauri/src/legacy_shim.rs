@@ -3,11 +3,11 @@
 /// Compatibility binary for the v1.7.x macOS updater.
 ///
 /// The old updater requires a second manager bundle and opens it after replacing
-/// both apps. The real Codex++ bundle is opened immediately afterward, so this
+/// both apps. The real Codex # bundle is opened immediately afterward, so this
 /// hidden shim only needs to be a valid small Mach-O process that exits cleanly.
 ///
 /// 用户开了「显示隐藏文件」时会看到这个壳并把它拖进「应用程序」，双击后什么都
-/// 不发生（#2493）。所以 macOS 上被启动时转交给主 Codex++：主程序已安装就直接
+/// 不发生（#2493）。所以 macOS 上被启动时转交给主 Codex #：主程序已安装就直接
 /// 拉起（旧更新器紧接着也会打开主程序，单实例下重复激活无害），找不到主程序才
 /// 弹窗说明该拖哪个 app。
 fn main() {

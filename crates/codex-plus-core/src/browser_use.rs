@@ -96,7 +96,7 @@ pub fn serve() -> anyhow::Result<()> {
 }
 
 /// JS 档下给客户端的说明：浏览器在 codex-plus-cu 里。
-const MERGED_NOTE: &str = "Browser control is provided by the codex-plus-cu `js` tool (same as Codex): use `cua.listTabs` / `cua.getTab` / `cua.createBrowserTab` there. This server exposes no tools while Codex++ uses the JS operation mode.";
+const MERGED_NOTE: &str = "Browser control is provided by the codex-plus-cu `js` tool (same as Codex): use `cua.listTabs` / `cua.getTab` / `cua.createBrowserTab` there. This server exposes no tools while Codex # uses the JS operation mode.";
 
 fn serve_merged() -> anyhow::Result<()> {
     let stdin = std::io::stdin();

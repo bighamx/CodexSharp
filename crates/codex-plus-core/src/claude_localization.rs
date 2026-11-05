@@ -340,8 +340,8 @@ const INSPECT_FUSE_INDEX: usize = 3;
 #[cfg(any(target_os = "windows", test))]
 const INSPECT_FUSE_DISABLED_MESSAGE: &str = "增强版副本的 Electron 调试开关（EnableNodeCliInspectArguments fuse）处于关闭状态，\
 Claude 会忽略 --inspect 参数，汉化与 Bash 时限增强都无法注入。请完全退出 Claude 后，\
-在 Codex++「Claude 增强」里点「制作增强版 / 更新副本」重新制作副本再启动；\
-若重新制作后仍提示此错误，请在 issue 中附上 Codex++ 状态目录下 claude-localization\\operation.log。";
+在 Codex #「Claude 增强」里点「制作增强版 / 更新副本」重新制作副本再启动；\
+若重新制作后仍提示此错误，请在 issue 中附上 Codex # 状态目录下 claude-localization\\operation.log。";
 
 #[cfg(any(target_os = "windows", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -489,7 +489,7 @@ fn verify_packed_ion_copy(copy_exe: &Path) -> Result<()> {
     crate::claude_ion_asar::verify_ion_asar(&asar)?;
     ensure!(
         asar_integrity_fuse_disabled(&fs::read(copy_exe)?),
-        "增强版副本改写了 ion-dist.asar，但 asar 完整性校验 fuse 仍是打开的，Claude 会拒绝加载。请在 Codex++「Claude 增强」里点「制作增强版 / 更新副本」重新制作副本。"
+        "增强版副本改写了 ion-dist.asar，但 asar 完整性校验 fuse 仍是打开的，Claude 会拒绝加载。请在 Codex #「Claude 增强」里点「制作增强版 / 更新副本」重新制作副本。"
     );
     Ok(())
 }
@@ -502,13 +502,13 @@ fn source_read_error_message(path: &Path, error: &std::io::Error, copy_root: &Pa
     match error.kind() {
         std::io::ErrorKind::PermissionDenied => format!(
             "无法读取 Claude 安装文件 {path}：当前账户没有读取权限（{error}）。\
-Windows 商店版（MSIX）Claude 的官方程序关闭了 Electron 调试开关，Codex++ 需要先把它复制到 {copy_root} \
-并在副本里打开调试开关，才能注入汉化与 Bash 时限增强。请用安装 Claude 的同一个 Windows 账户运行 Codex++，\
+Windows 商店版（MSIX）Claude 的官方程序关闭了 Electron 调试开关，Codex # 需要先把它复制到 {copy_root} \
+并在副本里打开调试开关，才能注入汉化与 Bash 时限增强。请用安装 Claude 的同一个 Windows 账户运行 Codex #，\
 不要以管理员或其他用户身份运行；若仍被拒绝，可改装 Claude 官网安装包后重新「制作增强版」。"
         ),
         std::io::ErrorKind::NotFound => format!(
             "找不到 Claude 安装文件 {path}：Claude 可能正在更新或已被卸载。请打开一次官方 Claude 确认能正常启动，\
-再回到 Codex++ 重新「制作增强版」。"
+再回到 Codex # 重新「制作增强版」。"
         ),
         _ => format!("读取 Claude 安装文件 {path} 失败：{error}。请确认 Claude 已安装完整后重新「制作增强版」。"),
     }
@@ -947,7 +947,7 @@ fn voice_input_enabled() -> bool {
         .unwrap_or(true)
 }
 
-/// 副本的语音入口靠 Codex++ helper 转写（hook.js 读 helper 落下的凭据）。helper 原本只随
+/// 副本的语音入口靠 Codex # helper 转写（hook.js 读 helper 落下的凭据）。helper 原本只随
 /// Codex 会话或协议代理常驻，没在跑 Codex 时 Claude 里点麦克风只会提示「语音服务未运行」。
 /// 所以开关打开且已经制作过副本时，管理器要把 helper 常驻起来。
 ///
@@ -983,7 +983,7 @@ fn extensions_enabled() -> bool {
         .unwrap_or(false)
 }
 
-/// 写入语音入口开关。只改 Codex++ 自己的设置，不触碰副本与官方应用。
+/// 写入语音入口开关。只改 Codex # 自己的设置，不触碰副本与官方应用。
 pub fn set_voice_input(enabled: bool) -> Result<ClaudeLocalizationStatus> {
     let store = crate::settings::SettingsStore::default();
     let mut settings = store.load()?;

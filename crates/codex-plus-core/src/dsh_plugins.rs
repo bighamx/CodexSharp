@@ -35,7 +35,7 @@ pub const SPEC: ManagedMcp = ManagedMcp {
     server_id: SERVER_ID,
     flag: MCP_FLAG,
     label: "dsh 插件 MCP",
-    comment: "Managed by Codex++: dsh plugins MCP",
+    comment: "Managed by Codex #: dsh plugins MCP",
     lock_file: ".codex-plus-dsh-mcp.lock",
     backup_dir: ".codex-plus-dsh-mcp-backups",
     legacy: &[],
@@ -261,7 +261,7 @@ pub struct PluginRecord {
     pub source: PluginSource,
     /// 包目录（宿主从这里加载）。
     pub root: String,
-    /// 包目录由 Codex++ 管理（npm / git），移除时一并移入备份；本地目录只解除登记。
+    /// 包目录由 Codex # 管理（npm / git），移除时一并移入备份；本地目录只解除登记。
     #[serde(default)]
     pub managed: bool,
     #[serde(default = "default_true")]
@@ -303,7 +303,7 @@ pub struct MarketEntry {
     /// 交给 [`parse_source`] 的字符串：npm 是 `name@version`（自定义 registry 时加 `#registry:<地址>`），
     /// git 是 `url#commit&path:子目录`。
     pub source: String,
-    /// 来源里 Codex++ 不支持、被忽略的部分；目前都支持，留作兼容（总是 `None`）。
+    /// 来源里 Codex # 不支持、被忽略的部分；目前都支持，留作兼容（总是 `None`）。
     pub note: Option<String>,
 }
 
@@ -1501,7 +1501,7 @@ fn move_dir(from: &Path, to: &Path) -> anyhow::Result<()> {
     }
 }
 
-/// 清理 Codex++ 自己创建的暂存目录。
+/// 清理 Codex # 自己创建的暂存目录。
 fn remove_dir_quietly(path: &Path) -> std::io::Result<()> {
     if path.exists() {
         std::fs::remove_dir_all(path)
@@ -1734,7 +1734,7 @@ pub fn companion_write(record: &PluginRecord, registry_path: &Path, bridge_path:
     let bridge_url = reqwest::Url::from_file_path(bridge_path).ok()?.to_string();
     let display = if record.name.is_empty() { &record.id } else { &record.name };
     let header = format!(
-        "// 由 Codex++ 根据 dsh 插件「{display}」生成，重新分析插件时会覆盖，不要手改。\n"
+        "// 由 Codex # 根据 dsh 插件「{display}」生成，重新分析插件时会覆盖，不要手改。\n"
     );
     let mut files = BTreeMap::new();
     files.insert(
@@ -1842,7 +1842,7 @@ pub fn companion_write(record: &PluginRecord, registry_path: &Path, bridge_path:
         );
         if let Some((client, source)) = &client_source {
             script.push_str(&format!(
-                "\n  // dsh 前端插件：截住它的 __ModuleLoader__.load，把发往 /api/ 的 fetch 经后台转给插件的宿主半边，\n  // 再交给 Codex++ 的 dsh 前端运行时（React 用 Codex 页面自己的，dsh 插槽映射到 Codex++ 的插槽）。\n  const modules = []\n  const loader = {{ load: (module) => modules.push(module) }}\n  const routed = async (input, init = {{}}) => {{\n    const url = typeof input === 'string' ? input : String(input?.url ?? input)\n    if (!url.startsWith('/api/')) return globalThis.fetch(input, init)\n    const reply = await ctx.backend.call('fetch', {{ path: url, method: init.method || 'GET', headers: init.headers ?? {{}}, body: init.body ?? null }}, {{ timeout: 120000 }})\n    return new Response(reply?.body ?? '', {{ status: reply?.status ?? 502, headers: reply?.headers ?? {{}} }})\n  }}\n  const window = new Proxy(globalThis.window, {{\n    get: (target, key) => key === '__ModuleLoader__' ? loader : key === 'fetch' ? routed : Reflect.get(target, key),\n  }})\n  const fetch = routed\n  ;(function () {{\n// ---- {name} 的前端入口 ----\n{source}\n// ---- 前端入口结束 ----\n  }}).call(window)\n  void codexPlus.dshClient(ctx, modules, {{ packageName: {package}, config: {config} }}).catch((error) => ctx.fail(error))\n",
+                "\n  // dsh 前端插件：截住它的 __ModuleLoader__.load，把发往 /api/ 的 fetch 经后台转给插件的宿主半边，\n  // 再交给 Codex # 的 dsh 前端运行时（React 用 Codex 页面自己的，dsh 插槽映射到 Codex # 的插槽）。\n  const modules = []\n  const loader = {{ load: (module) => modules.push(module) }}\n  const routed = async (input, init = {{}}) => {{\n    const url = typeof input === 'string' ? input : String(input?.url ?? input)\n    if (!url.startsWith('/api/')) return globalThis.fetch(input, init)\n    const reply = await ctx.backend.call('fetch', {{ path: url, method: init.method || 'GET', headers: init.headers ?? {{}}, body: init.body ?? null }}, {{ timeout: 120000 }})\n    return new Response(reply?.body ?? '', {{ status: reply?.status ?? 502, headers: reply?.headers ?? {{}} }})\n  }}\n  const window = new Proxy(globalThis.window, {{\n    get: (target, key) => key === '__ModuleLoader__' ? loader : key === 'fetch' ? routed : Reflect.get(target, key),\n  }})\n  const fetch = routed\n  ;(function () {{\n// ---- {name} 的前端入口 ----\n{source}\n// ---- 前端入口结束 ----\n  }}).call(window)\n  void codexPlus.dshClient(ctx, modules, {{ packageName: {package}, config: {config} }}).catch((error) => ctx.fail(error))\n",
                 name = client.package_name,
                 package = js_string(&client.package_name),
                 config = client.config,
@@ -1902,7 +1902,7 @@ pub fn companion_write(record: &PluginRecord, registry_path: &Path, bridge_path:
         name: format!("dsh：{display}"),
         version: if record.version.is_empty() { "0.1.0".to_string() } else { record.version.clone() },
         description: format!(
-            "由 Codex++ 为 dsh 插件「{display}」生成：{}。在「dsh 插件」里管理，随插件启停与移除。",
+            "由 Codex # 为 dsh 插件「{display}」生成：{}。在「dsh 插件」里管理，随插件启停与移除。",
             targets.join("、")
         ),
         routes: Vec::new(),
@@ -2127,7 +2127,7 @@ pub fn run_mcp(args: &[OsString]) -> anyhow::Result<i32> {
         .stdin(Stdio::inherit())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
-    // 插件经 Codex++ 可执行文件发起宿主调用（读写会话、调模型、问用户）。
+    // 插件经 Codex # 可执行文件发起宿主调用（读写会话、调模型、问用户）。
     if let Ok(exe) = std::env::current_exe() {
         command.env(crate::extension_backend::HOST_EXE_ENV, exe);
     }

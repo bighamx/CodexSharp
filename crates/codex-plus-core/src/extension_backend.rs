@@ -1,7 +1,7 @@
 //! 拓展的常驻后台进程：拓展包在 `codexpp.json` 里声明 `backend.script`，页面侧经 `ctx.backend`
 //! 调用它导出的方法、接收它推送的事件。
 //!
-//! 进程由处理桥接请求的 Codex++ 进程（启动器）托管：首次调用时用 Node 启动，之后常驻。
+//! 进程由处理桥接请求的 Codex # 进程（启动器）托管：首次调用时用 Node 启动，之后常驻。
 //! 热重载、启停拓展多半发生在别的进程（管理器、拓展 MCP 直接经 CDP 重载），所以停后台靠两条路：
 //! 页面上的拓展实例卸载时经桥接发 `stop`（带实例标识，不误停新实例刚拉起的后台）；每次调用前
 //! 再核对脚本、配置、启用状态，过期就重起、停用就停掉。页面整体重新加载时启动器直接全部停掉。
@@ -400,7 +400,7 @@ async fn page_call(ports: &[u16], function: &str, name: &Value, params: &Value) 
     }
     let websocket = websocket.context("没有找到已连接的 Codex 页面")?;
     let expression = format!(
-        "(async () => {{ if (typeof window.{function} !== \"function\") throw new Error(\"Codex 页面还没装好 Codex++ 拓展运行时\"); return JSON.stringify(await window.{function}({name}, {params})); }})()"
+        "(async () => {{ if (typeof window.{function} !== \"function\") throw new Error(\"Codex 页面还没装好 Codex # 拓展运行时\"); return JSON.stringify(await window.{function}({name}, {params})); }})()"
     );
     // 提问要等用户回答：按它的 timeoutMs 多给 5 秒；其余页面调用（会话写入）给 30 秒。
     let timeout = if function == "__codexPlusUiCall" && name == "ask" {
@@ -431,7 +431,7 @@ pub fn set_remote_bridge_ports(ports: Vec<u16>) {
 /// 宿主调用的命令行入口参数：`CodexPlusPlus --codex-plus-host-call`，stdin 一个 `{ service, method, params }`，
 /// stdout 一行 `{ result }` 或 `{ error }`。给不经运行器起的 Node 进程用（dsh 插件 MCP、钩子常驻进程）。
 pub const HOST_CALL_FLAG: &str = "--codex-plus-host-call";
-/// Codex++ 起 Node 进程时设置：指向 Codex++ 可执行文件，Node 侧据此发起宿主调用。
+/// Codex # 起 Node 进程时设置：指向 Codex # 可执行文件，Node 侧据此发起宿主调用。
 pub const HOST_EXE_ENV: &str = "CODEX_PLUS_HOST_EXE";
 const MAX_HOST_CALL_BYTES: u64 = 8 * 1024 * 1024;
 

@@ -39,7 +39,7 @@
   const codexPlusModelPickerNativeLabelClass = "codex-plus-model-group-native-label";
   /** 我们自己插入的模型标签类名。 */
   const codexPlusModelPickerOwnLabelClass = "codex-plus-model-group-own-label";
-  /** 在 Codex++ 里收藏过的模型，行尾的星标。 */
+  /** 在 Codex # 里收藏过的模型，行尾的星标。 */
   const codexPlusModelPickerFavoriteClass = "codex-plus-model-group-favorite";
   /** 行上的分组标记属性。 */
   const codexPlusModelPickerGroupAttr = "data-codex-plus-model-group";
@@ -96,7 +96,7 @@
           modelCount: (count) => `${count} 个模型`,
           groupAria: (name, count, current, isDefault) => `${name}${isDefault ? "（默认供应商）" : ""}，${count} 个模型${current ? "，当前使用" : ""}`,
           groupTitle: (name, count) => `${name} · ${count}`,
-          favorite: "已收藏（在 Codex++ 里收藏的模型）",
+          favorite: "已收藏（在 Codex # 里收藏的模型）",
         }
       : {
           defaultBadge: "Default",
@@ -108,7 +108,7 @@
           modelCount: (count) => `${count} models`,
           groupAria: (name, count, current, isDefault) => `${name}${isDefault ? " (default provider)" : ""}, ${count} models${current ? ", currently selected" : ""}`,
           groupTitle: (name, count) => `${name} · ${count}`,
-          favorite: "Favorite (starred in Codex++)",
+          favorite: "Favorite (starred in Codex #)",
         };
   }
 
@@ -420,7 +420,7 @@
       const groupId =
         typeof entry.codex_plus_group_id === "string" ? entry.codex_plus_group_id.trim() : "";
       if (!provider || !groupId) return;
-      // 在 Codex++ 里收藏过的模型（网关写的 `codex_plus_favorite`）：行尾画星标。
+      // 在 Codex # 里收藏过的模型（网关写的 `codex_plus_favorite`）：行尾画星标。
       const value = { provider, groupId, favorite: entry.codex_plus_favorite === true };
       // 原文键：网关关掉「模型名后带供应商」时，同名的几份只差末尾看不见的零宽字符，
       // 宽松归一化会把它们抹掉，必须先按原文比对。

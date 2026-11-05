@@ -28,7 +28,7 @@ export function AgentFocusDialog({ initial, onDone, onCancel }: {
   onDone: (mode: FocusMode) => Promise<boolean>;
   onCancel?: () => void;
 }) {
-  // 第一次问默认选「只管理 Codex」：大多数人装 Codex++ 是为了 Codex。
+  // 第一次问默认选「只管理 Codex」：大多数人装 Codex # 是为了 Codex。
   const [value, setValue] = useState<FocusMode>(initial ?? "codex");
   const [pending, setPending] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
@@ -106,7 +106,7 @@ export function AgentFocusDialog({ initial, onDone, onCancel }: {
     <div className="tour-root" ref={dialog} role="dialog" aria-modal="true" aria-labelledby="agent-focus-title" aria-describedby="agent-focus-description" aria-busy={pending} tabIndex={-1}>
       <div className="tour-dim" />
       <div className="tour-card agent-focus-card" data-centered="true">
-        <h3 id="agent-focus-title">{t("你打算怎么用 Codex++？")}</h3>
+        <h3 id="agent-focus-title">{t("你打算怎么用 Codex #？")}</h3>
         <p id="agent-focus-description">{t("选择要使用的功能，之后可以在设置里修改。已有的 Agent 网关连接不会随模式切换而断开。")}</p>
         <div className="agent-focus-list" role="radiogroup" aria-label={t("使用模式")}>
           {FOCUS_MODES.map((mode) => {
@@ -133,7 +133,7 @@ export function AgentFocusDialog({ initial, onDone, onCancel }: {
             <div className="tour-actions"><button className="tour-ghost" onClick={() => setLoadAttempt((attempt) => attempt + 1)} type="button"><RefreshCw aria-hidden="true" size={13} />{t("重试")}</button></div>
           </div>
         ) : value === "enhance" && gateway.agents.length ? (
-          <p className="agent-focus-warning">{tf("{0} 目前经 Codex++ 网关接入，切换后会继续运行并管理对应配置。要交给其他供应商工具，请先在「全部功能」的「Agent 接入」中断开。", [gateway.agents.join("、")])}</p>
+          <p className="agent-focus-warning">{tf("{0} 目前经 Codex # 网关接入，切换后会继续运行并管理对应配置。要交给其他供应商工具，请先在「全部功能」的「Agent 接入」中断开。", [gateway.agents.join("、")])}</p>
         ) : null}
         {saveFailed ? <p className="agent-focus-warning" role="alert">{t("模式尚未切换。请重试，或取消后检查设置。")}</p> : null}
         <div className="tour-actions agent-focus-actions">

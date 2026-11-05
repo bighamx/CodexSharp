@@ -404,7 +404,7 @@
     },
     {
       "number": 2585,
-      "title": "[Bug]: 用户脚本在 MutationObserver 回调内自改 innerText，导致 Codex++ 启动黑屏且渲染进程 100% CPU",
+      "title": "[Bug]: 用户脚本在 MutationObserver 回调内自改 innerText，导致 Codex # 启动黑屏且渲染进程 100% CPU",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2585",
       "snapshotUpdatedAt": "2026-10-17T09:40:45Z",
       "finalState": "OPEN",
@@ -500,7 +500,7 @@
     },
     {
       "number": 2574,
-      "title": "[Bug]: Codex++ 1.9.0 在 Codex App 自动更新后无法启动/重启，恢复后 service tier dispatcher 补丁仍失败",
+      "title": "[Bug]: Codex # 1.9.0 在 Codex App 自动更新后无法启动/重启，恢复后 service tier dispatcher 补丁仍失败",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2574",
       "snapshotUpdatedAt": "2026-10-17T09:56:10Z",
       "finalState": "OPEN",
@@ -656,7 +656,7 @@
     },
     {
       "number": 2551,
-      "title": "Codex++ 增加「强制刷新 UI 配置」按钮，修复 Statsig 开关获取失败导致中文界面无法启用的问题",
+      "title": "Codex # 增加「强制刷新 UI 配置」按钮，修复 Statsig 开关获取失败导致中文界面无法启用的问题",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2551",
       "snapshotUpdatedAt": "2026-10-15T14:55:13Z",
       "finalState": "OPEN",
@@ -824,7 +824,7 @@
     },
     {
       "number": 2525,
-      "title": "[Bug]: Windows Codex Beta 版本无法通过 Codex++ 多开启动",
+      "title": "[Bug]: Windows Codex Beta 版本无法通过 Codex # 多开启动",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2525",
       "snapshotUpdatedAt": "2026-10-15T07:39:07Z",
       "finalState": "OPEN",
@@ -956,7 +956,7 @@
     },
     {
       "number": 2499,
-      "title": "[Bug]: Windows 下通过 Codex++ 启动后，Codex 任务栏显示白色通用图标",
+      "title": "[Bug]: Windows 下通过 Codex # 启动后，Codex 任务栏显示白色通用图标",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2499",
       "snapshotUpdatedAt": "2026-10-17T08:25:07Z",
       "finalState": "OPEN",
@@ -1364,7 +1364,7 @@
     },
     {
       "number": 2438,
-      "title": "[Bug]: Codex++ 1.7.0 在 Windows 开机后首次启动、网络未通过代理时，UI 回退英文；代理连通后重新启动才显示中文。启动命令没有语言参数，疑似 locale 初始化失败后没有重试。",
+      "title": "[Bug]: Codex # 1.7.0 在 Windows 开机后首次启动、网络未通过代理时，UI 回退英文；代理连通后重新启动才显示中文。启动命令没有语言参数，疑似 locale 初始化失败后没有重试。",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2438",
       "snapshotUpdatedAt": "2026-10-15T14:54:38Z",
       "finalState": "OPEN",
@@ -1532,7 +1532,7 @@
     },
     {
       "number": 2407,
-      "title": "[Bug]: 经 Codex++ 启动 Codex 26.1002.x 后报「无法加载工作空间设置」无法发送，不经 Codex++ 则正常",
+      "title": "[Bug]: 经 Codex # 启动 Codex 26.1002.x 后报「无法加载工作空间设置」无法发送，不经 Codex # 则正常",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2407",
       "snapshotUpdatedAt": "2026-10-15T07:03:02Z",
       "finalState": "OPEN",
@@ -1784,7 +1784,7 @@
     },
     {
       "number": 2213,
-      "title": "[Bug]: Codex++ v1.3.0 在 Codex Desktop 26.527.3686.0 上插件入口未解锁（API token 登录）",
+      "title": "[Bug]: Codex # v1.3.0 在 Codex Desktop 26.527.3686.0 上插件入口未解锁（API token 登录）",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2213",
       "snapshotUpdatedAt": "2026-10-17T07:06:17Z",
       "finalState": "OPEN",
@@ -1880,7 +1880,7 @@
     },
     {
       "number": 2156,
-      "title": "Codex++ (v1.3.0) sends the same MCP namespace in **two different `tool_search_output` input items** within a single request. The upstream provider (\"Console Go\") rejects the request because it requires namespace names to be unique across the whole input.",
+      "title": "Codex # (v1.3.0) sends the same MCP namespace in **two different `tool_search_output` input items** within a single request. The upstream provider (\"Console Go\") rejects the request because it requires namespace names to be unique across the whole input.",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2156",
       "snapshotUpdatedAt": "2026-10-16T08:33:00Z",
       "finalState": "OPEN",
@@ -2240,7 +2240,7 @@
     },
     {
       "number": 2038,
-      "title": "[Bug]: 使用 Codex++ 的**中转注入模式**连接第三方 API（非官方 OpenAI 账号），Codex 会因为检测不到模型的工具调用能力标识，自动禁用 `js_repl`",
+      "title": "[Bug]: 使用 Codex # 的**中转注入模式**连接第三方 API（非官方 OpenAI 账号），Codex 会因为检测不到模型的工具调用能力标识，自动禁用 `js_repl`",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/2038",
       "snapshotUpdatedAt": "2026-09-10T22:56:24Z",
       "finalState": "OPEN",
@@ -2540,7 +2540,7 @@
     },
     {
       "number": 1794,
-      "title": "[Feature]: Codex++1.2.44版本无法使用@computer use  、@Brower、@Chrome",
+      "title": "[Feature]: Codex #1.2.44版本无法使用@computer use  、@Brower、@Chrome",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1794",
       "snapshotUpdatedAt": "2026-09-10T22:53:25Z",
       "finalState": "OPEN",
@@ -2624,7 +2624,7 @@
     },
     {
       "number": 1677,
-      "title": "[Bug]: 点击重启Codex++后没有启动",
+      "title": "[Bug]: 点击重启Codex #后没有启动",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1677",
       "snapshotUpdatedAt": "2026-09-10T22:52:44Z",
       "finalState": "OPEN",
@@ -2936,7 +2936,7 @@
     },
     {
       "number": 1443,
-      "title": "[Bug]: 使用 Codex++ 启动后，打开内置浏览器会导致 Codex App 整体崩溃",
+      "title": "[Bug]: 使用 Codex # 启动后，打开内置浏览器会导致 Codex App 整体崩溃",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1443",
       "snapshotUpdatedAt": "2026-10-08T04:53:34Z",
       "finalState": "OPEN",
@@ -3500,7 +3500,7 @@
     },
     {
       "number": 1329,
-      "title": "[Bug]: Codex++无法通过系统代理连接到GitHub",
+      "title": "[Bug]: Codex #无法通过系统代理连接到GitHub",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1329",
       "snapshotUpdatedAt": "2026-10-08T04:55:39Z",
       "finalState": "OPEN",
@@ -4184,7 +4184,7 @@
     },
     {
       "number": 1205,
-      "title": "[Bug]: 升级后 Codex++ 无法启动",
+      "title": "[Bug]: 升级后 Codex # 无法启动",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1205",
       "snapshotUpdatedAt": "2026-10-16T09:20:07Z",
       "finalState": "OPEN",
@@ -4316,7 +4316,7 @@
     },
     {
       "number": 1183,
-      "title": "[Bug]: Codex++不断自动向api后端发送 gpt-5.4 模型的请求",
+      "title": "[Bug]: Codex #不断自动向api后端发送 gpt-5.4 模型的请求",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1183",
       "snapshotUpdatedAt": "2026-10-08T04:58:35Z",
       "finalState": "OPEN",
@@ -4328,7 +4328,7 @@
     },
     {
       "number": 1180,
-      "title": "[Config]: kimi-k2.7-code fails with Moonshot invalid thinking via Codex++ proxy",
+      "title": "[Config]: kimi-k2.7-code fails with Moonshot invalid thinking via Codex # proxy",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1180",
       "snapshotUpdatedAt": "2026-10-08T04:58:35Z",
       "finalState": "OPEN",
@@ -4700,7 +4700,7 @@
     },
     {
       "number": 1103,
-      "title": "[Bug]: 应用程序“Codex++”已不能再打开。",
+      "title": "[Bug]: 应用程序“Codex #”已不能再打开。",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1103",
       "snapshotUpdatedAt": "2026-10-08T05:00:02Z",
       "finalState": "OPEN",
@@ -4820,7 +4820,7 @@
     },
     {
       "number": 1079,
-      "title": "[Bug]: Codex++1.2.13版本无法使用computer use",
+      "title": "[Bug]: Codex #1.2.13版本无法使用computer use",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1079",
       "snapshotUpdatedAt": "2026-10-08T05:00:04Z",
       "finalState": "OPEN",
@@ -5000,7 +5000,7 @@
     },
     {
       "number": 1032,
-      "title": "[Bug]: 频繁出现Codex和后台Codex++后端断连；",
+      "title": "[Bug]: 频繁出现Codex和后台Codex #后端断连；",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/1032",
       "snapshotUpdatedAt": "2026-10-16T08:33:11Z",
       "finalState": "OPEN",
@@ -5756,7 +5756,7 @@
     },
     {
       "number": 874,
-      "title": "[Bug]: 存在Codex++ 但是点击重启Codex++ 按钮报错失败",
+      "title": "[Bug]: 存在Codex # 但是点击重启Codex # 按钮报错失败",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/874",
       "snapshotUpdatedAt": "2026-10-17T09:41:35Z",
       "finalState": "OPEN",
@@ -5936,7 +5936,7 @@
     },
     {
       "number": 851,
-      "title": "[Bug]: 使用Codex++设置操控电脑无法设置成功",
+      "title": "[Bug]: 使用Codex #设置操控电脑无法设置成功",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/851",
       "snapshotUpdatedAt": "2026-10-08T05:04:09Z",
       "finalState": "OPEN",
@@ -5960,7 +5960,7 @@
     },
     {
       "number": 849,
-      "title": "[Bug]: Codex++ 管理器脚本市场无法加载,原因是 https://raw.githubusercontent.com/BigPizzaV3/CodexPlusPlusScriptMarket/main/index.json 这份远程的脚本数据格式有误",
+      "title": "[Bug]: Codex # 管理器脚本市场无法加载,原因是 https://raw.githubusercontent.com/BigPizzaV3/CodexPlusPlusScriptMarket/main/index.json 这份远程的脚本数据格式有误",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/849",
       "snapshotUpdatedAt": "2026-10-15T14:50:55Z",
       "finalState": "OPEN",
@@ -6116,7 +6116,7 @@
     },
     {
       "number": 821,
-      "title": "Mac启动不了Codex++ 无法定位到Codex路径 手动指向也不行",
+      "title": "Mac启动不了Codex # 无法定位到Codex路径 手动指向也不行",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/821",
       "snapshotUpdatedAt": "2026-10-17T09:41:33Z",
       "finalState": "OPEN",
@@ -6476,7 +6476,7 @@
     },
     {
       "number": 755,
-      "title": "[Bug]: 不仅Codex++启动不了 codex也启动不了了",
+      "title": "[Bug]: 不仅Codex #启动不了 codex也启动不了了",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/755",
       "snapshotUpdatedAt": "2026-10-08T05:06:15Z",
       "finalState": "OPEN",
@@ -6644,7 +6644,7 @@
     },
     {
       "number": 716,
-      "title": "[Bug]: 重启Codex++没有没有反应",
+      "title": "[Bug]: 重启Codex #没有没有反应",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/716",
       "snapshotUpdatedAt": "2026-10-08T05:06:57Z",
       "finalState": "OPEN",
@@ -6788,7 +6788,7 @@
     },
     {
       "number": 686,
-      "title": "Codex++ 启动时隐藏 settings 页的 Context-Aware Suggestions 开关，导致用户无法手动关闭 Ambient Suggestions 消耗 token",
+      "title": "Codex # 启动时隐藏 settings 页的 Context-Aware Suggestions 开关，导致用户无法手动关闭 Ambient Suggestions 消耗 token",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/686",
       "snapshotUpdatedAt": "2026-10-08T05:07:42Z",
       "finalState": "OPEN",
@@ -7112,7 +7112,7 @@
     },
     {
       "number": 609,
-      "title": "[Bug]: 插件BUG     Codex++ rewrites config.toml and clears bundled plugin cache",
+      "title": "[Bug]: 插件BUG     Codex # rewrites config.toml and clears bundled plugin cache",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/609",
       "snapshotUpdatedAt": "2026-10-15T16:00:46Z",
       "finalState": "OPEN",
@@ -7388,7 +7388,7 @@
     },
     {
       "number": 536,
-      "title": "[Bug]: 升级Codex++后Codex进入不了界面 一直停留在启动界面",
+      "title": "[Bug]: 升级Codex #后Codex进入不了界面 一直停留在启动界面",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/536",
       "snapshotUpdatedAt": "2026-09-10T20:13:50Z",
       "finalState": "OPEN",
@@ -7544,7 +7544,7 @@
     },
     {
       "number": 499,
-      "title": "[Question]: 点击“重启Codex++”，Codex为什么一直卡在启动界面呢？",
+      "title": "[Question]: 点击“重启Codex #”，Codex为什么一直卡在启动界面呢？",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/499",
       "snapshotUpdatedAt": "2026-09-10T20:12:23Z",
       "finalState": "OPEN",
@@ -7556,7 +7556,7 @@
     },
     {
       "number": 498,
-      "title": "[Bug]: 通过Codex++管理工具无法重启codex和启动codex++，且无法使用Computer Use与Browser Use",
+      "title": "[Bug]: 通过Codex #管理工具无法重启codex和启动codex++，且无法使用Computer Use与Browser Use",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/498",
       "snapshotUpdatedAt": "2026-09-10T20:12:20Z",
       "finalState": "OPEN",
@@ -8276,7 +8276,7 @@
     },
     {
       "number": 272,
-      "title": "macOS Apple Silicon 上 Codex++ 启动后界面空白 / 一直加载，但 helper 和 bridge 日志显示正常",
+      "title": "macOS Apple Silicon 上 Codex # 启动后界面空白 / 一直加载，但 helper 和 bridge 日志显示正常",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/272",
       "snapshotUpdatedAt": "2026-09-10T20:06:50Z",
       "finalState": "OPEN",
@@ -8492,7 +8492,7 @@
     },
     {
       "number": 239,
-      "title": "启动 Codex++ 失败：failed to query CDP targets",
+      "title": "启动 Codex # 失败：failed to query CDP targets",
       "url": "https://github.com/BigPizzaV3/CodexPlusPlus/issues/239",
       "snapshotUpdatedAt": "2026-09-10T20:05:53Z",
       "finalState": "OPEN",
@@ -9016,7 +9016,7 @@
       "number": 2589,
       "title": "[Bug]: 0.10.0闪退",
       "expectedUpdatedAt": "2026-10-17T22:58:37Z",
-      "body": "正文和标题写的是 0.10.0，而本仓当前正式版是 1.10.0（北京时间 2026-10-17 发布），请先核对 exe 属性中的实际版本及安装包文件名。\n\n“打开即退出”需要区分 Codex++ 管理器退出还是其启动的官方 Codex 退出；请补 Windows 完整版本、退出的进程名，以及 Windows 事件查看器对应时间的异常模块/异常码，或本次启动最后一条错误。先保留现有配置，不需要重装系统或删除数据，本条保持开放。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "正文和标题写的是 0.10.0，而本仓当前正式版是 1.10.0（北京时间 2026-10-17 发布），请先核对 exe 属性中的实际版本及安装包文件名。\n\n“打开即退出”需要区分 Codex # 管理器退出还是其启动的官方 Codex 退出；请补 Windows 完整版本、退出的进程名，以及 Windows 事件查看器对应时间的异常模块/异常码，或本次启动最后一条错误。先保留现有配置，不需要重装系统或删除数据，本条保持开放。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -9045,7 +9045,7 @@
       "number": 589,
       "title": "[Question]: 为什么windows 电脑经常启动不了code++",
       "expectedUpdatedAt": "2026-09-10T22:18:08Z",
-      "body": "Windows 启动失败需先区分 Codex++ 本身打不开，还是管理器能开但官方 Codex 没有窗口。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "Windows 启动失败需先区分 Codex # 本身打不开，还是管理器能开但官方 Codex 没有窗口。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -9071,7 +9071,7 @@
     },
     {
       "number": 536,
-      "title": "[Bug]: 升级Codex++后Codex进入不了界面 一直停留在启动界面",
+      "title": "[Bug]: 升级Codex #后Codex进入不了界面 一直停留在启动界面",
       "expectedUpdatedAt": "2026-09-10T20:13:50Z",
       "body": "长时间停在启动 logo 的报告保留；新版本已有有界启动壳恢复和生命周期修复，但不能据此认定这个现场已恢复。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -9099,9 +9099,9 @@
     },
     {
       "number": 499,
-      "title": "[Question]: 点击“重启Codex++”，Codex为什么一直卡在启动界面呢？",
+      "title": "[Question]: 点击“重启Codex #”，Codex为什么一直卡在启动界面呢？",
       "expectedUpdatedAt": "2026-09-10T20:12:23Z",
-      "body": "原版直启正常、经 Codex++ 仅在开代理时能进的 A/B 对照有效；需要分别核对本地 helper/CDP 与官方远程初始化。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "原版直启正常、经 Codex # 仅在开代理时能进的 A/B 对照有效；需要分别核对本地 helper/CDP 与官方远程初始化。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -9115,7 +9115,7 @@
       "number": 493,
       "title": "[Bug]: 版本26.527.31326 (3390) 通过codex++ 打开秒退",
       "expectedUpdatedAt": "2026-09-10T20:12:07Z",
-      "body": "你给出的 26.527.31326 是官方 Codex 版本，尚缺当时及当前 Codex++ 版本；“秒退”应按崩溃进程和签名/异常报告定位。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "你给出的 26.527.31326 是官方 Codex 版本，尚缺当时及当前 Codex # 版本；“秒退”应按崩溃进程和签名/异常报告定位。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -9169,7 +9169,7 @@
     },
     {
       "number": 272,
-      "title": "macOS Apple Silicon 上 Codex++ 启动后界面空白 / 一直加载，但 helper 和 bridge 日志显示正常",
+      "title": "macOS Apple Silicon 上 Codex # 启动后界面空白 / 一直加载，但 helper 和 bridge 日志显示正常",
       "expectedUpdatedAt": "2026-09-10T20:06:50Z",
       "body": "你已提供 M1、官方版本和原版直启正常，后端曾成功仍不等于页面后续渲染成功；应捕获变空白时的第一条异常。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -9211,7 +9211,7 @@
     },
     {
       "number": 239,
-      "title": "启动 Codex++ 失败：failed to query CDP targets",
+      "title": "启动 Codex # 失败：failed to query CDP targets",
       "expectedUpdatedAt": "2026-09-10T20:05:53Z",
       "body": "你的启动状态是 failed to query CDP targets；当前版本会记录实际改选的调试端口，单纯有端口监听仍不等于有可注入页面。\n\n如果当前 v1.10.0 仍现，请补这次官方客户端/增强工具完整版本、概览中的 status/phase 和首条失败文字，并比较同一官方应用直接启动的结果。只需故障时段的脱敏摘录，不要清空配置或上传 auth.json；本条保留。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -9295,7 +9295,7 @@
     },
     {
       "number": 498,
-      "title": "[Bug]: 通过Codex++管理工具无法重启codex和启动codex++，且无法使用Computer Use与Browser Use",
+      "title": "[Bug]: 通过Codex #管理工具无法重启codex和启动codex++，且无法使用Computer Use与Browser Use",
       "expectedUpdatedAt": "2026-09-10T20:12:20Z",
       "body": "本条按“启动无反应，同时需登录后才出现插件/中文”保留。插件目录可见、安装成功、账号连接和当前会话真正拿到工具是不同阶段，API Key 本身不会创建官方连接器登录。\n\n请在当前版本只选一个失败插件，补官方完整 build、供应商模式、插件名称/ID及该阶段的错误原文；若安装成功，请再说明当前会话实际有没有相应工具。#2049 跟踪原生远程市场认证，#2477 跟踪 iab 缺失，但还不能仅凭相似现象把本条判为重复或已修复。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -9437,7 +9437,7 @@
       "number": 403,
       "title": "[Bug]: [Bug] Windows 下 Chrome Native Host 注册项未创建，@chrome 无法连接",
       "expectedUpdatedAt": "2026-09-10T20:09:52Z",
-      "body": "你已给出 manifest 存在、HKCU NativeMessagingHosts 注册项缺失的具体对照，不必再重复重装整个 Codex++。修复后端主要恢复 helper/桥接，不负责保证官方 Native Host 安装注册完成；其他用户“切回官方恢复”也不证明你的注册表项已补齐。\n\n本条保留。请只补当前官方 build、浏览器扩展 ID，以及 Native Host manifest 的 name/path/allowed_origins 结构（路径用户名可打码），再对照官方客户端自身的扩展安装/连接结果，先验证实际 host 程序与扩展 ID 匹配，避免直接写入猜测的注册项。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "你已给出 manifest 存在、HKCU NativeMessagingHosts 注册项缺失的具体对照，不必再重复重装整个 Codex #。修复后端主要恢复 helper/桥接，不负责保证官方 Native Host 安装注册完成；其他用户“切回官方恢复”也不证明你的注册表项已补齐。\n\n本条保留。请只补当前官方 build、浏览器扩展 ID，以及 Native Host manifest 的 name/path/allowed_origins 结构（路径用户名可打码），再对照官方客户端自身的扩展安装/连接结果，先验证实际 host 程序与扩展 ID 匹配，避免直接写入猜测的注册项。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -9983,7 +9983,7 @@
       "number": 1121,
       "title": "[Feature]: 能不能增加默认目录功能",
       "expectedUpdatedAt": "2026-09-10T22:38:02Z",
-      "body": "当前没有给原生“新建项目”设置默认根目录的独立 Codex++ 选项，这个需求保留。首版应保存用户选定的默认目录，仅影响以后新建项目，并保持“选择已有目录”可用；不能靠改历史数据库或批量软链迁移已有项目。\n\n临时可先在目标根目录创建项目文件夹，再在 Codex 选择该目录打开。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "当前没有给原生“新建项目”设置默认根目录的独立 Codex # 选项，这个需求保留。首版应保存用户选定的默认目录，仅影响以后新建项目，并保持“选择已有目录”可用；不能靠改历史数据库或批量软链迁移已有项目。\n\n临时可先在目标根目录创建项目文件夹，再在 Codex 选择该目录打开。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -10095,7 +10095,7 @@
       "number": 209,
       "title": "优化codex++进入方式",
       "expectedUpdatedAt": "2026-09-10T20:05:08Z",
-      "body": "当前 v1.7.2 起统一为 Codex++ GUI 入口，打开管理器与“启动 Codex”是两个动作；“开机打开 Codex++”和“自动接管官方 App”也不是打开管理器即启动。\n\n你要的少一次点击/直接进入工作窗口继续作为入口体验需求保留，相关独立静默启动与开机最小化分别在 #2494/#2572 跟踪。后续应区分用户主动打开与后台启动，避免每次唤起管理器都多开一个 Codex。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "当前 v1.7.2 起统一为 Codex # GUI 入口，打开管理器与“启动 Codex”是两个动作；“开机打开 Codex #”和“自动接管官方 App”也不是打开管理器即启动。\n\n你要的少一次点击/直接进入工作窗口继续作为入口体验需求保留，相关独立静默启动与开机最小化分别在 #2494/#2572 跟踪。后续应区分用户主动打开与后台启动，避免每次唤起管理器都多开一个 Codex。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -10598,7 +10598,7 @@
     },
     {
       "number": 2156,
-      "title": "Codex++ (v1.3.0) sends the same MCP namespace in **two different `tool_search_output` input items** within a single request. The upstream provider (\"Console Go\") rejects the request because it requires namespace names to be unique across the whole input.",
+      "title": "Codex # (v1.3.0) sends the same MCP namespace in **two different `tool_search_output` input items** within a single request. The upstream provider (\"Console Go\") rejects the request because it requires namespace names to be unique across the whole input.",
       "expectedUpdatedAt": "2026-10-16T08:33:00Z",
       "body": "当前 Chat 转换会按统一名字合并历史 namespace 的子工具，并以当前定义覆盖旧定义，避免映射丢失；但 Responses 原样历史的严格 namespace 去重不等同这条 Chat 投影。兼容策略仍需按实际路由验证，本条保留严格 Responses 上游这部分。\n\n修复发布：[v1.10.0](https://github.com/BigPizzaV3/CodexPlusPlus/releases/tag/v1.10.0)，提交 [845a2882](https://github.com/BigPizzaV3/CodexPlusPlus/commit/845a2882)。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -10738,7 +10738,7 @@
     },
     {
       "number": 1205,
-      "title": "[Bug]: 升级后 Codex++ 无法启动",
+      "title": "[Bug]: 升级后 Codex # 无法启动",
       "expectedUpdatedAt": "2026-10-16T09:20:07Z",
       "body": "桌面应用识别已收紧，CLI-only 目录不再仅因存在 codex.exe 被当成有效桌面宿主。本轮 launcher 回归通过。你实际安装目标及启动仍需同一目录复测，不能以人工路径夹具代替现场，本条保留。\n\n修复发布：[v1.10.0](https://github.com/BigPizzaV3/CodexPlusPlus/releases/tag/v1.10.0)，提交 [23596ed9](https://github.com/BigPizzaV3/CodexPlusPlus/commit/23596ed9)。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -10766,7 +10766,7 @@
     },
     {
       "number": 2525,
-      "title": "[Bug]: Windows Codex Beta 版本无法通过 Codex++ 多开启动",
+      "title": "[Bug]: Windows Codex Beta 版本无法通过 Codex # 多开启动",
       "expectedUpdatedAt": "2026-10-15T07:39:07Z",
       "body": "manifest/Beta 包与 ChatGPT (Beta).exe 识别现在已发布，不再只是 main。带空格名称相关 launcher 回归本轮通过；真正 Windows Beta 多开仍需按原步骤验收，本条保留。\n\n修复发布：[v1.10.0](https://github.com/BigPizzaV3/CodexPlusPlus/releases/tag/v1.10.0)，提交 [2c8500fd](https://github.com/BigPizzaV3/CodexPlusPlus/commit/2c8500fd)。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -10878,9 +10878,9 @@
     },
     {
       "number": 2499,
-      "title": "[Bug]: Windows 下通过 Codex++ 启动后，Codex 任务栏显示白色通用图标",
+      "title": "[Bug]: Windows 下通过 Codex # 启动后，Codex 任务栏显示白色通用图标",
       "expectedUpdatedAt": "2026-10-17T08:25:07Z",
-      "body": "你补充的 Store 正式包 26.1013.4894.0、由 Codex++ 创建的进程及更新后仍白图标已记录，不再重复要求这些信息。另 #2587 已在 v1.10.0 复现接管后的同一现象，合并到本条跟踪。\n\n当前主线仍有“窗口图标与任务栏属性任一成功即停止重试”的判断，现有多开身份修复没有改到它。此项列为 P1：分别记录两项结果、只对失败项有界重试，再在同一 HWND/AUMID 上验收。主条目保持开放，不再建议重复清图标缓存。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "你补充的 Store 正式包 26.1013.4894.0、由 Codex # 创建的进程及更新后仍白图标已记录，不再重复要求这些信息。另 #2587 已在 v1.10.0 复现接管后的同一现象，合并到本条跟踪。\n\n当前主线仍有“窗口图标与任务栏属性任一成功即停止重试”的判断，现有多开身份修复没有改到它。此项列为 P1：分别记录两项结果、只对失败项有界重试，再在同一 HWND/AUMID 上验收。主条目保持开放，不再建议重复清图标缓存。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "可修复缺陷",
@@ -10892,7 +10892,7 @@
     },
     {
       "number": 2574,
-      "title": "[Bug]: Codex++ 1.9.0 在 Codex App 自动更新后无法启动/重启，恢复后 service tier dispatcher 补丁仍失败",
+      "title": "[Bug]: Codex # 1.9.0 在 Codex App 自动更新后无法启动/重启，恢复后 service tier dispatcher 补丁仍失败",
       "expectedUpdatedAt": "2026-10-17T09:56:10Z",
       "body": "新补诊断明确显示 debugger connected、官方 App running，但 local_server stopped，latest_launch 已到 stopped。这份状态不能仅用 dispatcher 补丁失败解释；需要继续看 launcher 为什么判目标结束并关闭 helper。\n\nv1.10.0 已移除旧自定义 service-tier dispatcher 控件，改为 opt-in 原生 Fast 解锁，旧 dispatcher 日志不再是新版验收标准。原启动/helper 生命周期问题保留；升级后仅需补 helper 停止前后的 launcher 退出原因与实际目标身份，不需要再贴整份设置。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
@@ -10992,7 +10992,7 @@
       "number": 349,
       "title": "审查模式",
       "expectedUpdatedAt": "2026-05-26T13:34:08Z",
-      "body": "逐段代码审查、命令执行审批和计划模式是不同入口。Codex++ 当前没有新增“每个代码块都逐段同意/驳回”的独立工作流；仅改变供应商不会自动提供它。请说明期望的是编辑前确认、执行工具审批还是修改后 diff 审查，并补官方版本/当前权限模式；本条保留，不以放开沙盒代替审查能力。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "逐段代码审查、命令执行审批和计划模式是不同入口。Codex # 当前没有新增“每个代码块都逐段同意/驳回”的独立工作流；仅改变供应商不会自动提供它。请说明期望的是编辑前确认、执行工具审批还是修改后 diff 审查，并补官方版本/当前权限模式；本条保留，不以放开沙盒代替审查能力。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "答复并保留",
@@ -11034,7 +11034,7 @@
       "number": 2592,
       "title": "[Bug]: 浏览器插件路由不到供应商模型",
       "expectedUpdatedAt": "2026-10-18T04:17:40Z",
-      "body": "你在版本栏填写的 26.1013.40934 是官方客户端版本，还需补实际 Codex++ 版本。“Chrome 扩展自己的模型菜单没有供应商模型”与“Codex 桌面端模型菜单没有模型”是两个入口，不能由桌面 catalog 已生效就推定扩展读取同一目录。\n\n请补扩展名称/ID及版本、扩展中该模型菜单的局部截图，并确认同一台桌面 Codex 菜单能否选到目标模型。若桌面正常、扩展缺失，应继续查扩展列表来自官方服务还是桌面 app-server，再决定桥接范围；本条保留，暂不建议复制 Key 到扩展或改写扩展认证。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "你在版本栏填写的 26.1013.40934 是官方客户端版本，还需补实际 Codex # 版本。“Chrome 扩展自己的模型菜单没有供应商模型”与“Codex 桌面端模型菜单没有模型”是两个入口，不能由桌面 catalog 已生效就推定扩展读取同一目录。\n\n请补扩展名称/ID及版本、扩展中该模型菜单的局部截图，并确认同一台桌面 Codex 菜单能否选到目标模型。若桌面正常、扩展缺失，应继续查扩展列表来自官方服务还是桌面 app-server，再决定桥接范围；本条保留，暂不建议复制 Key 到扩展或改写扩展认证。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": false,
       "stateReason": "completed",
       "category": "需补证据定位",
@@ -11048,7 +11048,7 @@
       "number": 346,
       "title": "不通过ccx-windows-amd64，怎么直连llama cpp",
       "expectedUpdatedAt": "2026-10-08T05:10:35Z",
-      "body": "可以绕过 ccx，直接接 llama.cpp 的 OpenAI 兼容服务：在 Codex++ 新建自定义供应商，选纯 API、Chat Completions，上游填你示例服务的 http://127.0.0.1:7080/v1，并手工填写该服务实际发布的模型 ID；服务不鉴权时使用对应的无鉴权设置。保存并“使用”后，由 Codex++ 把桌面 Responses 转成上游 Chat。\n\n这项直连配置能力已提供，按使用咨询答复关闭。若实际 POST 请求仍失败，请在本条补模型/协议及脱敏 HTTP 错误再复核，不以浏览器网页能打开代替工具调用验收。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
+      "body": "可以绕过 ccx，直接接 llama.cpp 的 OpenAI 兼容服务：在 Codex # 新建自定义供应商，选纯 API、Chat Completions，上游填你示例服务的 http://127.0.0.1:7080/v1，并手工填写该服务实际发布的模型 ID；服务不鉴权时使用对应的无鉴权设置。保存并“使用”后，由 Codex # 把桌面 Responses 转成上游 Chat。\n\n这项直连配置能力已提供，按使用咨询答复关闭。若实际 POST 请求仍失败，请在本条补模型/协议及脱敏 HTTP 错误再复核，不以浏览器网页能打开代替工具调用验收。\n\n<!-- codexplusplus-full-triage:2026-10-18 -->",
       "close": true,
       "stateReason": "completed",
       "category": "使用咨询已回答",

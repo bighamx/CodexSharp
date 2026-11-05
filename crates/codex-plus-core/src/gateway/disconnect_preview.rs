@@ -181,7 +181,7 @@ pub fn preview(
         files: Vec::new(),
         warnings: vec![
             "预览仅展示字段变更；所有配置值、注释和认证内容均已隐藏。".into(),
-            "断开还会更新 Codex++ 的绑定、供应商记录与恢复存档，这些内部状态不在配置 diff 中。"
+            "断开还会更新 Codex # 的绑定、供应商记录与恢复存档，这些内部状态不在配置 diff 中。"
                 .into(),
         ],
         can_disconnect: true,

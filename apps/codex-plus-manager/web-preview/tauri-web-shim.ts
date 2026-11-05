@@ -523,8 +523,8 @@ const agentCacheReport = {
     cacheGroup("codex-tmp", "Codex", "temporary", 894, 0, 0),
     cacheGroup("claude-cache", "Claude", "cache", 23, 23, 120),
     cacheGroup("claude-logs", "Claude", "logs", 36, 36, 40),
-    cacheGroup("plus-update", "Codex++", "update", 459, 459, 2),
-    cacheGroup("plus-cache", "Codex++", "cache", 0.07, 0.07, 6),
+    cacheGroup("plus-update", "Codex #", "update", 459, 459, 2),
+    cacheGroup("plus-cache", "Codex #", "cache", 0.07, 0.07, 6),
   ],
 };
 
@@ -600,7 +600,7 @@ const demoComputerUseTargets = () => ({
 const demoClaudeEnhance = {
   supported: true,
   sourceApp: "/Applications/Claude.app",
-  copyApp: "~/Applications/Claude (Codex++).app",
+  copyApp: "~/Applications/Claude (Codex #).app",
   sourceVersion: "1.3.12",
   copyVersion: "1.3.12",
   prepared: true,
@@ -648,7 +648,7 @@ const demoUserScripts = { enabled: true, claude_enabled: false, skip_next_start:
       ],
       config: { minutes: 25, sound: true, theme: "red", note: "休息一下\n喝口水", tags: ["工作"], webhook: { url: "", retry: 1 } } } },
   { key: "user:future-ext", name: "未来拓展", source: "user", kind: "package", enabled: true, status: "failed",
-    error: "需要拓展 API v2，当前 Codex++ 提供 v1，请升级 Codex++", package: { id: "future-ext", version: "1.0.0", description: "", engine: 2, routes: [] } },
+    error: "需要拓展 API v2，当前 Codex # 提供 v1，请升级 Codex #", package: { id: "future-ext", version: "1.0.0", description: "", engine: 2, routes: [] } },
   { key: "user:claude-extension-demo", name: "Claude 连通测试", source: "user", kind: "package",
     enabled: false, claude_enabled: true, status: "disabled", error: "",
     package: { id: "claude-extension-demo", version: "0.1.0", description: "按钮、后台工具与会话事件", engine: 1, routes: [], backend: true,
@@ -770,11 +770,11 @@ export async function invoke<T = unknown>(command: string, args: Record<string, 
     case "load_auto_takeover_state": return ok({ running: false, enabled: false, message: "演示模式" }) as T;
     case "update_check": return ok({ currentVersion: "2.3.0", latestVersion: "2.3.0", updateAvailable: false }) as T;
     case "refresh_script_market": return ok({ market: { status: "ok", message: "演示模式", updatedAt: "2026-10-26T12:51:00Z", scripts: [
-      { id: "relay-balance", name: "Codex Relay Balance", description: "通用中转站余额与模型用量监控，支持自动读取或手动填写接口、日期范围、Token 明细和实际扣费倍率。", version: "0.3.7", author: "Codex++ Community", tags: ["codex", "relay", "balance", "usage", "quota"], homepage: "https://github.com/demo/relay-balance", script_url: "", installed: false, installedVersion: "", updateAvailable: false },
+      { id: "relay-balance", name: "Codex Relay Balance", description: "通用中转站余额与模型用量监控，支持自动读取或手动填写接口、日期范围、Token 明细和实际扣费倍率。", version: "0.3.7", author: "Codex # Community", tags: ["codex", "relay", "balance", "usage", "quota"], homepage: "https://github.com/demo/relay-balance", script_url: "", installed: false, installedVersion: "", updateAvailable: false },
       { id: "model-matrix", name: "Codex Model Matrix", description: "紧凑且适配主题的 Codex 模型选择器，配备可拖动吸附的推理强度滑块。", version: "1.0.0", author: "lx", tags: ["codex", "models", "reasoning"], homepage: "https://github.com/demo/model-matrix", script_url: "", installed: true, installedVersion: "1.0.0", updateAvailable: false },
       { id: "context-meter", name: "Codex Context Used Meter", description: "在 Codex App 对话界面显示当前会话上下文余量。", version: "101", author: "Minghou-Lei", tags: ["context", "tokens"], homepage: "", script_url: "", installed: false, installedVersion: "", updateAvailable: false },
     ], packages: [
-      { kind: "package", id: "session-search", name: L("会话搜索", "Session search"), description: L("在侧边栏搜索全部历史会话，回车跳到命中的那一轮。", "Search all past sessions from the sidebar and jump to the matching turn."), version: "1.0.0", author: "Codex++", tags: ["history"], homepage: "", icon: "", updatedAt: "2026-10-30", repo: "BigPizzaV3/codexpp-session-search", tag: "v1.0.0", sha: "9c1e0b7d3a5f6e8c9d0a1b2c3d4e5f6a7b8c4f2a", official: true, channel: "official", installed: false, installedVersion: "", installedSha: "", updateAvailable: false },
+      { kind: "package", id: "session-search", name: L("会话搜索", "Session search"), description: L("在侧边栏搜索全部历史会话，回车跳到命中的那一轮。", "Search all past sessions from the sidebar and jump to the matching turn."), version: "1.0.0", author: "Codex #", tags: ["history"], homepage: "", icon: "", updatedAt: "2026-10-30", repo: "BigPizzaV3/codexpp-session-search", tag: "v1.0.0", sha: "9c1e0b7d3a5f6e8c9d0a1b2c3d4e5f6a7b8c4f2a", official: true, channel: "official", installed: false, installedVersion: "", installedSha: "", updateAvailable: false },
       { kind: "package", id: "word-guard", name: L("命令守卫", "Command guard"), description: L("拦截危险的 shell 命令，并给出更安全的替代写法。", "Block dangerous shell commands and suggest safer alternatives."), version: "1.2.0", author: "alice", tags: ["hooks"], homepage: "", icon: "", updatedAt: "2026-10-28", repo: "alice/codexpp-word-guard", tag: "v1.2.0", sha: "4f2a9c1e0b7d3a5f6e8c9d0a1b2c3d4e5f6a7b8c", official: false, channel: "curated", installed: true, installedVersion: "1.1.0", installedSha: "0b7d3a5f6e8c9d0a1b2c3d4e5f6a7b8c4f2a9c1e", updateAvailable: true },
     ], blockedInstalled: [] }, user_scripts: demoUserScripts }) as T;
     case "load_ccs_providers": return ok({ providers: [] }) as T;
@@ -834,7 +834,7 @@ export async function invoke<T = unknown>(command: string, args: Record<string, 
       status: args.action === "connect" ? "connected" : args.action === "disconnect" ? "disconnected" : "not_connected",
       message: "", configPath: "~/.codex/config.toml", extensionsDirectory: "~/.config/Codex++/user_scripts",
     } as T;
-    // 社区拓展演示数据：一个带钩子与后台的、一个只有页面脚本且已安装的、一个需要新版 Codex++ 的。
+    // 社区拓展演示数据：一个带钩子与后台的、一个只有页面脚本且已安装的、一个需要新版 Codex # 的。
     case "extension_publish_request": {
       const report = { id: args.payload?.id, name: L("字数统计", "Word count"), version: args.action === "bump" ? "1.0.1" : "1.0.0", description: L("统计输入框字数", "Count characters"), errors: [], warnings: [L("没有 README，发布时会按清单生成一份", "No README; one will be generated from the manifest")], secrets: [], files: 4, bytes: 5120, hasReadme: false, hasLicense: false, publishedRepo: null, suggestedRepoName: `codexpp-${args.payload?.id}`, gh: { ready: true, account: "demo-user" } };
       if (args.action === "publish") return { ok: true, repo: `demo-user/codexpp-${args.payload?.id}`, url: "https://github.com/", version: "1.0.0", steps: ["发布前检查", "确认 GitHub 账号", "确认 git 身份", "创建仓库", "初始化工作副本", "整理文件", "提交", "打标签", "推送", "创建 release", "添加 topic"].map((step) => ({ step, ok: true, output: "" })) } as T;
@@ -885,7 +885,7 @@ export async function invoke<T = unknown>(command: string, args: Record<string, 
           rows: [
             { id: "greet", module: "dsh-greet-bundle", status: "compatible", kind: "plugin", reasons: [], notes: [], mappings: ["instructions", "PreToolUse", "Stop"], tools: [{ name: "greet", description: "Greet someone by name." }],
               configSchema: { type: "object", dict: { greeting: { type: "string", meta: { default: "Hello", description: L("问候语", "Greeting") } }, punctuation: { type: "union", list: [{ type: "const", value: "!" }, { type: "const", value: "." }], meta: { default: "!" } }, times: { type: "number", meta: { default: 1, min: 1, max: 5 } } } } },
-            { id: "session-tool", module: "./session.js", status: "incompatible", kind: "plugin", reasons: [L("依赖 Codex++ 不提供的服务：sessions（属于 dsh 的 agent 循环 / 会话 / 模型等运行时）", "Needs services Codex++ does not provide: sessions")], notes: [], tools: [] },
+            { id: "session-tool", module: "./session.js", status: "incompatible", kind: "plugin", reasons: [L("依赖 Codex # 不提供的服务：sessions（属于 dsh 的 agent 循环 / 会话 / 模型等运行时）", "Needs services Codex # does not provide: sessions")], notes: [], tools: [] },
             { id: "demo-mcp", module: "@deepseek-ai/dsh-mcp-client", status: "compatible", kind: "mcp", reasons: [], notes: [L("MCP 配置可导入 Codex；reconnect、toolCallTimeoutMs 等 dsh 专属字段会被丢弃", "The MCP config can be imported into Codex; dsh-only fields are dropped")], tools: [] },
           ],
         },

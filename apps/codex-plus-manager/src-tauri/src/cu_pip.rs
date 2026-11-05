@@ -13,7 +13,7 @@
 //!   或用户切到了那个应用时收起；
 //! - 用户点了关闭：这个会话里不再弹，直到下一个会话。
 //!
-//! 窗口显示时**不激活** Codex++，用户正在用的窗口不会失焦。
+//! 窗口显示时**不激活** Codex #，用户正在用的窗口不会失焦。
 //!
 //! # 浏览器
 //!
@@ -360,7 +360,7 @@ fn ensure_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
         })
         .unwrap_or((MARGIN, 38.0));
     WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App("/index.html#cu-pip".into()))
-        .title("Codex++ Computer Use")
+        .title("Codex # Computer Use")
         .inner_size(WIDTH, HEIGHT)
         .min_inner_size(220.0, 150.0)
         .position(x, y)
@@ -371,7 +371,7 @@ fn ensure_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
         .skip_taskbar(true)
         .shadow(true)
         .focused(false)
-        // 小窗所属的 Codex++ 通常不在前台：不开这个，第一下点击只用来激活窗口，
+        // 小窗所属的 Codex # 通常不在前台：不开这个，第一下点击只用来激活窗口，
         // 网页收不到按下事件，标题栏拖不动、按钮第一下没反应。
         .accept_first_mouse(true)
         .visible(false)
@@ -385,7 +385,7 @@ fn ensure_window(app: &AppHandle) -> Option<tauri::WebviewWindow> {
         .ok()
 }
 
-/// 浮到最上层并显示，不激活 Codex++。AppKit 调用必须在主线程。
+/// 浮到最上层并显示，不激活 Codex #。AppKit 调用必须在主线程。
 fn order_front(app: &AppHandle, window: &tauri::WebviewWindow) {
     #[cfg(target_os = "macos")]
     {

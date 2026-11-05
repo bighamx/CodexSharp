@@ -13,13 +13,13 @@ import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 WIRE = b"dL7pKGdnNz796PbbjQWNKmHXBZaB9tsX"
-# 由 Codex++ 的「Computer Use」开关注入；关闭时副本与官方 asar 逐字节一致。
+# 由 Codex # 的「Computer Use」开关注入；关闭时副本与官方 asar 逐字节一致。
 COMPUTER_USE = os.environ.get("CODEX_PLUS_CLAUDE_COMPUTER_USE", "0") == "1"
 PROGRESS_FILE = os.environ.get("CODEX_PLUS_CLAUDE_PROGRESS")
 
 
 def report(percent, message):
-    """把阶段进度写给宿主（Codex++ 读它画进度条）；单独运行脚本时静默跳过。"""
+    """把阶段进度写给宿主（Codex # 读它画进度条）；单独运行脚本时静默跳过。"""
     if not PROGRESS_FILE:
         return
     try:

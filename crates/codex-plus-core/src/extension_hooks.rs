@@ -1,9 +1,9 @@
-//! 拓展的 Codex 钩子：拓展包在 `codexpp.json` 里声明 `hooks`，由 Codex++ 统一分发。
+//! 拓展的 Codex 钩子：拓展包在 `codexpp.json` 里声明 `hooks`，由 Codex # 统一分发。
 //!
 //! Codex 的钩子要用户逐条信任（按条目哈希记录），新增或改动的钩子在信任前不会运行。所以
-//! Codex++ 只往 `~/.codex/config.toml` 写**固定不变**的分发条目：每个用到的事件一条，命令是
+//! Codex # 只往 `~/.codex/config.toml` 写**固定不变**的分发条目：每个用到的事件一条，命令是
 //! `CodexPlusPlus --codex-plus-hook <事件>`，超时固定 120 秒。用户在 Codex 里信任一次后，
-//! 拓展增删改都不必重新信任；哪些拓展在跑由 Codex++ 的拓展开关决定。
+//! 拓展增删改都不必重新信任；哪些拓展在跑由 Codex # 的拓展开关决定。
 //!
 //! 分发时只起一个 Node 进程：它按各拓展的 matcher 过滤、并发调用命中的钩子脚本（各自超时），
 //! 把结果交回这里，按 Codex 的协议合并成一个输出。任何拓展出错都只记日志，不挡 Codex。
@@ -21,7 +21,7 @@ use crate::user_scripts::{EXTENSION_HOOK_EVENTS, ExtensionHook, UserScriptManage
 pub const HOOK_FLAG: &str = "--codex-plus-hook";
 /// 分发条目的超时（秒）。固定值，避免拓展超时变化改动条目哈希、逼用户重新信任。
 const DISPATCH_TIMEOUT_SECS: u64 = 120;
-const STATUS_MESSAGE: &str = "Codex++ 拓展钩子";
+const STATUS_MESSAGE: &str = "Codex # 拓展钩子";
 const MAX_PAYLOAD_BYTES: usize = 4 * 1024 * 1024;
 
 /// Node 侧运行器：stdin 读 `{ event, subject, payload, hooks: [{ id, script, matcher, timeoutMs }] }`，
@@ -138,13 +138,13 @@ pub async fn dispatch(
         .iter()
         .filter_map(|item| item.get("output").filter(|output| output.is_object()).cloned().map(|output| (item.get("id").and_then(Value::as_str).unwrap_or("").to_string(), output)))
         .collect::<Vec<_>>();
-    // 代为执行：结果存成带令牌的文件，原工具调用以「拒绝 + 结果 + 令牌标记」结束。经 Codex++ 代理时，
+    // 代为执行：结果存成带令牌的文件，原工具调用以「拒绝 + 结果 + 令牌标记」结束。经 Codex # 代理时，
     // 下一次请求里网关按令牌把这条工具输出换成纯结果；不经代理时模型也能从拒绝理由里读到结果。
     for item in &results {
         if let Some(text) = item.get("executed").and_then(Value::as_str) {
             let id = item.get("id").and_then(Value::as_str).unwrap_or("").to_string();
             let token = store_tool_execution(manager, &id, &payload, text)?;
-            let reason = format!("（Codex++ 拓展 {id} 已代为执行该工具调用，以下是执行结果）\n{text}\n{}", tool_exec_marker(&token));
+            let reason = format!("（Codex # 拓展 {id} 已代为执行该工具调用，以下是执行结果）\n{text}\n{}", tool_exec_marker(&token));
             outputs.push((id, json!({ "hookSpecificOutput": { "hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": reason } })));
         }
     }
@@ -306,9 +306,9 @@ fn owned_events(contents: &str) -> Vec<String> {
 
 /// 本工具写的分发命令。路径按 shell 规则加引号（Codex 经 shell 执行钩子命令）。
 fn dispatch_command(executable: &Path, event: &str) -> anyhow::Result<String> {
-    let path = executable.to_str().context("Codex++ 程序路径不是有效 UTF-8")?;
+    let path = executable.to_str().context("Codex # 程序路径不是有效 UTF-8")?;
     if path.chars().any(char::is_control) {
-        anyhow::bail!("Codex++ 程序路径包含控制字符");
+        anyhow::bail!("Codex # 程序路径包含控制字符");
     }
     let quoted = if cfg!(windows) {
         format!("\"{path}\"")
@@ -444,7 +444,7 @@ pub fn sync_default(manager: &UserScriptManager) -> Value {
     let dsh = crate::dsh_plugins::sync_extension_plugins_default(manager);
     let home = crate::codex_home::default_codex_home_dir();
     let result = std::env::current_exe()
-        .context("无法定位 Codex++ 程序")
+        .context("无法定位 Codex # 程序")
         .and_then(|executable| sync_codex_config(&home, &executable, manager))
         .map(|mut report| {
             report["codex"] = match manager.enabled_codex_assets().and_then(|enabled| crate::extension_codex::sync(&home, manager, &enabled)) {
@@ -472,7 +472,7 @@ pub fn sync_default(manager: &UserScriptManager) -> Value {
 }
 
 /// `CodexPlusPlus --codex-plus-hook <事件>` 的入口：stdin 读事件负载，stdout 写合并后的输出。
-/// 任何内部错误都以「无意见」退出 0，并把原因写到 stderr，绝不因为 Codex++ 自身问题挡住 Codex。
+/// 任何内部错误都以「无意见」退出 0，并把原因写到 stderr，绝不因为 Codex # 自身问题挡住 Codex。
 pub async fn run_cli(manager: &UserScriptManager, event: &str) -> i32 {
     use std::io::Read;
     let mut raw = Vec::new();
@@ -489,7 +489,7 @@ pub async fn run_cli(manager: &UserScriptManager, event: &str) -> i32 {
             0
         }
         Err(error) => {
-            eprintln!("Codex++ 拓展钩子未运行：{error:#}");
+            eprintln!("Codex # 拓展钩子未运行：{error:#}");
             0
         }
     }

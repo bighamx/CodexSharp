@@ -150,7 +150,7 @@ pub fn prepare_managed_plugin() -> anyhow::Result<PathBuf> {
     prepare_managed_plugin_at(
         &crate::user_scripts::default_user_script_manager(),
         &crate::paths::default_app_state_dir(),
-        &std::env::current_exe().context("无法定位 Codex++ 可执行文件")?,
+        &std::env::current_exe().context("无法定位 Codex # 可执行文件")?,
     )
 }
 
@@ -187,7 +187,7 @@ pub fn prepare_managed_plugin_at(
     let manifest = json!({
         "name": PLUGIN_NAME,
         "version": env!("CARGO_PKG_VERSION"),
-        "description": "Codex++ extensions for Claude Desktop",
+        "description": "Codex # extensions for Claude Desktop",
         "author": {"name": "CodexPlusPlus"},
     });
     let mcp = json!({
@@ -287,7 +287,7 @@ pub async fn handle_request(manager: &UserScriptManager, request: Value) -> Opti
         Some("ping") => json!({}),
         Some("tools/list") => json!({"tools": [{
             "name": TOOL_NAME,
-            "description": "Call a backend method explicitly declared by an enabled Codex++ Claude Desktop extension.",
+            "description": "Call a backend method explicitly declared by an enabled Codex # Claude Desktop extension.",
             "inputSchema": {
                 "type": "object",
                 "properties": {

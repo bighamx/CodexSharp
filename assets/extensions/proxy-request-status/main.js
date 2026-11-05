@@ -1,4 +1,4 @@
-  // 请求状态条拓展的入口：拓展启用时每 1.2 秒问一次 Codex++ 进行中的代理请求，停用 / 热重载时摘掉状态条。
+  // 请求状态条拓展的入口：拓展启用时每 1.2 秒问一次 Codex # 进行中的代理请求，停用 / 热重载时摘掉状态条。
   // 状态条放进公开插槽 composer.above 给的容器；取数走清单里声明的 /proxy-status。
   // 轮询到的数据作为服务 codexpp.proxyStatus 提供：requests() 最近一次的结果，fetch() 立即问一次。
   codexPlus.extension((ctx) => {

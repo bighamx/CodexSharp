@@ -650,7 +650,7 @@ fn app_paths_invalid_saved_path_falls_back_instead_of_sticking() {
     let junk = temp.path().join("Codex++");
     std::fs::create_dir_all(&junk).unwrap();
 
-    // 合法独立安装：即使 saved 指向 Codex++，规范化失败后应能落到该候选
+    // 合法独立安装：即使 saved 指向 Codex #，规范化失败后应能落到该候选
     // （通过显式 app_dir 验证回退链之外的合法路径仍可用）
     let standalone = temp.path().join("Programs").join("OpenAI").join("Codex");
     std::fs::create_dir_all(&standalone).unwrap();

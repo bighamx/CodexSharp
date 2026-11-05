@@ -33,7 +33,7 @@ const SAFE_TOP_LEVEL_KEYS: &[&str] = &[
 ];
 
 /// 新版 Codex（26.10xx+）的项目列表/会话归属键：结构由 Codex 拥有，
-/// Codex++ 不解析、不归一，但快照和 merge 时要原样带过——
+/// Codex # 不解析、不归一，但快照和 merge 时要原样带过——
 /// 否则半截状态（Codex 写入中途被读到）再 merge 写回，
 /// 这些键就永远从 state 里消失，对应 #2876 / #2707 的「项目消失」。
 const PASS_THROUGH_STATE_KEYS: &[&str] = &[
@@ -722,7 +722,7 @@ fn create_backup(home: &Path, original: &Value) -> anyhow::Result<PathBuf> {
         root.join("metadata.json"),
         serde_json::to_string_pretty(&json!({
             "version": SNAPSHOT_VERSION,
-            "managedBy": "Codex++ app state sync",
+            "managedBy": "Codex # app state sync",
             "createdAtMs": now_ms(),
         }))?,
     )?;

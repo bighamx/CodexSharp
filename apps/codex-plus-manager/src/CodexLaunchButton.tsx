@@ -29,7 +29,7 @@ export function CodexLaunchButton({ state, size = "default", className = "" }: {
     ? state.unavailableReason ?? ""
     : state.running
       ? t("重启 Codex，让供应商和增强设置重新生效")
-      : t("启动 Codex，并加载 Codex++ 的供应商和增强设置");
+      : t("启动 Codex，并加载 Codex # 的供应商和增强设置");
   return (
     // 置灰的按钮不响应鼠标（disabled:pointer-events-none），提示挂在外层，悬停时仍能看到原因。
     <span className={`codex-launch ${className}`.trim()} data-running={state.running} data-unavailable={unavailable} title={hint}>

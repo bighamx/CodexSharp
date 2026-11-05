@@ -1,4 +1,4 @@
-//! Codex++ 的任务栏集成仅写分组、名称和重启入口，图标由 Codex 管理。
+//! Codex # 的任务栏集成仅写分组、名称和重启入口，图标由 Codex 管理。
 
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Storage::EnhancedStorage::{
@@ -17,7 +17,7 @@ pub(crate) fn apply_to_window(hwnd: HWND) -> anyhow::Result<()> {
 
     for (key, value) in [
         (PKEY_AppUserModel_ID, "com.bigpizzav3.codexplusplus.codex"),
-        (PKEY_AppUserModel_RelaunchDisplayNameResource, "Codex++"),
+        (PKEY_AppUserModel_RelaunchDisplayNameResource, "Codex #"),
         (PKEY_AppUserModel_RelaunchCommand, relaunch_command.as_str()),
     ] {
         unsafe { store.SetValue(&key, &PROPVARIANT::from(value))? };

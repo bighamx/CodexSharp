@@ -7,7 +7,7 @@
 
 - 打开会话后滚动、切会话有明显延迟，输入偶尔掉帧
 - 活动监视器里 Codex 的渲染进程常年 GB 级
-- 系统里堆着几十个 `Codex++ --codex-plus-dsh-mcp` 和一个配套的 `node host.mjs serve`
+- 系统里堆着几十个 `Codex # --codex-plus-dsh-mcp` 和一个配套的 `node host.mjs serve`
 
 ## 证据
 
@@ -15,9 +15,9 @@
 
 ```
 codex app-server (pid 47737)
- ├─ Codex++ --codex-plus-dsh-mcp   × 14（历史峰值 45）
+ ├─ Codex # --codex-plus-dsh-mcp   × 14（历史峰值 45）
  │   └─ node host.mjs serve        × 14（每个 68 MB）
- ├─ Codex++ --codex-plus-extension-mcp × 5
+ ├─ Codex # --codex-plus-extension-mcp × 5
  └─ node cua-repl.mjs              × 7
 ```
 
@@ -111,7 +111,7 @@ codex app-server (pid 47737)
   `disconnect()` 旧 observer。页面上的 10 个 `<style>` 是不同用途，不是泄漏
 - **`inline_image_data_url_leak`**（累计 1341 次）：网关侧 `guard_inline_image_data_urls`
   已经在请求体里清掉了 data URL，这条日志是「清理到了」的记录。渲染进程里的图片来自
-  Codex 自己的消息内容，不在 Codex++ 的改动面
+  Codex 自己的消息内容，不在 Codex # 的改动面
 - **`feature_gates` 双份 15.8 MB**：statsig 客户端与 Codex 各存一份，属于上游行为
 
 ## 验证方式

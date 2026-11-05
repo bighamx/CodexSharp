@@ -1072,7 +1072,7 @@ pub struct BackendSettings {
     pub dictation: DictationSettings,
     #[serde(rename = "codexAppPath", default)]
     pub codex_app_path: String,
-    /// 自动接管官方 App：开启后用户自己双击启动官方 App 时由 Codex++ 接管并注入。
+    /// 自动接管官方 App：开启后用户自己双击启动官方 App 时由 Codex # 接管并注入。
     #[serde(rename = "codexAppAutoTakeover", default)]
     pub codex_app_auto_takeover: bool,
     /// 已在运行的官方 App 没有调试端口时、「疑似有人在用」的策略：
@@ -1114,7 +1114,7 @@ pub struct BackendSettings {
     pub relay_profiles_enabled: bool,
     #[serde(rename = "enhancementsEnabled", default = "default_true")]
     pub enhancements_enabled: bool,
-    /// 管理器启动时及运行期间自动检查 Codex++ 更新（#1272）。默认开；
+    /// 管理器启动时及运行期间自动检查 Codex # 更新（#1272）。默认开；
     /// 关闭后只在用户手动点「检查更新」时联网检查。
     #[serde(rename = "updateAutoCheck", default = "default_true")]
     pub update_auto_check: bool,
@@ -1152,7 +1152,7 @@ pub struct BackendSettings {
     // 默认开启：输入框上方的请求状态条（#2824），纯展示层；关掉后注入层停止轮询 /proxy-status。
     #[serde(rename = "codexAppProxyRequestStatus", default = "default_true")]
     pub codex_app_proxy_request_status: bool,
-    // 默认开启：只在受管副本的页面里加一个语音入口，识别走 Codex++ 自己的听写服务，
+    // 默认开启：只在受管副本的页面里加一个语音入口，识别走 Codex # 自己的听写服务，
     // 不改官方应用、不动输入框已有内容；关掉只是没有入口，已运行的副本需重启才生效。
     #[serde(rename = "claudeAppVoiceInput", default = "default_true")]
     pub claude_app_voice_input: bool,
@@ -1169,7 +1169,7 @@ pub struct BackendSettings {
     pub claude_app_computer_use: bool,
     #[serde(rename = "claudeAppBashTimeout", default)]
     pub claude_app_bash_timeout: ClaudeBashTimeoutSettings,
-    /// Codex++ Computer Use 的审批策略。
+    /// Codex # Computer Use 的审批策略。
     ///
     /// - `auto`（默认）：代理就地放行，只留痕。适合信任调用方、只想少弹窗的场景。
     /// - `claude`：把 Codex 原生的 elicitation 表单透传给客户端，由 Claude 侧审批。
@@ -2872,7 +2872,7 @@ fn merge_known_setting_fields(target: &mut Map<String, Value>, source: &Map<Stri
     }
     // 协议代理自动重试：管理器整份保存也会经过 normalize，这里补上部分更新路径，
     // 保证任何走 /settings/set 的调用都不会被静默丢弃。
-    // Codex++ 更新提醒偏好（#1272）：「跳过此版本」由管理器单独写入，必须在白名单里。
+    // Codex # 更新提醒偏好（#1272）：「跳过此版本」由管理器单独写入，必须在白名单里。
     merge_bool_setting(target, source, "updateAutoCheck");
     merge_bool_setting(target, source, "updateAutoDownload");
     if let Some(value) = source.get("updateSkippedVersion").and_then(Value::as_str) {

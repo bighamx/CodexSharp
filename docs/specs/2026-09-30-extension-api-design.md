@@ -10,7 +10,7 @@
 
 ### 1.1 拓展是怎么被执行的
 
-拓展（用户脚本）不是配置项，也不是被 Codex 主动加载的插件，**是文件系统里的 `.js` 文件，由 Codex++ 拼成一个大字符串，通过 CDP 注入到 Codex 渲染进程主世界里执行**。
+拓展（用户脚本）不是配置项，也不是被 Codex 主动加载的插件，**是文件系统里的 `.js` 文件，由 Codex # 拼成一个大字符串，通过 CDP 注入到 Codex 渲染进程主世界里执行**。
 
 完整链路：
 
@@ -247,7 +247,7 @@ window.codexPlus = {
 脚本可据此分支：
 
 ```js
-if (window.codexPlus.apiVersion < 1) { /* 提示用户升级 Codex++ */ }
+if (window.codexPlus.apiVersion < 1) { /* 提示用户升级 Codex # */ }
 ```
 
 Rust 侧改路由时的约定（写进 AGENTS.md）：

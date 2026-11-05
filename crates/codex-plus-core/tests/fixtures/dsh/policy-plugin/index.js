@@ -52,7 +52,7 @@ export function apply(ctx, config) {
     return { ...decision, messages: [...decision.messages, note('policy-demo: remember the house rules')] }
   }, { prepend: true })
 
-  // 改写用户原话：带 secret-token 的输入换成打码后的一条（钩子做不到，经 Codex++ 代理的请求里换掉）。
+  // 改写用户原话：带 secret-token 的输入换成打码后的一条（钩子做不到，经 Codex # 代理的请求里换掉）。
   ctx.on('agent/pre-step', async (_step, next) => {
     const decision = await next()
     if (decision.kind !== 'enter') return decision

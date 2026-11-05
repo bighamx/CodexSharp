@@ -76,8 +76,8 @@ const patchStatsigClient = (client) => {
 ```js
 const load = () => {
     window.__codexSessionDeleteBridge("/user-scripts/load", {}).then((result) => {
-      if (result?.status === "failed") console.warn("[Codex++] user scripts:", result.message);
-    }).catch((error) => console.warn("[Codex++] user scripts:", error));
+      if (result?.status === "failed") console.warn("[Codex #] user scripts:", result.message);
+    }).catch((error) => console.warn("[Codex #] user scripts:", error));
   };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", load, { once: true });
   else load();
@@ -108,7 +108,7 @@ if !is_windows || can_bind(requested) || is_existing_cdp(requested) {
 
 - 这个值随后只被**传参**使用：`:628` `launch_codex(...)`、`:636` `ensure_injection(...)`、`:646` `start_bridge_watchdog(...)`，全程没有任何地方重新读进程命令行里的 `--remote-debugging-port`。
 
-全仓 grep `remote-debugging-port` 只在两处出现：`launcher.rs:2672`（**拼启动参数**用）与 `watcher.rs:776`（仅 macOS 存活判定用，不回流）。所以「Windows 上 Codex 自重启换了端口，Codex++ 仍只认启动时那个」在代码上进得去 —— 62801 正是 `find_available()` 在 9229 被占时另选的端口。
+全仓 grep `remote-debugging-port` 只在两处出现：`launcher.rs:2672`（**拼启动参数**用）与 `watcher.rs:776`（仅 macOS 存活判定用，不回流）。所以「Windows 上 Codex 自重启换了端口，Codex # 仍只认启动时那个」在代码上进得去 —— 62801 正是 `find_available()` 在 9229 被占时另选的端口。
 
 **需要更正的一处**：issue 说「12 次重试全部 10061」。main 上是 `launcher.rs:278-294`：
 
@@ -289,7 +289,7 @@ CreateShortcut "$DESKTOP\Codex++ 管理工具.lnk" "$INSTDIR\codex-plus-plus-man
 
 | issue | 要问什么 |
 |---|---|
-| **#2246** | `failed to launch Codex executable C:\Program Files\WindowsApps\OpenAI.Codex_26.915.4065.0_x64__...\app\Codex.exe`（Codex++ 1.2.12）。要 `codex-plus.log` 全文 + 当前 Codex++ 版本 —— 1.2.12 早于 AUMID 激活改造（`2a41afb` / `2b4d8d68`），**很可能只是版本太老**，先让用户升级到最新再复测，不必先动代码 |
+| **#2246** | `failed to launch Codex executable C:\Program Files\WindowsApps\OpenAI.Codex_26.915.4065.0_x64__...\app\Codex.exe`（Codex # 1.2.12）。要 `codex-plus.log` 全文 + 当前 Codex # 版本 —— 1.2.12 早于 AUMID 激活改造（`2a41afb` / `2b4d8d68`），**很可能只是版本太老**，先让用户升级到最新再复测，不必先动代码 |
 | **#2254** | 0x80270254，与 #2306 同根因（AUMID 硬编码失效），但用户是 1.3.0、且 `settings_path` 落在 `C:\Users\ASUS\.codex-session-delete\settings.json`（异常路径，疑似用旧版/绿色版）。要「显式 `--app-path` 能否启动」的对照结果（同 #2306 的未验证差异） |
 | **#2377** | 启动问题，正文 33KB 主要是 bridge 心跳日志（每 5 秒 `backend/status` + `settings/get`，全部 `resolve_ok`，**看不出异常**）。关键线索是用户自述「开了 VPN 时启动失败，关掉代理后成功」—— 需确认 `launcher.rs` 的 AUMID 激活或 `watcher` 探测是否在 `HTTPS_PROXY` 环境下走网络路径。**建议先要 `latest-status.json` 与图 2 的错误串**；另注意 `c509c06d`（#2313，2026-10-03 落 main）重写了启动/重启生命周期，很可能已覆盖，应先让用户升级复测 |
 | **#2253** | 见 §6.3 |
@@ -342,7 +342,7 @@ for (key, value) in user_override {
 
 **但圆圈是 Codex 客户端按它自己读到的窗口渲染的**，本仓只能通过 `config.toml` + `model_catalog_json` 间接影响。「显示不正确」的三个候选成因（按可复现性排序）：
 
-1. **命中外部 catalog 降级路径**：外部 `model_catalog_json` 指针存在且未被认作 Codex++ 托管时走 `apply_external_catalog_fallback`（`relay_config.rs:2339-2362`），退化成**全模型共用一个顶层 `model_context_window`** —— 这正是「圆圈显示不对」的稳定表现形态，也是三个候选里唯一能可靠复现的；
+1. **命中外部 catalog 降级路径**：外部 `model_catalog_json` 指针存在且未被认作 Codex # 托管时走 `apply_external_catalog_fallback`（`relay_config.rs:2339-2362`），退化成**全模型共用一个顶层 `model_context_window`** —— 这正是「圆圈显示不对」的稳定表现形态，也是三个候选里唯一能可靠复现的；
 2. 该模型未进 `model_list`（只在窗口 map 里有 key）→ 不生成 catalog 条目；
 3. 圆圈口径含输出上限，与配置值不是同一量。
 

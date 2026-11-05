@@ -941,7 +941,7 @@ async fn gateway_end_to_end() {
     }
 
     // —— 8d. Codex 以 ChatGPT 官方身份接入：请求带着 Codex 自己的登录先到本地代理（openai_base_url），
-    //        经托管的「Codex++ 网关」供应商转进网关，再按池路由 ——
+    //        经托管的「Codex # 网关」供应商转进网关，再按池路由 ——
     let (codex_base, codex_seen) =
         mock_upstream(vec![(200, "text/event-stream", chat_sse("经网关回答"))]).await;
     gateway.providers = providers(vec![relay(

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add Codex-only management for MCP servers, skills, and plugins, using the same switching concept as CCSwitch while staying inside Codex++'s current settings and relay profile model.
+Add Codex-only management for MCP servers, skills, and plugins, using the same switching concept as CCSwitch while staying inside Codex #'s current settings and relay profile model.
 
 This feature manages shared Codex context entries from the existing `relayCommonConfigContents` TOML snippet and lets each supplier profile choose which entries are active when that supplier is switched on.
 

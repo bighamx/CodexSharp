@@ -3,7 +3,7 @@
  * 没有同源、弹窗、顶层跳转），页面里拿不到 Tauri 接口，资源请求与表单外发受下面的 CSP 限制；经 postMessage 调
  * 宿主开放的几样：本拓展的配置、本拓展的常驻后台、本拓展 assets/ 里的资源、提示条、主题，
  * 以及清单 `manager.data` 声明过的只读管理器数据（`data`）、跳到管理器别的页面（`navigate`），
- * 和清单 `permissions.routes` 声明过、开放给拓展页面的 Codex++ 数据路由（`call`，例如桌宠的图库与音效）。
+ * 和清单 `permissions.routes` 声明过、开放给拓展页面的 Codex # 数据路由（`call`，例如桌宠的图库与音效）。
  *
  * 消息格式：页面 → 宿主 `{ __codexPlusManager: 1, id, method, params }`，宿主 → 页面
  * `{ __codexPlusManager: 1, id, ok, value | error }`；宿主主动推的事件 `{ __codexPlusManager: 1, event, value }`。

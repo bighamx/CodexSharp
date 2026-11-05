@@ -354,7 +354,7 @@ async fn open_candidates(
             _ = &mut released => {}
             _ = tokio::time::sleep(sleep) => {}
             _ = client_gone(request.client) => {
-                anyhow::bail!("客户端已断开，放弃等待 Codex++ 本地限速的名额");
+                anyhow::bail!("客户端已断开，放弃等待 Codex # 本地限速的名额");
             }
         }
         queued += now.elapsed();
@@ -464,7 +464,7 @@ async fn client_gone(client: Option<&tokio::net::TcpStream>) {
     }
 }
 
-/// 所有候选都因 Codex++ 本地限速满了、排队超时：不是上游的错误，回给客户端时用 429。
+/// 所有候选都因 Codex # 本地限速满了、排队超时：不是上游的错误，回给客户端时用 429。
 #[derive(Debug)]
 pub struct LocalRateLimited {
     pub message: String,
@@ -494,8 +494,8 @@ impl LocalRateLimited {
         }
         Self {
             message: format!(
-                "Codex++ 本地限速：{} 的 Key 都已达到你设置的请求上限，排队等待 {} 秒仍没有空出名额。\
-                 这是 Codex++ 网关自己的限速，不是上游返回的错误；可以在网关「供应商池」里调高这家的限速上限，或给它添加更多 Key。",
+                "Codex # 本地限速：{} 的 Key 都已达到你设置的请求上限，排队等待 {} 秒仍没有空出名额。\
+                 这是 Codex # 网关自己的限速，不是上游返回的错误；可以在网关「供应商池」里调高这家的限速上限，或给它添加更多 Key。",
                 providers.join("、"),
                 waited.as_secs()
             ),
@@ -582,7 +582,7 @@ async fn attempt_pipeline(
     // ChatGPT 订阅后端只服务 Codex 自己的客户端：请求体、请求头都整理成 Codex CLI 发的样子。
     let chatgpt = crate::official_login::member_uses_official_login_transport(&candidate.relay);
     // 拓展用 gateway.replaces 关掉 builtin:official-shaping：请求体、UA 与版本头不再整理成 Codex CLI 的样子，
-    // 由拓展在 upstream 段自己整理（上下文里 official 为 true）；会话头与官方凭据仍由 Codex++ 处理。
+    // 由拓展在 upstream 段自己整理（上下文里 official 为 true）；会话头与官方凭据仍由 Codex # 处理。
     let shaping = !crate::extension_gateway::builtin_replaced("builtin:official-shaping");
     let mut relay = candidate.relay.clone();
     let mut cache_key = String::new();

@@ -1,6 +1,6 @@
 //! Agent 自带的模型：不经网关、由 Agent 用自己的登录或 Key 直接向厂商要的模型。
 //!
-//! 网关的模型下拉里，Codex++ 池里的模型之外再列一组「直连，不经 Codex++」：
+//! 网关的模型下拉里，Codex # 池里的模型之外再列一组「直连，不经 Codex #」：
 //! - Codex：断开网关后会回到的直连供应商的模型。官方登录读 Codex 为 ChatGPT 账号缓存的
 //!   `models_cache.json`，厂商记为 OpenAI；聚合供应商列它发布给 Codex 的模型目录；别的供应商读它
 //!   自己的模型列表。后两种厂商记为供应商名。
@@ -343,7 +343,7 @@ fn claude_base_after_restore(ctx: &ApplyContext, binding: Option<&AgentBinding>)
 /// 写 Codex `config.toml` 根上的 `model`。断开后还停在托管供应商上说明没还原成，不写。
 fn write_codex_model(ctx: &ApplyContext, model: &str) -> anyhow::Result<()> {
     if ctx.settings.load()?.active_relay_id == CODEX_GATEWAY_RELAY_ID {
-        bail!("Codex 还接在 Codex++ 网关上，没能断开");
+        bail!("Codex 还接在 Codex # 网关上，没能断开");
     }
     let path = ctx.codex_home.join("config.toml");
     let text = stash::read_optional(&path)?.unwrap_or_default();

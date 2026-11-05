@@ -155,9 +155,9 @@ pub fn claude_gateway_provider(
     }
     ClaudeProvider {
         id: GATEWAY_PROVIDER_ID.to_string(),
-        name: "Codex++ 网关".to_string(),
+        name: "Codex # 网关".to_string(),
         website_url: String::new(),
-        notes: "由 Codex++ 网关模式管理，请在网关模式里修改或关闭。".to_string(),
+        notes: "由 Codex # 网关模式管理，请在网关模式里修改或关闭。".to_string(),
         settings_config: json!({ "env": Value::Object(env) }),
         created_at: 0,
         ccs_source_id: String::new(),
@@ -216,7 +216,7 @@ fn agent_gateway_profile(
     let base = format!("{}/v1", gateway_base_url_on(host, port, agent));
     RelayProfile {
         id: "codex-plus-gateway".to_string(),
-        name: "Codex++ 网关".to_string(),
+        name: "Codex # 网关".to_string(),
         protocol: RelayProtocol::Responses,
         relay_mode: RelayMode::PureApi,
         base_url: base.clone(),
@@ -353,7 +353,7 @@ pub fn codex_gateway_profile_on(
     let host = crate::wsl_network::codex_gateway_host(wsl_host);
     let synthetic = agent_gateway_profile(gateway, binding, &host, port, &ToolId::Codex);
     let mut profile = crate::provider_import::pool_relay_profile(
-        "Codex++ 网关",
+        "Codex # 网关",
         &synthetic.base_url,
         &synthetic.api_key,
         RelayProtocol::Responses,
@@ -1238,7 +1238,7 @@ fn write_codex(
 ) -> anyhow::Result<()> {
     let mut settings = ctx.settings.load()?;
     if !settings.relay_profiles_enabled {
-        bail!("Codex 的供应商配置总开关已关闭，无法接入网关：请在 Codex++ 的「供应商列表」里打开「配置切换」");
+        bail!("Codex 的供应商配置总开关已关闭，无法接入网关：请在 Codex # 的「供应商列表」里打开「配置切换」");
     }
     // Codex 在 WSL 里运行：网关额外监听 WSL 网卡，地址写成它（#2773）；拿不到时保持回环。
     let wsl_host = crate::wsl_network::codex_gateway_wsl_host(&ctx.codex_home, ctx.port).address();
@@ -1437,7 +1437,7 @@ enum RestoreOutcome {
 
 /// 把一个 Agent 的配置还原成接入网关前的样子。
 ///
-/// Codex++ 的记录里它还接在网关上、配置却已经指向别处（用户用别的工具改过）时，写回存档
+/// Codex # 的记录里它还接在网关上、配置却已经指向别处（用户用别的工具改过）时，写回存档
 /// 会盖掉用户的新选择：这时不写 Agent 的文件，只丢掉存档和网关自己的记录。
 fn restore_agent(
     ctx: &ApplyContext,
@@ -1462,7 +1462,7 @@ fn restore_agent(
     Ok(RestoreOutcome::Restored)
 }
 
-/// Codex++ 的记录里这个 Agent 还接在网关上（Codex：直连模式当前是托管供应商；Claude：当前是
+/// Codex # 的记录里这个 Agent 还接在网关上（Codex：直连模式当前是托管供应商；Claude：当前是
 /// 网关供应商；Grok：接入时的存档还在，没还原过）。旧版接入、没有存档的 Grok 认不出，按没接算。
 fn recorded_on_gateway(ctx: &ApplyContext, agent: &ToolId) -> bool {
     match agent {
@@ -1485,7 +1485,7 @@ fn live_endpoint(ctx: &ApplyContext, agent: &ToolId) -> Option<String> {
     drift::check(ctx, agent).map(|found| found.endpoint)
 }
 
-/// 两个地址算同一个：相同，或都是 Codex++ 自己的本地代理（之间换过端口、启动时重写过也算）。
+/// 两个地址算同一个：相同，或都是 Codex # 自己的本地代理（之间换过端口、启动时重写过也算）。
 fn same_endpoint(left: &str, right: &str) -> bool {
     left.trim_end_matches('/') == right.trim_end_matches('/')
         || (crate::protocol_proxy::is_managed_protocol_proxy_base_url(left)
@@ -1864,7 +1864,7 @@ pub fn note_grok_switched(store: &GatewayStore) -> anyhow::Result<()> {
 }
 
 /// 用户在 Codex 的供应商页直接切换：切到别的供应商等于断开网关；
-/// 切回托管的「Codex++ 网关」等于重新接入（断开时它还留在列表里，没被删）。
+/// 切回托管的「Codex # 网关」等于重新接入（断开时它还留在列表里，没被删）。
 pub fn note_codex_switched(
     store: &GatewayStore,
     target_id: &str,
@@ -2038,7 +2038,7 @@ pub fn reapply_if_port_changed(ctx: &ApplyContext) -> anyhow::Result<usize> {
     Ok(changed)
 }
 
-/// 退出 Codex++（用户打开了「退出时恢复直连」，默认开）或安装更新前（`force`，不看开关）
+/// 退出 Codex #（用户打开了「退出时恢复直连」，默认开）或安装更新前（`force`，不看开关）
 /// 恢复所有走网关的 Agent。绑定保留为开启状态，并记下「已恢复」，下次启动时由 [`reapply_enabled`]
 /// 重新指回网关。某个 Agent 还原失败时继续还原其它的，最后返回第一个错误。
 pub fn restore_all_for_exit(

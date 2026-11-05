@@ -33,7 +33,7 @@ use crate::model_suffix::parse_model_suffix;
 use crate::settings::{RelayProfile, RelayProtocol};
 use crate::tools::ToolConfig;
 
-/// Grok 的 `api_backend` 取值。当前 Codex++ 只产 `chat_completions`，
+/// Grok 的 `api_backend` 取值。当前 Codex # 只产 `chat_completions`，
 /// 如果上游是 Responses 端点，跟着 profile 的协议走。
 ///
 /// Anthropic Messages 在 Grok 的 `api_backend` 里没有对应取值，

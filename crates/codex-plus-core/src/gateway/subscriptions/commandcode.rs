@@ -301,7 +301,7 @@ async fn wait_browser(login: BrowserLogin) -> anyhow::Result<(String, String)> {
                     "403 Forbidden",
                     &headers,
                     "text/html; charset=utf-8",
-                    &editor_kit::page("这个登录页已失效，请在 Codex++ 最新打开的页面里授权。"),
+                    &editor_kit::page("这个登录页已失效，请在 Codex # 最新打开的页面里授权。"),
                 )
                 .await;
                 continue;
@@ -344,9 +344,9 @@ async fn wait_browser(login: BrowserLogin) -> anyhow::Result<(String, String)> {
                     break;
                 };
                 let text = if ok {
-                    "登录成功，可以回到 Codex++ 了。"
+                    "登录成功，可以回到 Codex # 了。"
                 } else {
-                    "登录没有完成，请回到 Codex++ 重新登录。"
+                    "登录没有完成，请回到 Codex # 重新登录。"
                 };
                 let status = if request.path.starts_with("/callback/complete") {
                     "200 OK"

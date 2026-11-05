@@ -3,11 +3,11 @@
 //! 清单（codexpp.json）里的写法：
 //! - `skills`：包内含 `SKILL.md` 的目录列表；省略时自动收 `skills/*/SKILL.md`。装进 `~/.codex/skills/<拓展>-<目录名>`。
 //! - `agents`：`[{ name, description, instructions?, model?, reasoningEffort?, nicknames? }]`，写成 Codex 的
-//!   `[agents.<拓展>-<name>]`，角色配置文件放在 Codex++ 数据目录。`instructions` 可以是包内 .md 路径或文字。
+//!   `[agents.<拓展>-<name>]`，角色配置文件放在 Codex # 数据目录。`instructions` 可以是包内 .md 路径或文字。
 //! - `mcpServers`：`{ 名字: { command, args?, env?, cwd? } | { url, headers? } }`，写成 `[mcp_servers.<拓展>-<名字>]`。
 //!   字符串里的 `${extensionDir}` 换成包目录，`${config.键}` 换成拓展配置值。
-//! - `instructions`：包内 .md 路径或文字，合并进 `~/.codex/AGENTS.md` 里 Codex++ 托管的一段（官方直连也生效）。
-//! - `prompts` / `resources`：经 Codex++ 拓展 MCP 提供的提示词模板与只读资源（不写进 Codex home）。
+//! - `instructions`：包内 .md 路径或文字，合并进 `~/.codex/AGENTS.md` 里 Codex # 托管的一段（官方直连也生效）。
+//! - `prompts` / `resources`：经 Codex # 拓展 MCP 提供的提示词模板与只读资源（不写进 Codex home）。
 //!
 //! 同步只动自己写过的东西：技能目录带标记文件，配置项与 AGENTS.md 段落记在状态文件里；同名的用户自有条目不覆盖。
 
@@ -22,7 +22,7 @@ use crate::user_scripts::UserScriptManager;
 
 /// 技能目录里的归属标记文件，内容是拓展 id。
 pub const SKILL_MARKER: &str = ".codexpp-extension";
-const INSTRUCTIONS_START: &str = "<!-- codexpp-extensions:start（由 Codex++ 拓展管理，请勿手改这一段） -->";
+const INSTRUCTIONS_START: &str = "<!-- codexpp-extensions:start（由 Codex # 拓展管理，请勿手改这一段） -->";
 const INSTRUCTIONS_END: &str = "<!-- codexpp-extensions:end -->";
 /// 单个技能目录的大小上限。
 const SKILL_MAX_BYTES: u64 = 4 * 1024 * 1024;
@@ -37,9 +37,9 @@ pub struct ExtensionCodexAssets {
     pub mcp_servers: Vec<ExtensionMcpServer>,
     /// 合并进全局 AGENTS.md 的文字。
     pub instructions: Option<String>,
-    /// 经 Codex++ 拓展 MCP 提供的提示词模板（prompts/list、prompts/get）。
+    /// 经 Codex # 拓展 MCP 提供的提示词模板（prompts/list、prompts/get）。
     pub prompts: Vec<ExtensionPrompt>,
-    /// 经 Codex++ 拓展 MCP 提供的只读资源（resources/list、resources/read）。
+    /// 经 Codex # 拓展 MCP 提供的只读资源（resources/list、resources/read）。
     pub resources: Vec<ExtensionResource>,
 }
 
@@ -368,7 +368,7 @@ fn sync_dir(manager: &UserScriptManager) -> PathBuf {
     manager.tool_exec_dir().with_file_name(".codex-sync")
 }
 
-/// 把 config.toml 文本里 Codex++ 拥有的 agents / mcp_servers 条目调整成 `wanted`。
+/// 把 config.toml 文本里 Codex # 拥有的 agents / mcp_servers 条目调整成 `wanted`。
 /// 返回新文本与新的归属列表；同名的用户条目不动，并记进 `conflicts`。
 fn sync_config_text(
     contents: &str,
@@ -417,7 +417,7 @@ fn sync_config_text(
     Ok((document.to_string(), next))
 }
 
-/// AGENTS.md 里替换（或去掉）Codex++ 托管的一段。
+/// AGENTS.md 里替换（或去掉）Codex # 托管的一段。
 pub fn sync_instructions_text(contents: &str, block: Option<&str>) -> String {
     let mut text = contents.to_string();
     if let (Some(start), Some(end)) = (text.find(INSTRUCTIONS_START), text.find(INSTRUCTIONS_END)) {
@@ -555,7 +555,7 @@ pub fn sync(home: &Path, manager: &UserScriptManager, enabled: &[EnabledCodexAss
         .collect::<Vec<_>>();
     sync_skills(home, &skills, &mut report)?;
 
-    // 子 agent：角色配置文件写在 Codex++ 数据目录，config.toml 里只放描述和路径。
+    // 子 agent：角色配置文件写在 Codex # 数据目录，config.toml 里只放描述和路径。
     let agents_dir = state_dir.join("agents");
     let mut agents = BTreeMap::new();
     for item in enabled {

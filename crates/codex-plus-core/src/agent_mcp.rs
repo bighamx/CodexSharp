@@ -1,6 +1,6 @@
 //! Claude Code 与 Grok 的 MCP 服务器读写，供「全局管理 · MCP」同时管理多个 Agent。
 //!
-//! Codex 的 MCP 仍走 Codex++ 的公共配置（context entries），这里只管另外两家。
+//! Codex 的 MCP 仍走 Codex # 的公共配置（context entries），这里只管另外两家。
 //! 对前端统一用 Codex 规范的 `[mcp_servers.<id>]` 表体（TOML 文本）交换，表单与解析逻辑
 //! 全部复用 [`crate::mcp_config`]；格式差异在这里换算：
 //!

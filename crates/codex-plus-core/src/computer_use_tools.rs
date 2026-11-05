@@ -3,10 +3,10 @@
 //! 这里补三样东西，工具面与返回内容本身不改：
 //!
 //! 1. **使用说明**：写进 `initialize` 结果的 `instructions`，客户端（Claude Code 等）放进
-//!    系统提示。内容是 Codex++ 自己写的，针对这 10 个工具。
+//!    系统提示。内容是 Codex # 自己写的，针对这 10 个工具。
 //! 2. **确认规则**：本会话第一次成功的工具结果后面附上 Codex 的确认规则。原文**运行时**
 //!    从本机 ChatGPT.app 的 `@oai/cua/docs` 读取（与 JS 档 cua_repl 首次下发的是同一份），
-//!    Codex++ 不复制、不分发这段文字；本机没有这个文件就不附。
+//!    Codex # 不复制、不分发这段文字；本机没有这个文件就不附。
 //! 3. **防丢字**：`type_text` 的内容里有非 ASCII 字符时直接返回错误，提示改用 `set_value`。
 //!    实测（2026-10-25）：ASCII 全部正确；`é`、`ï`、破折号、弯引号、表情、中文都被丢掉，
 //!    `Å` 这类当前布局能直接按出的反而能打。按布局精确判断太脆弱，这里保守地只放行 ASCII。
@@ -26,7 +26,7 @@ pub const INSTRUCTIONS: &str = "Operate native macOS apps through Codex Computer
 - Stop once the requested result is visible in the returned state.\n\
 \n\
 ## Text input\n\
-- `type_text` presses keys, so it can only type plain ASCII. Accented letters, Chinese and other CJK text, emoji and typographic punctuation would be silently dropped by the OS; Codex++ rejects such text instead of losing it.\n\
+- `type_text` presses keys, so it can only type plain ASCII. Accented letters, Chinese and other CJK text, emoji and typographic punctuation would be silently dropped by the OS; Codex # rejects such text instead of losing it.\n\
 - For any non-ASCII text, use `set_value` on the field (it replaces the whole value). Use `press_key` for Return, Tab and shortcuts.\n\
 \n\
 ## Scope and safety\n\

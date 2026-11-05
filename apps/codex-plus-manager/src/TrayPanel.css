@@ -790,7 +790,7 @@ body:has(.tray-panel) {
   color: hsl(var(--brand-accent));
 }
 
-/* 竖排小地图：上排 Agent、中间 Codex++、下排供应商；连线和光点由 HubTopology 画。
+/* 竖排小地图：上排 Agent、中间 Codex #、下排供应商；连线和光点由 HubTopology 画。
    总览在窄窗口下会隐藏连线，这里要显式打开。 */
 .tray-panel .hub-topology.tp-flow-topology {
   display: grid;

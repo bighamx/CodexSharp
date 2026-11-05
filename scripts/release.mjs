@@ -135,7 +135,7 @@ if (toCommit.length) {
   run("git", ["commit", "-m", `release: ${tag}`], { stdio: ["ignore", "pipe", "inherit"] });
   step(`已提交 release: ${tag}`);
 }
-run("git", ["tag", "-a", tag, "-m", `Codex++ ${tag}`]);
+run("git", ["tag", "-a", tag, "-m", `Codex # ${tag}`]);
 step(`已打 tag ${tag} → ${run("git", ["rev-parse", "--short", "HEAD"])}`);
 execFileSync("git", ["push", "--atomic", "origin", "HEAD:refs/heads/main", `refs/tags/${tag}`], { cwd: root, stdio: "inherit" });
 

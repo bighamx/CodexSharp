@@ -1,7 +1,7 @@
   // Agent 桌宠拓展的设置界面。Codex 里「拓展」详情页（ctx.registerSettingsPanel，见 main.js）和管理器里的设置页
   // （settings.html，见 settings-page.js）共用这一份；两边各自给一个 host：
   //   { config, save(values) → Promise<生效配置>, call(route, payload) → Promise<结果>, asset(path) → data URL 或 Promise }
-  // 图片、音效的下载与导入走 Codex++ 的 /agent-pet/* 路由（清单 permissions.routes 声明过），内嵌音效取包里的 assets/。
+  // 图片、音效的下载与导入走 Codex # 的 /agent-pet/* 路由（清单 permissions.routes 声明过），内嵌音效取包里的 assets/。
   // 这里的名字都带 cppPetSettings 前缀：拓展包的页面脚本拼在同一个作用域里，不能和 pet.js / whale.js 重名。
 
   const cppPetSettingsSizeMin = 64;
@@ -513,7 +513,7 @@
         oninput: (event) => update({ [key]: type === "number" ? event.target.valueAsNumber : event.target.value.trim() }, { render: false }),
       }));
       const custom = config.codexAppWhaleBalanceProtocol === "custom";
-      return group("API 余额（可选）", "跟随 Codex++ 当前供应商查询余额；Codex 订阅额度和本地 token 无需配置此项。",
+      return group("API 余额（可选）", "跟随 Codex # 当前供应商查询余额；Codex 订阅额度和本地 token 无需配置此项。",
         h("label", { class: "cpps-field" }, h("span", { text: "余额查询方式" }), h("select", {
           class: "cpps-select", "aria-label": "余额查询方式",
           onchange: (event) => update({ codexAppWhaleBalanceProtocol: event.target.value }),
@@ -540,7 +540,7 @@
         onclick: () => void fetchPreviews(Object.keys(state.previews).filter((id) => state.previews[id].state === "failed")),
       }, "重试下载");
       const head = h("div", { class: "cpps-group-head" },
-        h("div", {}, h("strong", { text: "形象" }), h("small", { text: "图片在用到时联网下载并缓存在本机，不随 Codex++ 打包。内置图库来自 Microsoft Fluent Emoji（MIT），二次元形象来自 Wikimedia Commons（CC0）。" })),
+        h("div", {}, h("strong", { text: "形象" }), h("small", { text: "图片在用到时联网下载并缓存在本机，不随 Codex # 打包。内置图库来自 Microsoft Fluent Emoji（MIT），二次元形象来自 Wikimedia Commons（CC0）。" })),
         retry);
       const gallery = state.catalog
         ? h("div", { class: "cpps-gallery", role: "radiogroup", "aria-label": "形象" }, state.catalog.map((entry) => {
@@ -644,7 +644,7 @@
                 file ? h("button", { type: "button", class: "cpps-button", "aria-label": `清除${label}`, disabled: !on, onclick: () => clearCustomSound(slot) }, "×") : h("span"),
               );
             }),
-            h("small", { class: "cpps-muted", text: "导入本地 MP3 / OGG / WAV / M4A（2 MB 以内），复制到 Codex++ 状态目录，可只设其中一个。" }),
+            h("small", { class: "cpps-muted", text: "导入本地 MP3 / OGG / WAV / M4A（2 MB 以内），复制到 Codex # 状态目录，可只设其中一个。" }),
             state.importError ? h("p", { class: "cpps-error", role: "alert", text: state.importError }) : null),
           range("音量", 0, 100, 5, Math.round(config.volume * 100), (value) => `${value}%`, (value) => update({ volume: value / 100 }, { render: false }), !on),
         ),

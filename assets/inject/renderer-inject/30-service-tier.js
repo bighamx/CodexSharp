@@ -1,6 +1,6 @@
   // 服务等级由 Codex 原生控件决定；此兼容入口仅负责供应商适配。
   function applyCodexServiceTierRequestOverride(method, params, threadIdHint = "") {
-    // 所有发往 app-server 的请求都经过这里：先做 Codex++ 自己的改写，再交给拓展的 codex/request 中间件。
+    // 所有发往 app-server 的请求都经过这里：先做 Codex # 自己的改写，再交给拓展的 codex/request 中间件。
     // typeof 守卫：测试会单独执行本分片，那时拓展内核不在作用域里。
     const patched = applyCodexRemoteSessionProviderOverride(method, params);
     return typeof codexPlusApplyExtensionRequestMiddleware === "function"
@@ -509,7 +509,7 @@
       });
       if (starts.size > 256) starts.delete(starts.keys().next().value);
     };
-    // 已由 Codex++ 创建/恢复的会话直接发送。正常消息不再额外读取配置或线程状态。
+    // 已由 Codex # 创建/恢复的会话直接发送。正常消息不再额外读取配置或线程状态。
     if (known?.signature === signature && !known.needsRecovery) {
       try {
         const response = await sendRequest(method, params, options);
@@ -985,7 +985,7 @@
         new Promise((_, reject) => {
           timeoutId = setTimeout(() => {
             sendCodexPlusDiagnostic("app_server_preparation_read_timeout", { path, timeoutMs });
-            reject(new Error(`Codex++ preparation read timed out: ${path}`));
+            reject(new Error(`Codex # preparation read timed out: ${path}`));
           }, timeoutMs);
         }),
       ]);

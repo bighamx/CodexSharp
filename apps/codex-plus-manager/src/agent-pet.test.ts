@@ -256,7 +256,7 @@ test("设置界面在拓展包里：Codex 详情页经 ctx.registerSettingsPanel
     assert.ok(manifest.permissions.routes.includes(route), `${route} 没在清单里声明`);
     assert.ok(api.includes(`"${route}",`), `${route} 不在拓展路由白名单`);
   }
-  // 写配置的路由只给 Codex++ 自己的详情页用，不开放给拓展。
+  // 写配置的路由只给 Codex # 自己的详情页用，不开放给拓展。
   assert.ok(!api.includes('"/user-scripts/set-config"'));
 });
 

@@ -1,7 +1,7 @@
 //! 拓展一键发布：把本地拓展包发布成 GitHub 公开仓库（`codexpp-extension` topic + release 包文件），
 //! 出现在社区栏。设计见 docs/plans/2026-10-30-extension-publish-discovery-design.md 第十节。
 //!
-//! 鉴权全部交给 `gh`：Codex++ 不读、不存 token，也不改用户的全局 git 配置；推送时只在那一条
+//! 鉴权全部交给 `gh`：Codex # 不读、不存 token，也不改用户的全局 git 配置；推送时只在那一条
 //! git 命令上临时指定 `gh auth git-credential` 作凭据助手。每一步失败都停下并给出原始输出，
 //! 已完成的步骤不回滚（仓库已建、提交已推都可以安全重试）。
 
@@ -295,7 +295,7 @@ pub fn generate_readme(manifest: &Value, repo: &str) -> String {
         format!("| 能力 | 内容 |\n| --- | --- |\n{}", rows.join("\n"))
     };
     format!(
-        "# {name}\n\n{description}\n\n## 安装\n\n在 Codex++ 管理器打开「拓展 → 社区拓展」，搜索 `{id}` 点安装；\n或从 [Releases](https://github.com/{repo}/releases) 下载 `{id}-v<版本>.zip`，解压到 Codex++ 的拓展目录。\n\n## 需要的能力\n\n{table}\n\n---\n\n这是一个 [Codex++](https://github.com/BigPizzaV3/CodexPlusPlus) 拓展（topic：`codexpp-extension`）。\n",
+        "# {name}\n\n{description}\n\n## 安装\n\n在 Codex # 管理器打开「拓展 → 社区拓展」，搜索 `{id}` 点安装；\n或从 [Releases](https://github.com/{repo}/releases) 下载 `{id}-v<版本>.zip`，解压到 Codex # 的拓展目录。\n\n## 需要的能力\n\n{table}\n\n---\n\n这是一个 [Codex #](https://github.com/BigPizzaV3/CodexPlusPlus) 拓展（topic：`codexpp-extension`）。\n",
         name = text("name"),
         description = text("description"),
         id = text("id"),

@@ -340,7 +340,7 @@ async fn request_stages_order_and_builtin_replaces() {
     apply_request_with(&manager, &mut request, "/v1/responses").await.unwrap();
     assert_eq!(request["instructions"], "原始|early|late");
     assert!(request.get("seen").is_none());
-    // upstream 段：拿到 Codex++ 转换后的请求体与上游信息。
+    // upstream 段：拿到 Codex # 转换后的请求体与上游信息。
     let mut upstream = json!({"model": "deepseek-chat", "messages": []});
     apply_upstream_request_with(&manager, &mut upstream, "/v1/responses", json!({"stage": "upstream", "wireApi": "chat", "relay": {"id": "r1"}})).await.unwrap();
     assert_eq!(upstream["seen"], "upstream:chat:r1");

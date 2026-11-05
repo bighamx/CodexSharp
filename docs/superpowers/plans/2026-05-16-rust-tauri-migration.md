@@ -4,7 +4,7 @@
 
 **Goal:** Replace the Python backend with a Rust core, a no-window silent launcher, and a Tauri management tool while preserving the existing Codex App injection behavior.
 
-**Architecture:** Add a Rust workspace beside the current Python package, port behavior in verifiable slices, then switch the installed entry points to Rust and remove Python only after parity is proven. The only user-facing entry points are `Codex++` silent launch and `Codex++ 管理工具`; there is no separate CLI.
+**Architecture:** Add a Rust workspace beside the current Python package, port behavior in verifiable slices, then switch the installed entry points to Rust and remove Python only after parity is proven. The only user-facing entry points are `Codex #` silent launch and `Codex # 管理工具`; there is no separate CLI.
 
 **Tech Stack:** Rust 1.95, Cargo workspace, Tauri 2, TypeScript/Vite, `rusqlite`, `serde`, `serde_json`, `tokio`, `reqwest`, `tungstenite` or `tokio-tungstenite`, Windows PowerShell shortcut generation, macOS app bundle generation, existing `renderer-inject.js`, existing pytest suite as behavior reference during migration.
 
@@ -19,8 +19,8 @@ The design covers several subsystems: Rust workspace setup, data operations, CDP
 - Create `Cargo.toml`: workspace root with members under `crates/` and `apps/`.
 - Create `crates/codex-plus-core/`: shared launch, CDP, bridge, settings, logs, diagnostics, path resolution, install/update primitives.
 - Create `crates/codex-plus-data/`: SQLite, backup, markdown export, provider sync, and filesystem data operations.
-- Create `apps/codex-plus-launcher/`: no-window silent launcher binary used by the `Codex++` shortcut.
-- Create `apps/codex-plus-manager/`: Tauri management console used by `Codex++ 管理工具`.
+- Create `apps/codex-plus-launcher/`: no-window silent launcher binary used by the `Codex #` shortcut.
+- Create `apps/codex-plus-manager/`: Tauri management console used by `Codex # 管理工具`.
 - Move or copy runtime assets into `assets/`: icons, sponsor images, and `renderer-inject.js` source used by Rust packaging.
 - Create `tests/fixtures/`: shared SQLite, rollout, and settings fixtures for Rust integration tests.
 - Modify `README.md` and `README_EN.md`: replace Python usage with Rust/Tauri installation and two-entry behavior.
@@ -202,7 +202,7 @@ use anyhow::Result;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    println!("Codex++ launcher {}", codex_plus_core::version::VERSION);
+    println!("Codex # launcher {}", codex_plus_core::version::VERSION);
     Ok(())
 }
 ```
@@ -240,7 +240,7 @@ Create `apps/codex-plus-manager/index.html`:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codex++ 管理工具</title>
+    <title>Codex # 管理工具</title>
   </head>
   <body>
     <div id="app"></div>
@@ -257,7 +257,7 @@ const app = document.getElementById("app");
 if (app) {
   app.innerHTML = `
     <main style="font-family: system-ui, sans-serif; padding: 24px">
-      <h1>Codex++ 管理工具</h1>
+      <h1>Codex # 管理工具</h1>
       <p>Rust/Tauri migration shell is ready.</p>
     </main>
   `;
@@ -301,7 +301,7 @@ pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![backend_version])
         .run(tauri::generate_context!())
-        .expect("failed to run Codex++ manager");
+        .expect("failed to run Codex # manager");
 }
 ```
 
@@ -850,14 +850,14 @@ Test generated Windows shortcut scripts contain both:
 
 ```text
 Codex++.lnk
-Codex++ 管理工具.lnk
+Codex # 管理工具.lnk
 ```
 
 Test generated macOS app bundle metadata contains both:
 
 ```text
 Codex++.app
-Codex++ 管理工具.app
+Codex # 管理工具.app
 ```
 
 - [ ] **Step 2: Implement Windows install/uninstall**
@@ -907,8 +907,8 @@ git commit -m "feat: port install update and watcher management to Rust"
 Replace Python commands with two-entry usage:
 
 ```text
-双击 Codex++：静默启动增强版 Codex。
-双击 Codex++ 管理工具：安装、卸载、更新、设置、日志和诊断。
+双击 Codex #：静默启动增强版 Codex。
+双击 Codex # 管理工具：安装、卸载、更新、设置、日志和诊断。
 ```
 
 Remove references to:
@@ -931,7 +931,7 @@ Document release artifacts:
 codex-plus-plus.exe
 codex-plus-plus-manager.exe
 Codex++.app
-Codex++ 管理工具.app
+Codex # 管理工具.app
 ```
 
 - [ ] **Step 4: Run docs tests and commit**
@@ -975,10 +975,10 @@ Expected: pass, or replace these tests with Rust/Node equivalents before deletin
 
 Verify:
 
-- `Codex++` shortcut starts Codex without opening management UI.
-- Codex App shows the Codex++ injected menu.
+- `Codex #` shortcut starts Codex without opening management UI.
+- Codex App shows the Codex # injected menu.
 - Delete/undo/export/move/settings routes work from the injected UI.
-- `Codex++ 管理工具` opens and shows Overview status.
+- `Codex # 管理工具` opens and shows Overview status.
 - Management tool can repair shortcuts and read latest logs.
 - Update check works with mocked or real release metadata.
 

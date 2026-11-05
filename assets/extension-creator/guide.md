@@ -1,6 +1,6 @@
-# Codex++ 拓展创作指南（给 agent 看）
+# Codex # 拓展创作指南（给 agent 看）
 
-你在帮用户做一个 Codex++ 拓展。用户可能说「插件」，但这里做的是 Codex++ 拓展，不是 Codex 自带的插件
+你在帮用户做一个 Codex # 拓展。用户可能说「插件」，但这里做的是 Codex # 拓展，不是 Codex 自带的插件
 （Codex 插件是 skills / MCP 包，由 Codex 管理，不归这些工具管）；回复用户时称它为「拓展」。
 拓展是跑在 Codex 桌面 App 页面里的 JavaScript，能给 Codex 加页面、菜单、
 会话行操作，或者改造页面行为。完成后拓展立刻热重载生效，用户不用重启。
@@ -26,7 +26,7 @@
 
 ## 工作流程
 
-1. 先弄清用户想要什么：出现在哪里（图标栏整页 / Codex++ 菜单开关或按钮 / 会话行「更多」菜单 / 直接改页面）、
+1. 先弄清用户想要什么：出现在哪里（图标栏整页 / Codex # 菜单开关或按钮 / 会话行「更多」菜单 / 直接改页面）、
    点了做什么、要不要记住设置。需求含糊时先问，别猜。
 2. 要改 Codex 原生界面时（换图标、改颜色、隐藏或挪动按钮、在输入框旁加东西），先用
    `codexpp_extension_inspect` 查页面结构，不要凭印象猜选择器。见下文「改 Codex 原生界面」。
@@ -36,7 +36,7 @@
    - `loaded` 且没有 `error`：改了界面的话用 `codexpp_extension_screenshot` 截图确认真的生效（选择器没命中
      时拓展不会报错，只是没效果），再告诉用户去哪里看（例如「左侧图标栏新出现的 X 入口」）。
    - `failed` 或有 `error`：读错误、改代码、在同一个关联拓展上再写一次，不要因报错另建一个。
-   - `reload.reloaded = false`：按 `reload.reason` 告诉用户需要做什么（通常是在 Codex++ 管理器里点「热重载」）。
+   - `reload.reloaded = false`：按 `reload.reason` 告诉用户需要做什么（通常是在 Codex # 管理器里点「热重载」）。
 5. 改已有拓展前先 `codexpp_extension_read` 读回现有代码，在它的基础上改。
 6. 不提供删除：用户不想要了就 `codexpp_extension_set_enabled` 停用，并告诉用户拓展目录在哪里、可以手动删除。
 
@@ -55,9 +55,9 @@ codexPlus.extension((ctx) => {
 | 能力 | 说明 |
 | --- | --- |
 | `ctx.registerPage({ title, render }, { navLabel, icon })` | 整页视图并自动配图标栏入口。`render({ container, close })` **每次打开都会重新调用**，每次都从空白重建 `container` 的内容，不要缓存 DOM |
-| `ctx.registerMenuItem(def)` | Codex++ 菜单「主页」面板的一行。开关形态：`{ label, description, toggleValue: () => bool, onChange: (next) => {} }`；按钮形态：`{ label, description, buttonLabel, onActivate: ({ close }) => {} }` |
-| `ctx.registerRowAction({ label, icon, onActivate })` | 会话行「更多操作」里的一项，`onActivate({ row, session_id, title, archived, resolve, close })`。加 `placement: "inline"` 画成行上常驻的图标按钮（套原生按钮外观）；加 `surfaces: ["sidebar", "archived"]` 同时出现在归档页的行上（归档页的行未必有会话 id，用 `await resolve()` 取）。Codex++ 自带的「删除」「导出」就是这样注册的 |
-| `ctx.registerComposerAction({ label, icon, onActivate })` | 输入区（发送按钮那一行）的图标按钮，`onActivate({ editor, insertText, close })`，`insertText(text)` 往输入框插字。比自己往输入区塞节点稳，Codex 改结构由 Codex++ 适配 |
+| `ctx.registerMenuItem(def)` | Codex # 菜单「主页」面板的一行。开关形态：`{ label, description, toggleValue: () => bool, onChange: (next) => {} }`；按钮形态：`{ label, description, buttonLabel, onActivate: ({ close }) => {} }` |
+| `ctx.registerRowAction({ label, icon, onActivate })` | 会话行「更多操作」里的一项，`onActivate({ row, session_id, title, archived, resolve, close })`。加 `placement: "inline"` 画成行上常驻的图标按钮（套原生按钮外观）；加 `surfaces: ["sidebar", "archived"]` 同时出现在归档页的行上（归档页的行未必有会话 id，用 `await resolve()` 取）。Codex # 自带的「删除」「导出」就是这样注册的 |
+| `ctx.registerComposerAction({ label, icon, onActivate })` | 输入区（发送按钮那一行）的图标按钮，`onActivate({ editor, insertText, close })`，`insertText(text)` 往输入框插字。比自己往输入区塞节点稳，Codex 改结构由 Codex # 适配 |
 | `ctx.registerMessageAction({ label, icon, roles, visible(message), onActivate({ message }) })` | 每条对话消息操作行（复制、编辑按钮旁）的图标按钮。`message = { role, id, turnId, conversationId, text, element }`，`roles` 取 `"user"` / `"assistant"` |
 | `ctx.registerMessageDecoration({ roles, render({ message, container }) })` | 消息正文下方的一块内容，往 `container` 里画；流式输出时会清空重画。要给消息加标记、摘要、翻译用这个，不要自己往消息里塞节点 |
 | `ctx.registerSlot({ slot, render({ container }) })` | 往固定位置放内容：`composer.above`（输入框上方）、`thread.top` / `thread.bottom`、`sidebar.top` / `sidebar.bottom`、`titlebar`（标题栏右侧）。Codex 重建 DOM 后会重新调 render；返回的句柄带 `refresh()` |
@@ -68,14 +68,14 @@ codexPlus.extension((ctx) => {
 | `ctx.storage.get(key, 默认值) / set(key, value) / remove(key)` | 按拓展隔离的本地存储，值按 JSON 存取 |
 | `ctx.registerNavEntry({ label, icon, onActivate })` | 只要一个图标栏按钮、不要整页时用 |
 | `ctx.onScan(() => {…}, { phase })` | Codex 界面变了（切会话、侧栏或输入框重建）时调用，按帧合并、页面隐藏时不跑。要「Codex 重建后把自己的东西补回去」用它，**不用自己开 MutationObserver**。`phase: "light"` 每次变化都跑（回调要很便宜），默认 `"deferred"` 跟完整扫描。返回的撤销函数带 `run()` 立即跑一次 |
-| `ctx.on("settings/loaded", ({ reason }) => …)` / `ctx.on("settings/changed", ({ key, value, persisted }) => …)` | 读到 Codex++ 设置（启动、每 5 秒心跳）/ 用户在 Codex 页面里改了一项设置时。要跟着 Codex++ 设置开关走的拓展订阅这两个 |
+| `ctx.on("settings/loaded", ({ reason }) => …)` / `ctx.on("settings/changed", ({ key, value, persisted }) => …)` | 读到 Codex # 设置（启动、每 5 秒心跳）/ 用户在 Codex 页面里改了一项设置时。要跟着 Codex # 设置开关走的拓展订阅这两个 |
 | `ctx.effect(() => cleanupFn)` | 任意副作用（插入的 DOM、patch 的函数），返回撤销函数 |
 | `ctx.listen(target, type, handler, options)` | 自动撤销的事件监听 |
 | `ctx.setInterval / ctx.setTimeout` | 自动清理的定时器。**返回值是撤销函数（调用它即取消），不是定时器 id**，不能交给 `clearTimeout` |
 | `ctx.asset("assets/pet.png")` | 包内资源（图片、音频、字体）的 data URL，直接给 `img.src` / CSS `url()`；写法见「图片、音频等资源」 |
 | `ctx.on(event, fn) / ctx.emit(event, ...args)` | 拓展之间的事件 |
 | `ctx.intercept(name, (value, next) => next(value), { order }) / ctx.waterfall(name, value)` | 中间件链 |
-| `ctx.call(route, payload)` | 调 Codex++ 后端，只能调写进 `routes` 参数且在可用列表里的路由 |
+| `ctx.call(route, payload)` | 调 Codex # 后端，只能调写进 `routes` 参数且在可用列表里的路由 |
 | `ctx.toast(message, { type })` | 提示，type 为 info / success / warn / error |
 | `ctx.fail(error)` | 上报 `await` 之后的异步错误，否则管理页看不到 |
 
@@ -178,7 +178,7 @@ npx esbuild src/main.js --bundle --minify --format=iife --outfile=/tmp/my-ext/di
   `[{ "id": "work", "name": "工作", "config": { "minutes": 50 } }, { "id": "rest", "name": "休息", "config": { "minutes": 10 } }]`。
   页面脚本按实例各调用一次，`ctx.config` 是叠上实例配置后的值，`ctx.instance` 是 `{ id, name }`，`ctx.storage` 与注册项按实例分开；
   实例最多 16 个，实例的 `config` 只能写 `config` 里声明过的键。钩子、网关、后台不分实例。
-- 用户在 Codex++ 管理器的拓展列表里点「设置」修改；对话里用户说「改成 50 分钟」时，用
+- 用户在 Codex # 管理器的拓展列表里点「设置」修改；对话里用户说「改成 50 分钟」时，用
   `codexpp_extension_configure` 改值即可，不必重写代码。改完会自动热重载。
 
 ## 给模型加工具
@@ -192,7 +192,7 @@ npx esbuild src/main.js --bundle --minify --format=iife --outfile=/tmp/my-ext/di
 
 - 脚本默认导出 `(args, { extension, tool }) => 结果`，可以 async。返回字符串作为文本；返回 `{ content: [...] }`
   按 MCP 内容块原样返回；其它值转成 JSON 文本；抛错时模型会看到错误。`timeout` 1~300 秒，默认 30。
-- 工具名只能是字母、数字、`_`、`-`；对外名字是 `<拓展 id>__<工具名>`，由已接入的 Codex++ 拓展 MCP 提供。
+- 工具名只能是字母、数字、`_`、`-`；对外名字是 `<拓展 id>__<工具名>`，由已接入的 Codex # 拓展 MCP 提供。
   写入后告诉用户：**新开一个对话**工具才会出现。
 - 工具脚本以用户权限运行，只做描述里写的事。
 
@@ -217,8 +217,8 @@ npx esbuild src/main.js --bundle --minify --format=iife --outfile=/tmp/my-ext/di
   - 改写工具参数：`permissionDecision: "allow"` 加 `updatedInput`（Bash 必须带字符串 `command`）
   - 给模型补上下文：`hookSpecificOutput.additionalContext: "…"`（UserPromptSubmit、SessionStart、PostToolUse 等）
   - 让本轮别停：Stop 事件返回 `{ decision: "block", reason: "还要做什么" }`
-- 多个拓展的结果由 Codex++ 合并：任一拒绝即拒绝，上下文按拓展顺序拼接。
-- 首次用到某个事件时，Codex++ 会往 Codex 配置写一条「Codex++ 拓展钩子」分发条目，**用户要在 Codex 的 Hooks
+- 多个拓展的结果由 Codex # 合并：任一拒绝即拒绝，上下文按拓展顺序拼接。
+- 首次用到某个事件时，Codex # 会往 Codex 配置写一条「Codex # 拓展钩子」分发条目，**用户要在 Codex 的 Hooks
   设置里信任它一次**（写入结果的 `hooks.note` 会提示），之后新开对话生效。务必把这一步告诉用户。
 - 钩子脚本在用户电脑上以用户权限运行，只做用户要求的事。
 
@@ -234,7 +234,7 @@ npx esbuild src/main.js --bundle --minify --format=iife --outfile=/tmp/my-ext/di
 - 脚本默认导出 `(body, { path, extension }) => 新 body | null`，可以 async。`body` 是 OpenAI Responses 请求体
   （`model`、`instructions`、`input`、`tools`、`reasoning` 等）的副本，返回新对象即替换，返回 `null` 不改。
   `timeout` 1~10 秒，默认 5。多个拓展按顺序串联。
-- 只对经 Codex++ 本地代理 / 网关发出的请求生效（中转、聚合、网关模式）；官方直连不经过这里，要告诉用户。
+- 只对经 Codex # 本地代理 / 网关发出的请求生效（中转、聚合、网关模式）；官方直连不经过这里，要告诉用户。
 - 它挡在每一次模型请求前面：保持快、只做用户要求的事、不要外发请求内容。出错或超时会保留原请求。
 - 每走一步都会经过：第二个参数的 `step.index` 是本轮第几步（工具调用之后加一），`step.userText` 是本轮用户输入。
   返回 `{ reject: "原因" }` 可以不发这一步（例如限制一轮最多 20 步）。
@@ -253,7 +253,7 @@ export default (error) => (error.status === 429 && error.attempt < 2 ? { retry: 
   最多 3 次，间隔最多 10 秒。
 - 网关请求中间件想加请求头时写第二个参数的 `headers`（`context.headers["x-trace"] = "1"`），鉴权类头会被忽略。
 
-## 关掉 Codex++ 网关的内置环节（gateway.replaces）
+## 关掉 Codex # 网关的内置环节（gateway.replaces）
 
 拓展要自己接管某一步时，在 `gateway` 参数里写 `"replaces": ["builtin:…"]`，拓展启用时关掉那个内置环节、停用后恢复：
 
@@ -263,7 +263,7 @@ export default (error) => (error.status === 429 && error.attempt < 2 ? { retry: 
 - 网关模式：`builtin:gateway-failover`（候选失败换下一个）、`builtin:key-cooldown`（429 后 Key 冷却）、
   `builtin:key-breaker`（供应商熔断）、`builtin:local-rate-limit`（Key 的 RPM / 并发限速）、`builtin:title-model`（起名请求改发起名模型）。
 - 关掉冷却 / 熔断后，在冷却的 Key 照常当候选（排在可用的后面），要避开谁在 `route` 段的中间件里自己筛。
-- 也能关请求转换 `builtin:request-conversion`（upstream 段拿到 Responses 形状的请求体，自己转成上游协议；响应仍由 Codex++ 转回）、鉴权头 `builtin:auth-headers`（只有声明它的拓展在 upstream 段拿到 `context.credential.apiKey`，自己往 `context.headers` 写鉴权头）、官方整理 `builtin:official-shaping`、请求日志与用量 `builtin:request-log`（关掉后不记日志、不计用量）。
+- 也能关请求转换 `builtin:request-conversion`（upstream 段拿到 Responses 形状的请求体，自己转成上游协议；响应仍由 Codex # 转回）、鉴权头 `builtin:auth-headers`（只有声明它的拓展在 upstream 段拿到 `context.credential.apiKey`，自己往 `context.headers` 写鉴权头）、官方整理 `builtin:official-shaping`、请求日志与用量 `builtin:request-log`（关掉后不记日志、不计用量）。
 - 只在用户明确要接管这一步时才关，并告诉用户关掉了什么；关掉鉴权头意味着拓展脚本会拿到 Key，要提醒用户。
 
 ## 工具管道（改工具参数、代为执行、改工具结果）
@@ -279,11 +279,11 @@ export default (error) => (error.status === 429 && error.attempt < 2 ? { retry: 
 - `preExecute`：`(input, { name, callId, cwd, payload, config }) => 新 input | { deny: "原因" } | null`。改参数或拦截，
   在 Codex 的 PreToolUse 钩子里跑，`matcher` 匹配钩子里的工具名（如 `Bash`）。
 - `execute`：同样的参数，返回结果（字符串或 JSON）就由拓展代为执行，原工具不跑；返回 `undefined` 交还原工具。
-  经 Codex++ 代理时模型看到的就是这个结果，不经代理时模型从「拒绝理由」里读到它。
+  经 Codex # 代理时模型看到的就是这个结果，不经代理时模型从「拒绝理由」里读到它。
 - `postExecute`：`(output, { name, input, callId, config }) => 新 output | undefined`。改写工具结果，`matcher` 匹配
-  模型侧的工具名（如 `exec_command`、`apply_patch`、`mcp__服务__工具`）。只对经 Codex++ 代理的请求生效，
+  模型侧的工具名（如 `exec_command`、`apply_patch`、`mcp__服务__工具`）。只对经 Codex # 代理的请求生效，
   同一条结果只改一次。
-- 前两段用到 PreToolUse 钩子：第一次用时要告诉用户在 Codex 的 Hooks 设置里信任「Codex++ 拓展钩子」一次。
+- 前两段用到 PreToolUse 钩子：第一次用时要告诉用户在 Codex 的 Hooks 设置里信任「Codex # 拓展钩子」一次。
 
 ## 网关响应流中间件（改写模型的回复）
 
@@ -312,7 +312,7 @@ export default async function* (context, next) {
 - `context` 带 `path`、`extension`、`config` 和请求摘要 `request`（`model`、`instructions`、`tools` 工具名、
   `lastUserText` 用户最后一句话等）。
 - 多个拓展按顺序嵌套，先声明的在最外层。出错或超时（`timeout` 1~10 秒，按单个事件计）时，这次回复剩下的部分
-  原样放行。和请求中间件一样，只对经 Codex++ 本地代理 / 网关的请求生效。
+  原样放行。和请求中间件一样，只对经 Codex # 本地代理 / 网关的请求生效。
 
 ## 读会话历史（只读）
 
@@ -354,12 +354,12 @@ export default async function* (context, next) {
 - `mcpServers`：`{ 名字: { command, args, env } | { url } }`，写进 Codex 配置；`${extensionDir}`、`${config.键}` 会被替换。
 - `instructions`：文字或包内 .md，合并进全局 AGENTS.md（官方直连也生效）——用户要「改系统提示词」「每次都遵守某规则」时用它。
 - `prompts`：`[{ name, description, arguments: [{ name, required }], template: "文字或 .md，含 {{参数}}" }]`；
-  `resources`：`[{ name, file: "docs/x.md" }]`。两者经 Codex++ 拓展 MCP 提供。
+  `resources`：`[{ name, file: "docs/x.md" }]`。两者经 Codex # 拓展 MCP 提供。
 - 前四类在新开的 Codex 对话里生效，提醒用户新开对话。
 
 ## Webhook 与定时任务
 
-- `backend: { "script": "backend/main.mjs", "http": true }` 后，`http://127.0.0.1:<Codex++ 本地代理端口>/ext/<拓展 id>/<路径>`
+- `backend: { "script": "backend/main.mjs", "http": true }` 后，`http://127.0.0.1:<Codex # 本地代理端口>/ext/<拓展 id>/<路径>`
   交给后台导出的 `http({ method, path, query, headers, body, json })`，返回字符串或 `{ status, json | body }`。
 - `schedules: [{ method: "digest", at: "09:00" }, { method: "poll", everyMinutes: 30 }]`：到点调用后台方法，需要声明 `backend`。
 
@@ -376,7 +376,7 @@ export default async function* (context, next) {
 ## 提供模型供应商
 
 在 `codexpp_extension_write` 的 `providers` 参数里声明 `[{ id, name, protocol: "responses" | "chat" | "anthropic", baseUrl,
-apiKey: { "config": "apiKey" }, models: [...] }]`，同时在 `config` 里声明 `apiKey`（string、secret）。并入 Codex++ 网关后，
+apiKey: { "config": "apiKey" }, models: [...] }]`，同时在 `config` 里声明 `apiKey`（string、secret）。并入 Codex # 网关后，
 模型名是 `<id>/<模型>`，要在网关模式下使用。Key 让用户在拓展设置里填，不要写进代码，也不要让用户把 Key 发进对话。
 上游有 `/models` 接口时可以写 `discoverModels: true` 自动拉模型列表。
 
@@ -430,7 +430,7 @@ const text = await ctx.backend.call("readNote");
 ctx.backend.on("tick", ({ count }) => ctx.toast(`第 ${count} 分钟`));
 ```
 
-- 第一次 `call` 时 Codex++ 用 Node 启动后台，之后常驻；页面刷新、拓展热重载 / 启停时全部停掉，下次调用再起。
+- 第一次 `call` 时 Codex # 用 Node 启动后台，之后常驻；页面刷新、拓展热重载 / 启停时全部停掉，下次调用再起。
   所以后台里的内存状态会丢，要持久就写文件。
 - 工作目录是拓展专属的数据目录（`ctx.dataDir`），相对路径都落在这里。
 - 方法只收一个参数（JSON），返回值要能 JSON 序列化；抛错时页面的 `call` 会 reject。默认 20 秒超时，
@@ -438,10 +438,10 @@ ctx.backend.on("tick", ({ count }) => ctx.toast(`第 ${count} 分钟`));
 - `emit(event, payload)` 推给页面的 `ctx.backend.on(event, handler)`（`"*"` 收全部）；`on` 不会启动后台。
 - 后台以用户权限运行、没有沙箱，只做用户要求的事。
 
-## 管理器面板（拓展在 Codex++ 管理器里的界面）
+## 管理器面板（拓展在 Codex # 管理器里的界面）
 
 要做统计、批量操作、比设置表单更复杂的配置界面时，在 `codexpp_extension_write` 的 `manager` 参数里写
-`{ "page": "manager.html", "title": "面板标题" }`，页面放在 `files` 里。用户在 Codex++ 管理器「本地拓展」里
+`{ "page": "manager.html", "title": "面板标题" }`，页面放在 `files` 里。用户在 Codex # 管理器「本地拓展」里
 这一行的「…」菜单点「打开面板」，面板展开在这一行下面。页面里用 `window.codexPlusManager`：
 
 ```html
@@ -461,9 +461,9 @@ ctx.backend.on("tick", ({ count }) => ctx.toast(`第 ${count} 分钟`));
   要联网或读写本机文件就放进常驻后台，经 `backend.call` 调。页面最大 1 MiB。
 - 没法用 `codexpp_extension_screenshot` 看管理器（它只截 Codex 页面），写好后让用户打开面板看看。
 
-## 顶替 Codex++ 内置功能
+## 顶替 Codex # 内置功能
 
-Codex++ 自带的功能都是内置拓展（会话删除、Markdown 导出、语音听写、模型分组……）。用户想换掉某个内置功能的
+Codex # 自带的功能都是内置拓展（会话删除、Markdown 导出、语音听写、模型分组……）。用户想换掉某个内置功能的
 做法时，在 `codexpp_extension_write` 的 `replaces` 参数里写内置拓展 id（如 `["model-picker-groups"]`）：你的拓展启用时
 那个内置拓展让位，停用时它回来。内置拓展能做的你都能用同样的 ctx 接口做（`onScan`、`registerSlot`、
 `registerRowAction`、`settings/changed`……）。
@@ -480,19 +480,19 @@ Codex++ 自带的功能都是内置拓展（会话删除、Markdown 导出、语
 
 用户手上已经有按 dsh（deepseek-harness）插件写法写的插件（`apply(ctx)` 里 `ctx.tools.register`、`ctx.on("tools/pre-execute", …)`
 等），不用改写成拓展：把插件目录（带 `package.json`）作为 `files` 写进包里的一个子目录，`dsh` 参数写这个目录名（如 `"dsh-plugin"`）。
-拓展启用时 Codex++ 把它作为 dsh 插件导入运行（工具经 MCP、事件经钩子与网关），停用、删除时一起停用、移除。
+拓展启用时 Codex # 把它作为 dsh 插件导入运行（工具经 MCP、事件经钩子与网关），停用、删除时一起停用、移除。
 写好后用 `codexpp_extension_list` 看加载状态；dsh 插件的逐行兼容性报告在管理器「拓展 → dsh 插件」里。
 新写的功能优先直接写成拓展，`dsh` 只用于搬用户已有的 dsh 插件。
 
 ## 工具连接断开时
 
-`codexpp_extension_*` 工具报 `Transport closed` 说明拓展服务断开了（通常是 Codex++ 刚更新或重启过），这个对话
-里不会自动恢复：告诉用户**新开一个对话**继续，拓展文件已经写好的不会丢。不要自己在终端里拉起 Codex++ 进程模拟
+`codexpp_extension_*` 工具报 `Transport closed` 说明拓展服务断开了（通常是 Codex # 刚更新或重启过），这个对话
+里不会自动恢复：告诉用户**新开一个对话**继续，拓展文件已经写好的不会丢。不要自己在终端里拉起 Codex # 进程模拟
 工具调用。
 
 ## 必须遵守
 
-- **自己插入到 Codex 页面里的节点必须带 `data-codex-plus-ext` 属性**（值写拓展 id），否则会触发 Codex++ 的
+- **自己插入到 Codex 页面里的节点必须带 `data-codex-plus-ext` 属性**（值写拓展 id），否则会触发 Codex # 的
   扫描自喂循环、吃满 CPU。用 `ctx.effect` 插入，并在返回的撤销函数里移除。
 - 自己加的 `<style>` 用唯一 id（如 `codex-plus-ext-<拓展id>-style`），同样带 `data-codex-plus-ext`，撤销时移除。
 - 颜色用 CSS 变量适配深浅色：`var(--codex-plus-text)`、`var(--codex-plus-bg-elevated)`、`var(--codex-plus-border)`。

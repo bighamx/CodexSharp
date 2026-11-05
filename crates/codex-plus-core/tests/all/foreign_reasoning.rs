@@ -422,7 +422,7 @@ async fn rejected_compaction_items_are_stripped_and_remembered() {
 
 #[tokio::test]
 async fn local_compaction_summary_is_kept_when_foreign_reasoning_is_stripped() {
-    // Codex++ 自己生成的本地压缩摘要进代理时就展开成 user 消息，拒收重发时不会被当成别家内容去掉。
+    // Codex # 自己生成的本地压缩摘要进代理时就展开成 user 消息，拒收重发时不会被当成别家内容去掉。
     let server = official_upstream().await;
     let relay = relay(&server, "local-summary");
     let local = json!({

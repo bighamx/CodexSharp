@@ -2,12 +2,12 @@
 
 ## Codex-Dream-Skin
 
-Codex++ includes adapted CSS and renderer injection logic from:
+Codex # includes adapted CSS and renderer injection logic from:
 
 https://github.com/Fei-Away/Codex-Dream-Skin
 
 Bundled Dream Skin renderer and CSS: upstream v1.5.20
-(commit `1c2e8fea9e44e2ce8384bbd1c8759b99397c5d7d`), with Codex++ header,
+(commit `1c2e8fea9e44e2ce8384bbd1c8759b99397c5d7d`), with Codex # header,
 code-block toolbar, compact home layout and composer corner adaptations retained.
 
 Original license:
@@ -41,7 +41,7 @@ images before redistribution when you do not hold the required rights.
 
 ## CC Switch
 
-Codex++ 的 Claude Code 供应商配置（`crates/codex-plus-core/src/tools/claude.rs`、
+Codex # 的 Claude Code 供应商配置（`crates/codex-plus-core/src/tools/claude.rs`、
 `apps/codex-plus-manager/src/claude-provider-model.ts`）参考了 CC Switch 的关键字段 /
 独有字段划分与 Claude 供应商预设（预设链接已去掉推广参数）：
 

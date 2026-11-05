@@ -568,7 +568,7 @@ fn grok_taken_over_by_another_tool_is_not_clobbered_on_restore() {
 }
 
 /// 接着网关时 Claude Code 被别的工具改走：断开时 settings.json 不动，
-/// 只删托管供应商、清掉 Codex++ 记的当前供应商和存档。
+/// 只删托管供应商、清掉 Codex # 记的当前供应商和存档。
 #[test]
 fn claude_taken_over_by_another_tool_is_not_clobbered_on_disconnect() {
     let fixture = fixture(57425);

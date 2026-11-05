@@ -46,7 +46,7 @@ fn installed_root_from_executable(executable: &Path) -> anyhow::Result<PathBuf> 
             .and_then(Path::parent)
             .and_then(Path::file_name)
             .and_then(|name| name.to_str());
-        if app_name.is_some_and(|name| name.eq_ignore_ascii_case("Codex++ 管理工具.app")) {
+        if app_name.is_some_and(|name| name.eq_ignore_ascii_case("Codex # 管理工具.app")) {
             bail!("{LEGACY_MIGRATION_MESSAGE}");
         }
         bail!(
@@ -235,7 +235,7 @@ fn replace_bundles(ops: &impl BundleOps, plan: &UpdatePlan) -> anyhow::Result<()
                 backups.display()
             );
         }
-        bail!("更新失败，旧 Codex++ app 已恢复：{error}");
+        bail!("更新失败，旧 Codex # app 已恢复：{error}");
     }
     Ok(())
 }
@@ -446,7 +446,7 @@ fn cleanup_stale_transactions(
     Ok(outcomes)
 }
 
-/// 记录本机更新建过的事务目录（JSON 字符串数组），放在 Codex++ 的 state 目录里（#2774 后续）。
+/// 记录本机更新建过的事务目录（JSON 字符串数组），放在 Codex # 的 state 目录里（#2774 后续）。
 ///
 /// 启动 / 下次更新时只清理记下来的这些路径，不再列出 app 所在目录：app 放在「下载 / 桌面 /
 /// 文稿」等受保护目录时，每次启动列目录都可能触发隐私授权提示。
@@ -848,7 +848,7 @@ mod runtime {
                 return Ok(());
             }
             if Instant::now() >= deadline {
-                bail!("未收到 Codex++ 批准，旧 app 未替换。");
+                bail!("未收到 Codex # 批准，旧 app 未替换。");
             }
             sleep(Duration::from_millis(100));
         }
@@ -877,10 +877,10 @@ mod runtime {
         let start = Instant::now();
         while let Some(path) = process_path(plan.manager_pid)? {
             if path != expected {
-                bail!("Codex++ 进程身份已变化，未替换 app。");
+                bail!("Codex # 进程身份已变化，未替换 app。");
             }
             if start.elapsed() > Duration::from_secs(60) {
-                bail!("等待 Codex++ 正常退出超时，未替换 app。");
+                bail!("等待 Codex # 正常退出超时，未替换 app。");
             }
             sleep(Duration::from_millis(100));
         }
@@ -920,7 +920,7 @@ mod runtime {
             bail!("更新计划的 DMG 不存在。");
         }
         if process_path(plan.manager_pid)?.as_deref() != Some(manager_executable(&root).as_path()) {
-            bail!("启动更新的 Codex++ 会话已失效或不属于本安装目录。");
+            bail!("启动更新的 Codex # 会话已失效或不属于本安装目录。");
         }
         for (index, spec) in BUNDLES.iter().copied().enumerate() {
             let info = validate_bundle(&NativeOps, &root.join(spec.name), spec)?;
@@ -1102,7 +1102,7 @@ mod runtime {
             BUNDLES[0],
         )?];
         if !super::super::is_newer_version(version, &old_bundles[0].version)? {
-            bail!("更新版本未高于当前 Codex++ 版本。");
+            bail!("更新版本未高于当前 Codex # 版本。");
         }
         // 先清掉以前失败 / 中断留下的事务目录，再建本次的。先置标记：等后台清理这一轮
         // 结束（放开更新锁）后，它不会再补跑，helper 拿锁不会撞上。
@@ -1263,7 +1263,7 @@ mod runtime {
             }
             Err(error) => {
                 let _ = write_state(&plan, "failed", &error.to_string());
-                // 只在原 Codex++ 已退出时重开；验证或签名拒绝不改变旧 app。
+                // 只在原 Codex # 已退出时重开；验证或签名拒绝不改变旧 app。
                 if approved && wait_manager(&plan).is_ok() {
                     let _ = open_bundle(&plan.install_root.join(BUNDLES[0].name));
                 }
@@ -1357,7 +1357,7 @@ mod runtime {
         fs::write(
             path.join("Contents/Info.plist"),
             format!(
-                "<?xml version=\"1.0\"?><plist version=\"1.0\"><dict><key>CodexPlusUnifiedApp</key><true/><key>CFBundleName</key><string>Codex++</string><key>CFBundleIdentifier</key><string>{}</string><key>CFBundleExecutable</key><string>{}</string><key>CFBundleShortVersionString</key><string>{version}</string><key>CFBundleVersion</key><string>{version}</string><key>CFBundlePackageType</key><string>APPL</string><key>LSMinimumSystemVersion</key><string>10.0.0</string></dict></plist>",
+                "<?xml version=\"1.0\"?><plist version=\"1.0\"><dict><key>CodexPlusUnifiedApp</key><true/><key>CFBundleName</key><string>Codex #</string><key>CFBundleIdentifier</key><string>{}</string><key>CFBundleExecutable</key><string>{}</string><key>CFBundleShortVersionString</key><string>{version}</string><key>CFBundleVersion</key><string>{version}</string><key>CFBundlePackageType</key><string>APPL</string><key>LSMinimumSystemVersion</key><string>10.0.0</string></dict></plist>",
                 spec.id, spec.executable,
             ),
         )?;
@@ -1537,7 +1537,7 @@ mod runtime {
                 target: plan.install_root.join(BUNDLES[0].name),
             };
             let error = replace_bundles(&ops, &plan).unwrap_err();
-            if !error.to_string().contains("旧 Codex++ app 已恢复") {
+            if !error.to_string().contains("旧 Codex # app 已恢复") {
                 return Err(error);
             }
         } else {
@@ -1794,7 +1794,7 @@ mod tests {
             replace_bundles(&ops, &plan)
                 .unwrap_err()
                 .to_string()
-                .contains("旧 Codex++ app 已恢复")
+                .contains("旧 Codex # app 已恢复")
         );
         assert_old_apps(&ops, &plan);
         assert!(
@@ -1833,7 +1833,7 @@ mod tests {
             root
         );
         for executable in [executable_path(
-            "Codex++ 管理工具.app",
+            "Codex # 管理工具.app",
             "CodexPlusPlusManager",
         )] {
             let error = installed_root_from_executable(&executable).unwrap_err();
@@ -1845,7 +1845,7 @@ mod tests {
             );
         }
         let renamed = installed_root_from_executable(&executable_path(
-            "Codex++ 2.app",
+            "Codex # 2.app",
             "CodexPlusPlus",
         ))
         .unwrap_err();
@@ -1874,7 +1874,7 @@ mod tests {
     fn macos_update_leaves_legacy_manager_bundle_in_place() {
         let (_temp, plan, payload) = fixture(true);
         let legacy = BundleSpec {
-            name: "Codex++ 管理工具.app",
+            name: "Codex # 管理工具.app",
             id: "com.bigpizzav3.codexplusplus.manager",
             executable: "CodexPlusPlusManager",
         };

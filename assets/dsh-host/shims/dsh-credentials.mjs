@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/dsh-credentials 替身：引用 / 键的构造与判断函数，语义同 dsh。
+// Codex # 兼容宿主提供的 @deepseek-ai/dsh-credentials 替身：引用 / 键的构造与判断函数，语义同 dsh。
 // 引用（CredentialRef）是环境变量名，键（CredentialKey）是 `<插件名>/<id>`，运行时都是字符串本身。
 // 取值走宿主注入的 ctx.credentials。
 

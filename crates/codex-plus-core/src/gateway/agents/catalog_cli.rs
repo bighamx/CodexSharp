@@ -506,7 +506,7 @@ pub const OPENCHAMBER: AgentSpec = AgentSpec {
     detect: |env| openchamber_dir(env).exists() || env.has_binary("openchamber"),
     config_path: |env| openchamber_dir(env).join("preferences.json"),
     write: write_openchamber,
-    hint: "新会话用 Codex++ 的模型，已打开的会话保持原模型；也可在模型列表里选「Codex++ · OpenChamber」下的模型",
+    hint: "新会话用 Codex # 的模型，已打开的会话保持原模型；也可在模型列表里选「Codex # · OpenChamber」下的模型",
 };
 
 fn mimo_dir(env: &AgentEnv) -> PathBuf {
@@ -528,7 +528,7 @@ pub const MIMO_CODE: AgentSpec = AgentSpec {
     detect: |env| mimo_dir(env).exists() || env.has_binary("mimo"),
     config_path: mimo_path,
     write: |env, wiring, set| write_opencode_style(&mimo_path(env), wiring, set),
-    hint: "在 MiMo Code 里用 /models 选 Codex++ 下的模型",
+    hint: "在 MiMo Code 里用 /models 选 Codex # 下的模型",
 };
 
 fn deveco_dir(env: &AgentEnv) -> PathBuf {
@@ -547,7 +547,7 @@ pub const DEVECO_CODE: AgentSpec = AgentSpec {
     detect: |env| deveco_dir(env).exists() || env.has_binary("deveco"),
     config_path: deveco_path,
     write: |env, wiring, set| write_opencode_style(&deveco_path(env), wiring, set),
-    hint: "在 DevEco Code 里用 /models 选 Codex++ 下的模型",
+    hint: "在 DevEco Code 里用 /models 选 Codex # 下的模型",
 };
 
 // ---------------------------------------------------------------- Pi 系
@@ -708,7 +708,7 @@ pub const ASIDE: AgentSpec = AgentSpec {
     config_path: |env| aside_dir(env).join("models.json"),
     // 选中的模型在运行中的 Aside 里改（它的设置由应用自己维护），这里只登记模型列表。
     write: |env, wiring, set| write_pi_models(&aside_dir(env).join("models.json"), wiring, set),
-    hint: "重启 Aside 后在模型设置里选 Codex++ 下的模型",
+    hint: "重启 Aside 后在模型设置里选 Codex # 下的模型",
 };
 
 // ---------------------------------------------------------------- omp（oh-my-pi）
@@ -1053,7 +1053,7 @@ pub const CRUSH: AgentSpec = AgentSpec {
     },
     config_path: crush_config_path,
     write: write_crush,
-    hint: "重启 Crush 后生效，用 Ctrl+L 切换 Codex++ 下的模型",
+    hint: "重启 Crush 后生效，用 Ctrl+L 切换 Codex # 下的模型",
 };
 
 // ---------------------------------------------------------------- Command Code
@@ -1095,7 +1095,7 @@ pub const COMMAND_CODE: AgentSpec = AgentSpec {
     detect: |env| command_code_dir(env).exists() || env.has_binary("command-code"),
     config_path: |env| command_code_dir(env).join("settings.json"),
     write: write_command_code,
-    hint: "仍需先用 command-code login 登录；重启后用 /model 选 Codex++ 下的模型",
+    hint: "仍需先用 command-code login 登录；重启后用 /model 选 Codex # 下的模型",
 };
 
 // ---------------------------------------------------------------- Kimi Code

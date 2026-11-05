@@ -942,7 +942,7 @@ pub fn multi_agent_v2_enabled(config_text: &str) -> bool {
 /// 用户配置与 `[features] multi_agent_v2` 冲突时返回一条可展示给管理器的提示；
 /// 无冲突或读取失败时返回 None。覆盖两类场景：
 /// - 模型聚合活动时被闸门覆盖经典子代理设置（原有行为）；
-/// - 普通供应商显式选择 v1（#2683）后被闸门重新打开——切换时 Codex++ 已写
+/// - 普通供应商显式选择 v1（#2683）后被闸门重新打开——切换时 Codex # 已写
 ///   `multi_agent_v2 = false` 压闸，这里捕捉之后用户手改或 Codex 回写的漂移。
 pub fn subagent_conflict_warning(home: &Path, settings: &BackendSettings) -> Option<String> {
     let config_text = std::fs::read_to_string(home.join("config.toml")).ok()?;
@@ -957,7 +957,7 @@ pub fn subagent_conflict_warning(home: &Path, settings: &BackendSettings) -> Opt
         return None;
     }
     multi_agent_v2_enabled(&config_text).then(|| {
-        "当前供应商已显式选择 Multi-Agent 协议 v1，但 config.toml 里 [features] multi_agent_v2 处于开启状态：它会覆盖目录中的 v1 声明，子代理任务可能无法与第三方上游通信。请关闭该项，或重新保存一次该供应商让 Codex++ 自动压下闸门。"
+        "当前供应商已显式选择 Multi-Agent 协议 v1，但 config.toml 里 [features] multi_agent_v2 处于开启状态：它会覆盖目录中的 v1 声明，子代理任务可能无法与第三方上游通信。请关闭该项，或重新保存一次该供应商让 Codex # 自动压下闸门。"
             .to_string()
     })
 }

@@ -237,7 +237,7 @@
   }
 
   /**
-   * 问一次 Codex++：返回最近的代理请求，出错或超时时 reject。
+   * 问一次 Codex #：返回最近的代理请求，出错或超时时 reject。
    * 桥接挂死时请求的 Promise 可能永远不 settle；ctx.call 的超时让 inFlight 不会永久为 true（否则状态条从此不再刷新）。
    */
   async function codexPlusProxyStatusFetch() {

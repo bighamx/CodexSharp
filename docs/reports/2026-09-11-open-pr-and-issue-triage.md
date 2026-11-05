@@ -107,7 +107,7 @@
 | [#2072](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2072) | 市场迁移后 GitHub 已装插件不在列表/会话工具中 | |
 | [#1310](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1310) / [#2076](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2076) | helper 端口 57321 绑定失败 / 端口排除范围 | 硬编码端口类 |
 
-**#2146 值得单独说**：这是一条风险预警而非可复现 bug，报告质量很高（DiskGenius 目录项 + 逐文件校验 + 完整时间线，删于 `2026-09-10 14:39:48`，`.codex` 重建于 14:59）。我按 AGENTS.md 的安全规则扫了一遍递归删除点：`skills.rs` 的 `remove_link` 对软链用 `remove_file`/`remove_dir`、只对实体目录用 `remove_dir_all`，注释里明确写了"绝不能用 remove_dir_all 顺着链接删"；`plugin_marketplace.rs` / `skills.rs` 的 `remove_dir_all` 都指向 staging/backup 目录。**没有找到能删整个 `.codex` 的代码路径**。但用户环境是 `launchMode: "patch"` + Codex 桌面版当天自动更新 + Codex++ 自更新三者同时发生，最可疑的是更新流程里的路径失效后回退。建议：加一道"拒绝删除 `CODEX_HOME` 本身及其祖先目录"的硬校验，无论触发源是什么。
+**#2146 值得单独说**：这是一条风险预警而非可复现 bug，报告质量很高（DiskGenius 目录项 + 逐文件校验 + 完整时间线，删于 `2026-09-10 14:39:48`，`.codex` 重建于 14:59）。我按 AGENTS.md 的安全规则扫了一遍递归删除点：`skills.rs` 的 `remove_link` 对软链用 `remove_file`/`remove_dir`、只对实体目录用 `remove_dir_all`，注释里明确写了"绝不能用 remove_dir_all 顺着链接删"；`plugin_marketplace.rs` / `skills.rs` 的 `remove_dir_all` 都指向 staging/backup 目录。**没有找到能删整个 `.codex` 的代码路径**。但用户环境是 `launchMode: "patch"` + Codex 桌面版当天自动更新 + Codex # 自更新三者同时发生，最可疑的是更新流程里的路径失效后回退。建议：加一道"拒绝删除 `CODEX_HOME` 本身及其祖先目录"的硬校验，无论触发源是什么。
 
 ### C. 聚类 → 一份改动能关一片（约 50 条）
 

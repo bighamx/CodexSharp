@@ -772,9 +772,9 @@ fn weixin_failure_reply(error: &str) -> String {
         reason = reason.chars().take(MAX_REASON_CHARS).collect::<String>() + "…";
     }
     if reason.is_empty() {
-        "Codex 处理失败，请在 Codex++ 管理器中查看连接状态。".to_string()
+        "Codex 处理失败，请在 Codex # 管理器中查看连接状态。".to_string()
     } else {
-        format!("Codex 处理失败：{reason}\n详情请在 Codex++ 管理器中查看连接状态。")
+        format!("Codex 处理失败：{reason}\n详情请在 Codex # 管理器中查看连接状态。")
     }
 }
 
@@ -789,7 +789,7 @@ fn is_allowed_peer(allow_from: &str, peer: &str) -> bool {
 }
 
 /// 模型流量若走本地代理（config.toml 的 openai_base_url 指向 127.0.0.1，
-/// 由 Codex++ 的单模型路由写入），该代理只随从 Codex++ 启动的桌面版存在。
+/// 由 Codex # 的单模型路由写入），该代理只随从 Codex # 启动的桌面版存在。
 /// 提前探测，避免 turn 失败后只剩一句模糊的「处理失败」。
 async fn local_model_endpoint_unreachable_reason() -> Option<String> {
     let base_url =
@@ -808,7 +808,7 @@ async fn local_model_endpoint_unreachable_reason() -> Option<String> {
     }
     Some(
         "Codex 桌面版当前未运行，微信连接暂时无法调用模型。\
-         请先从 Codex++ 启动 Codex 桌面版后重试。"
+         请先从 Codex # 启动 Codex 桌面版后重试。"
             .to_string(),
     )
 }
@@ -1199,7 +1199,7 @@ mod tests {
         assert!(reply.contains('…'));
         assert_eq!(
             weixin_failure_reply("  \n "),
-            "Codex 处理失败，请在 Codex++ 管理器中查看连接状态。"
+            "Codex 处理失败，请在 Codex # 管理器中查看连接状态。"
         );
     }
 

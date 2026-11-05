@@ -6,7 +6,7 @@ const agents = readFileSync(new URL("./GatewayAgents.tsx", import.meta.url), "ut
 const css = readFileSync(new URL("./GatewayPage.css", import.meta.url), "utf8");
 const listSource = agents.slice(agents.indexOf("export function ModelList"), agents.indexOf("/** Agent 行右侧的模型下拉。 */"));
 
-test("模型下拉：横向筛选替代左侧图标栏，操作放在底部，不再每行重复「经 Codex++」", () => {
+test("模型下拉：横向筛选替代左侧图标栏，操作放在底部，不再每行重复「经 Codex #」", () => {
   assert.match(listSource, /className="gw-mp-filters"/);
   assert.match(listSource, /className="gw-mp-foot"/);
   assert.doesNotMatch(listSource, /gw-popover-rail/);

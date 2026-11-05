@@ -495,9 +495,9 @@ pub struct GatewaySettings {
     pub bindings: BTreeMap<String, AgentBinding>,
     #[serde(default)]
     pub key_policy: KeyPolicy,
-    /// 退出 Codex++ 时把走网关的 Agent 恢复成直连，避免网关不在时连不上。
+    /// 退出 Codex # 时把走网关的 Agent 恢复成直连，避免网关不在时连不上。
     ///
-    /// 默认关：Agent 一直指着网关，下次打开 Codex++ 就能接着用，不用每次退出、启动都改一遍 Agent 的配置。
+    /// 默认关：Agent 一直指着网关，下次打开 Codex # 就能接着用，不用每次退出、启动都改一遍 Agent 的配置。
     /// 安装更新前不看这个开关，照样还原（见 [`crate::gateway::apply::restore_all_for_exit`]）。
     /// 2.0.0 发布前的开发版默认开、文件里总会写出 `true`，读的时候统一迁移成关，见 [`read_store`]。
     #[serde(default)]
@@ -544,13 +544,13 @@ pub struct GatewaySettings {
     /// 生图结果只给链接时原样转发、不下载成图片数据的 Agent（默认都转，见 [`Self::inline_image_urls_for`]）。
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub image_keep_urls: Vec<String>,
-    /// 模型下拉里不列自带模型（直连，不经 Codex++）的 Agent（默认都列，见 [`Self::shows_own_models_for`]）。
+    /// 模型下拉里不列自带模型（直连，不经 Codex #）的 Agent（默认都列，见 [`Self::shows_own_models_for`]）。
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub hide_own_models: Vec<String>,
     /// 旧版的全局生图模型，读的时候迁移给 Codex（见 [`read_store`]），之后不再写。
     #[serde(default, skip_serializing)]
     pub image_model: String,
-    /// 最后写这个文件的 Codex++ 版本。降级到旧版时旧版不会跑这里的代码，只留个记录方便排查。
+    /// 最后写这个文件的 Codex # 版本。降级到旧版时旧版不会跑这里的代码，只留个记录方便排查。
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub app_version: String,
     /// 不认识的字段（更新版本写的）原样保留，保存时写回。

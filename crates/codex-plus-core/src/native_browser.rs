@@ -744,7 +744,7 @@ fn prepare(paths: &BrowserPaths, key: &str, contract: &RuntimeContract) -> Resul
         }
         ensure!(
             sha(&current) == contract.service_sha,
-            "Runtime changed outside Codex++"
+            "Runtime changed outside Codex #"
         );
     }
     {
@@ -786,7 +786,7 @@ fn prepare(paths: &BrowserPaths, key: &str, contract: &RuntimeContract) -> Resul
     }
     ensure!(
         current == original && sha(&current) == journal.original_sha,
-        "Runtime changed outside Codex++; refusing to overwrite"
+        "Runtime changed outside Codex #; refusing to overwrite"
     );
     ensure!(
         read_regular(&target, MAX_SERVICE)? == current,
@@ -1024,7 +1024,7 @@ pub fn read_status() -> BrowserStatus {
     read_regular(&path, 8192)
         .and_then(|data| Ok(serde_json::from_slice(&data)?))
         .unwrap_or_else(|_| {
-            BrowserStatus::new("not_started", "Waiting for the next Codex++ launcher start")
+            BrowserStatus::new("not_started", "Waiting for the next Codex # launcher start")
         })
 }
 

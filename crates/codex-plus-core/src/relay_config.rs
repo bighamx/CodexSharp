@@ -305,7 +305,7 @@ pub fn responses_proxy_configured_in_home(home: &Path) -> bool {
 ///   指向本机代理。
 ///
 /// 只认活动 provider，避免配置里残留的其它 provider 造成误判。管理器据此判断
-/// 「Codex 即使不经过 Codex++ 启动也会把请求发给本地代理」，从而决定是否常驻
+/// 「Codex 即使不经过 Codex # 启动也会把请求发给本地代理」，从而决定是否常驻
 /// 本地 helper。
 pub fn live_config_uses_managed_protocol_proxy_in_home(home: &Path) -> bool {
     let contents = match std::fs::read_to_string(home.join("config.toml")) {
@@ -1612,7 +1612,7 @@ pub fn clear_relay_config_to_home(home: &Path) -> anyhow::Result<RelayApplyResul
     clear_relay_config_to_home_with_auth(home, None)
 }
 
-/// 卸载 Codex++ 时调用：live `config.toml` 仍指向本机协议代理时恢复为官方配置。
+/// 卸载 Codex # 时调用：live `config.toml` 仍指向本机协议代理时恢复为官方配置。
 ///
 /// 卸载后本地代理不再运行，残留的 `base_url = "http://127.0.0.1:57321/v1"`
 /// 会让官方 Codex 每次请求都 502（issue #406）。只在确认指向本机代理时才清理
@@ -1664,7 +1664,7 @@ pub fn clear_relay_config_to_home_with_auth(
     // 除上面确认的官方 HTTP 配置外，中转站与旧版 provider 的整段配置一律移除：
     // 只删认证字段会留下 base_url（切回官方后请求仍发往中转站，issue #2216），
     // 而「未被激活就跳过」会让切走时残留的 token 继续留在文件里。
-    // 这里清的是 Codex++ 自己管理的 provider（custom / 旧版名），
+    // 这里清的是 Codex # 自己管理的 provider（custom / 旧版名），
     // 用户自定义的其它 provider（如 custom1）不受影响。
     for legacy_provider in LEGACY_RELAY_PROVIDERS {
         if !preserve_official_http || active_provider.as_deref() != Some(*legacy_provider) {
@@ -3662,7 +3662,7 @@ fn ensure_windows_sandbox_usable_with(home: &Path, process_elevated: bool) -> an
         return Ok(false);
     }
     // elevated 只在「首次初始化」时需要管理员权限；初始化完成后普通进程也能用。
-    // 过去不看初始化状态一律降级，已经完成初始化的用户每次经 Codex++ 启动都被改回
+    // 过去不看初始化状态一律降级，已经完成初始化的用户每次经 Codex # 启动都被改回
     // unelevated，反而触发 `CreateProcessSecurityEnvironment failed`（#2615）。
     if windows_elevated_sandbox_setup_present(home) {
         return Ok(false);
@@ -3874,9 +3874,9 @@ fn apply_context_limits_to_config(
 }
 
 /// 外部 `model_catalog_json` 路径的 v1 闸门联动（#2683）：用户手写/live 外部目录时
-/// 目录内容由那份文件负责，Codex++ 不改写；但显式选 v1 的闸门压下动作不能省——
+/// 目录内容由那份文件负责，Codex # 不改写；但显式选 v1 的闸门压下动作不能省——
 /// 否则 `[features] multi_agent_v2` 开着会单向覆盖一切目录声明（含用户外部目录里的
-/// v1），且冲突提示里「重新保存让 Codex++ 自动压闸」的建议会永远落空。
+/// v1），且冲突提示里「重新保存让 Codex # 自动压闸」的建议会永远落空。
 ///
 /// 压下值只在当前供应商生效期间有意义：首次压下前把 live 里的原值存档，切走的
 /// 那次写入由 [`restore_multi_agent_v2_gate`] 还原，否则 features 补回逻辑会把
@@ -4345,9 +4345,9 @@ fn apply_model_catalog_to_config_with_live_policy(
     let auto_compact_fallback =
         parse_optional_positive_u64(&profile.auto_compact_limit, "压缩上下文大小")?;
     // 用户已手写 model_catalog_json 指针时保留，不覆盖（保 preserves_user_model_catalog_json 测试）。
-    // Codex++ 管理的 catalog 必须随当前 profile 切换；否则前一个供应商的模型列表会残留。
+    // Codex # 管理的 catalog 必须随当前 profile 切换；否则前一个供应商的模型列表会残留。
     // 该固定文件名属于已知的其他管理器投影，不视为用户手写 catalog；
-    // 切换到 Codex++ profile 时应接管，否则旧 catalog 会继续覆盖本 profile 的模型元数据。
+    // 切换到 Codex # profile 时应接管，否则旧 catalog 会继续覆盖本 profile 的模型元数据。
     if let Some(existing) = root_key_string(&config_text, "model_catalog_json") {
         if existing != catalog_relative && existing != catalog_pointer {
             if is_codex_plus_managed_model_catalog(home, &existing)
@@ -6146,7 +6146,7 @@ pub(crate) fn codex_provider_display_name(profile: &RelayProfile) -> Option<Stri
     (!name.is_empty() && !compact.eq_ignore_ascii_case("OpenAI")).then(|| name.to_string())
 }
 
-/// provider name 是否还是 Codex++ 自动填的值（空、provider id、旧版内置 id），
+/// provider name 是否还是 Codex # 自动填的值（空、provider id、旧版内置 id），
 /// 只有这种情况才会被显示名接管；用户手写的标签不动。
 fn provider_name_is_generated(name: &str, provider_id: &str) -> bool {
     let name = name.trim();
@@ -6156,7 +6156,7 @@ fn provider_name_is_generated(name: &str, provider_id: &str) -> bool {
         || LEGACY_RELAY_PROVIDERS.contains(&name)
 }
 
-/// 回填 live config 时，把 Codex++ 自己写进去的显示名换回快照里的原值，
+/// 回填 live config 时，把 Codex # 自己写进去的显示名换回快照里的原值，
 /// 免得显示名被固化成「用户手写的 name」，之后改名就不再同步（issue #192）。
 fn restore_profile_provider_name_for_backfill(
     config: &str,
@@ -6352,7 +6352,7 @@ fn complete_relay_profile_config_with_proxy_port(
     // 其余情况一律改写，让 codex 回退到本地压缩。
     let name_must_leave_openai =
         !uses_openai_provider && current_name.eq_ignore_ascii_case("OpenAI");
-    // name 仍是 Codex++ 自动生成的值时，换成供应商列表里的显示名（issue #192）；
+    // name 仍是 Codex # 自动生成的值时，换成供应商列表里的显示名（issue #192）；
     // 用户手写过的标签（issue #1886 / #2682）原样保留。
     let display_name = codex_provider_display_name(profile).filter(|_| {
         name_must_leave_openai || provider_name_is_generated(&current_name, &transport_provider_id)
@@ -6689,7 +6689,7 @@ fn experimental_bearer_token_from_config(config_contents: &str) -> anyhow::Resul
         if let Some(token) = provider_token_from_table(&doc, &provider_id) {
             return Ok(Some(token));
         }
-        // OpenAI is the session identity, while Codex++ keeps relay
+        // OpenAI is the session identity, while Codex # keeps relay
         // credentials in the custom transport table.
         if provider_id == "openai" {
             if let Some(token) = provider_token_from_table(&doc, RELAY_PROVIDER) {

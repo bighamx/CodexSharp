@@ -39,7 +39,7 @@ CodexPlusPlus/
 │   └── codex-plus-manager/   # Tauri manager
 ├── crates/
 │   ├── codex-plus-data/    # Data handling and provider sync
-│   └── codex-plus-core/    # Core Codex++ logic
+│   └── codex-plus-core/    # Core Codex # logic
 └── README.md               # Project documentation
 ```
 

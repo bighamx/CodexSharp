@@ -70,10 +70,10 @@
 
 | issue | 证据 | 为什么不修 | 建议回复要点 |
 |---|---|---|---|
-| #2107 | 整仓 grep `cua_node` / `runtimes` / `.staging-` 零引用；评论区把根因定位到 `%LOCALAPPDATA%\OpenAI\Codex\runtimes\cua_node` 的 `.staging-*` 部署过程 | 是 Codex 官方 CUA Runtime 的自部署行为，Codex++ 不写该目录 | 转成上游 SOP：看到 `.staging-*` 不要删，等它自己完成；「最小化失效」另开 issue 并附 MainWindowHandle 与 `latest-status.json`。 |
-| #2169（部分） | 全仓 grep `heapProfiler` / `HeapProfiler.start` 零命中；`cdp.rs` 只用 Runtime/Page/DOM 域 | V8 heap profiler 由 Codex 自家 renderer 启停，Codex++ 没有开启调用 | (a) 重注入循环按 §4.2 修；(b) 让用户用 `sample` 对比「只启动 ChatGPT」与「经 Codex++ 启动」以分离责任。 |
+| #2107 | 整仓 grep `cua_node` / `runtimes` / `.staging-` 零引用；评论区把根因定位到 `%LOCALAPPDATA%\OpenAI\Codex\runtimes\cua_node` 的 `.staging-*` 部署过程 | 是 Codex 官方 CUA Runtime 的自部署行为，Codex # 不写该目录 | 转成上游 SOP：看到 `.staging-*` 不要删，等它自己完成；「最小化失效」另开 issue 并附 MainWindowHandle 与 `latest-status.json`。 |
+| #2169（部分） | 全仓 grep `heapProfiler` / `HeapProfiler.start` 零命中；`cdp.rs` 只用 Runtime/Page/DOM 域 | V8 heap profiler 由 Codex 自家 renderer 启停，Codex # 没有开启调用 | (a) 重注入循环按 §4.2 修；(b) 让用户用 `sample` 对比「只启动 ChatGPT」与「经 Codex # 启动」以分离责任。 |
 | #2260 | `model_provider="custom"` + `model_catalog_json` 指针正是本仓 `relay_config.rs` 的合法写入形态（对应主 feature #1171/#931） | 用户的「被第三方改写」推断站不住，且正文无可操作信息 | 说明该指针是本工具配中转站的正常产物；要 `codexAppVersion`、实际错误文案、「App 清理配套组件」的完整路径（很可能对照 #2107 的 cua_node SOP）。 |
-| #2126 | 报错 URL 是 `chatgpt.com/backend-api/codex/responses` 且带 cf-ray | 请求直发官方后端，根本没走 Codex++ 本地代理；403 是 Cloudflare WAF，404 是账号无 gpt-5.5 权限 | 确认供应商是否「使用中」；403 换网络重试，404 需在官方侧解决订阅；若本意是走第三方却打到官方域名才需要我们跟进。 |
+| #2126 | 报错 URL 是 `chatgpt.com/backend-api/codex/responses` 且带 cf-ray | 请求直发官方后端，根本没走 Codex # 本地代理；403 是 Cloudflare WAF，404 是账号无 gpt-5.5 权限 | 确认供应商是否「使用中」；403 换网络重试，404 需在官方侧解决订阅；若本意是走第三方却打到官方域名才需要我们跟进。 |
 | #2171 | `ws://127.0.0.1:12326` 全仓零命中；不是 helper 端口（后者 57321 量级） | 该端口由扩展自身起，属 Codex Desktop 原生 sidepanel ↔ app-server | 但**不能直接判 not-our-bug**：注入层确实订阅了 browser 相关消息，需先证伪（见 §4.25）。 |
 | #2188 / #2373 / #2369 / #2287 | `Codex auth token is unavailable` / `unsupported Codex auth method: apikey` 均出自 CUA runtime 二进制，本仓 grep 零命中 | 原生 `getAuthStatus` 硬性要求 `auth_method == "chatgpt"`，检查发生在 HTTP 之前，代理/注入/元数据三处都够不到 | **不许做「把 apikey 标签改写成 chatgpt」的绕过**——那只改标签不转凭据，原生侧会把原 token 放进 `Authorization: Bearer`，服务端不接受，属既无效又带伪造身份风险。可行路径只有「官方登录 + 第三方模型」。 |
 
@@ -84,7 +84,7 @@
 | #2252 | 报错原文 `chatgpt authentication required for remote plugin catalog` 全仓零命中；本仓只在 `60-plugin-marketplace.js:132/137/189-194` 做本地兜底降级 | 远端插件目录要求 ChatGPT 登录态，API key 鉴权在协议层不成立 | 不是把插件藏了；可做体验补救（顶部说明条），**不要**把远端失败包装成成功。 |
 | #2325 | 本仓不参与 prompt caching 的构造或改写；`protocol_proxy.rs` 只做协议转换与转发 | 缓存命中由上游中转站实现决定 | 转讨论或关闭；可补文档：确认 base_url 是否 Responses 原生端点，且不要配错上下文窗口。 |
 | #2144 | `relay_config.rs:3411-3417`：混合模式下 API Key 写进 `experimental_bearer_token`，官方身份只保留登录；`relay_rotation.rs:185/215` 的 failover 只在聚合成员间轮转 | 「官方额度优先、耗尽兜底 API、恢复切回」是需要新增的 feature，不是缺陷 | 关单并在设置页文案澄清；替代方案是聚合供应商的 failover/轮转，或手动切回官方登录。 |
-| #2100 | 用户提供的 200 条 bridge 日志里没有优化请求 | Prompt Optimize 是脚本市场的第三方脚本，请求没到 Codex++ helper | 转脚本仓库追踪；让脚本作者在点击处加 try/catch 打 console。 |
+| #2100 | 用户提供的 200 条 bridge 日志里没有优化请求 | Prompt Optimize 是脚本市场的第三方脚本，请求没到 Codex # helper | 转脚本仓库追踪；让脚本作者在点击处加 try/catch 打 console。 |
 
 ### 3.3 Windows 安全策略 / 杀软 / 产品范围
 
@@ -93,8 +93,8 @@
 | #2184 | 维护者评论区已定性；注入机制（写脚本文件 + 回环调试端口）是启发式检测高命中项 | 杀软误报，代码开源无混淆；「反杀软」是军备竞赛且有安全代价 | README/Release notes 固定一段 Defender 加白步骤；启动期自检把 os error 2 升级为「可能被隔离」提示。 |
 | #2269 | os error 4551 = WDAC/AppLocker/Smart App Control 阻断；`install/mod.rs:305` 把 spawn 失败统一包成裸错误 | 企业应用控制策略，重装无用 | 只改可读性：识别 `raw_os_error() == Some(4551)` 给出「请联系管理员放行 / 检查智能应用控制」文案；**不要**做成自动关闭 Smart App Control。 |
 | #2238 | 注入层与 Codex 页面结构强绑定（`00-prelude.js` 第 4 行的宿主守卫） | 换宿主等于重写，不是适配 | 转 Discussion；若只是想要「按模型配窗口/供应商切换」，`crates/codex-plus-core` 那部分与宿主解耦，可单独提需求。 |
-| #2268 | 与本仓范围无关（workbuddy 是另一产品） | 评论已有人质疑 | close as not-planned；若本意是「在 Codex++ 里管理多个 Codex 账号」则另开 issue。 |
-| #2344 | 会话沙箱由 `~/.codex/config.toml` 的 `sandbox_mode` / `approval_policy` 决定 | 是 Codex 本体能力，不是 Codex++ 限制；标题已标「已解决」 | 直接关闭；给出 sandbox_mode 取值指引。 |
+| #2268 | 与本仓范围无关（workbuddy 是另一产品） | 评论已有人质疑 | close as not-planned；若本意是「在 Codex # 里管理多个 Codex 账号」则另开 issue。 |
+| #2344 | 会话沙箱由 `~/.codex/config.toml` 的 `sandbox_mode` / `approval_policy` 决定 | 是 Codex 本体能力，不是 Codex # 限制；标题已标「已解决」 | 直接关闭；给出 sandbox_mode 取值指引。 |
 | #2139 | 注入层未找到针对宿主模式选择器的改写（grep 无命中） | 更可能是上游 Codex 自身形态变化 | 要 DOM 片段（outerHTML）+ 官方直启对照截图 + `codexAppVersion`，再二分。 |
 
 ### 3.4 已修但仍需发版提醒
@@ -111,7 +111,7 @@
 
 **现象**：空闲状态每分钟一次注入模块重新解析，叠加一轮含约 286 个 `app://` asset 的全量 rescan；renderer 单次 burst 顶到 55.6% 单核。
 
-**根因**：60 秒周期不是 Codex++ 的定时器，是桥接看门狗把「隐藏窗口」误判成「桥接失效」后的整份脚本重注入。
+**根因**：60 秒周期不是 Codex # 的定时器，是桥接看门狗把「隐藏窗口」误判成「桥接失效」后的整份脚本重注入。
 - `crates/codex-plus-core/src/launcher.rs:1137`：看门狗 `tokio::time::interval(Duration::from_secs(5))`；窗口最小化后 Chromium 把后台定时器钳到约 1 次/分钟，`assets/inject/renderer-inject/40-backend-settings.js:194` 的 5s heartbeat 随之停摆。
 - `crates/codex-plus-core/src/bridge.rs:137-154`：`bridge_health_check_script` 只看 `lastInjectionAt(≤5s) / lastSuccessAt(≤15s) / lastAttemptAt(≤15s)`，**没有 visibilityState 判据**，后台必然返回 false。
 - `launcher.rs:26` `BRIDGE_HEALTH_FAILURE_THRESHOLD=2` → `launcher.rs:2811` `should_reinject_after_health_result` 放行 → `launcher.rs:2832` `check_and_reinject_bridge_inner` → `launcher.rs:2669` `try_inject` → `assets::injection_script_with_settings` 重发整份 616KB。
@@ -140,14 +140,14 @@
 
 ### 4.2 #2169 —— 调试端口持续连接导致 68% CPU 空转（P1，likely）
 
-**现象**：macOS 上 Codex++ 进程 68% CPU 空转。
+**现象**：macOS 上 Codex # 进程 68% CPU 空转。
 
 **根因**：三层，只有第一层是我们的。
 - (a) 桥接重注入循环：`e06c9fb5` 加了指数退避，但退避在 health 恢复时清零、健康判定含 `lastInjectionAt ≤5s`（`bridge.rs:149`），刚注入完必然判健康 → 退避实际不生效。**与 §4.1 是同一入口**（`launcher.rs:2879` 的 reset）。
 - (b) `V8HeapProfilerConnection::Start()`：Codex 自家 renderer 的诊断能力，全仓 grep `heapProfiler` 零命中，非我们引入，但被高频重注入反复触发。
 - (c) 每秒 80 次 `sysctl`：`launcher.rs:1129` 只在 Windows 上 spawn `run_pet_real_mouse_cursor_driver`，macOS 不跑，故该轮询来自 ChatGPT 自身。
 
-**修复方案**：只需修 (a)，与 §4.1 完全同一改法（合入 PR #2337 的三条改动 + 分片同步）。(b) 在 issue 里回复：heap profiler 由 Codex 客户端自身启停，Codex++ 只做 CDP 求值，请用户用 `sample` 对比两次启动。(c) 判为上游。
+**修复方案**：只需修 (a)，与 §4.1 完全同一改法（合入 PR #2337 的三条改动 + 分片同步）。(b) 在 issue 里回复：heap profiler 由 Codex 客户端自身启停，Codex # 只做 CDP 求值，请用户用 `sample` 对比两次启动。(c) 判为上游。
 
 **影响面**：同 §4.1。
 
@@ -476,13 +476,13 @@
 **根因**：`crates/codex-plus-core/src/app_paths.rs:509-556` 的 `normalize_codex_app_path` 要求路径存在、且 `executable_in_dir(path).is_some()`（`:531`）或 `path.join("app")` 下能枚举到 exe 且包名像 `OpenAI.Codex_*`（`:540-544`）。WindowsApps 的 ACL 第三方进程常枚举不了 exe，于是 `:536` 的 `is_codex_store_package_dir` 兜底成了唯一出路——而它的前提是最后一段能过 `codex_package_parts`（`:953-974`）。判据失败时 `normalize` 返回 None，落到 `resolve_codex_app_dir(None)` 自动探测，探测也失败时 `launcher.rs:792-802` 直接 `anyhow!("Codex App directory not found")`。**这是 #2204 / #2314 / #2343 日志里那条 `launcher.failed` 文案**，四个平台四种失败原因共用一句。#2314 的「手动选择也无反应」是多一层：`commands.rs:6333-6347` 的 `load_overview_payload` 里 `normalize_codex_app_path` 返回 None 时 UI 静默显示未检测，调用方不区分「路径无效」与「不是 Codex 目录」。
 
 **修复方案**（**先补可观测性再修判据，不能盲改**）：
-1. **第一步（可立即做）**：在 `DefaultLaunchHooks::resolve_app_dir`（`launcher.rs:792-802`）的报错里带上探测轨迹——试过的每个候选根、`normalize_codex_app_path` 的拒绝理由（不存在/是 Codex++ 目录/无 exe/包名不匹配）写进 `diagnostic_log` 与错误消息。
+1. **第一步（可立即做）**：在 `DefaultLaunchHooks::resolve_app_dir`（`launcher.rs:792-802`）的报错里带上探测轨迹——试过的每个候选根、`normalize_codex_app_path` 的拒绝理由（不存在/是 Codex # 目录/无 exe/包名不匹配）写进 `diagnostic_log` 与错误消息。
 2. **第二步（拿到日志后再定）**：若确认卡在包名判据，把 `:540-544` 的兜底从「包名像 `OpenAI.Codex_*`」放宽为「父链上任意一段像，或同目录存在 `AppxManifest.xml`」。**牵连**：`packaged_app_user_model_id`（`:693-712`）依赖 `package_name_from_app_dir` 反推 AUMID，放宽判据后必须保证 AUMID 仍能从 manifest 真读到，否则把 #2308/#2310 重新打开。
 3. **把拒绝理由传到前端**：`normalize_codex_app_path` 拆出返回 `anyhow::Result<PathBuf>` 的内核（保留现有 Option 薄壳），在 `commands.rs` 的选择路径上走内核并把错误文案回给前端。
 
 **影响面**：纯可观测性 + 判据放宽；不动判据语义时可零风险先合第一步；不碰 per-profile 与注入层。
 
-**需要补的测试**：`app_paths.rs` 补「多根下第二个根命中」；「所有根都空时返回 None 且错误文案含已搜索根列表」；「包名不匹配但存在 `AppxManifest.xml` 的目录应被接受」；「Codex++ 安装目录仍必须被拒」。normalize 内核分别对四种输入返回可区分的错误/成功。
+**需要补的测试**：`app_paths.rs` 补「多根下第二个根命中」；「所有根都空时返回 None 且错误文案含已搜索根列表」；「包名不匹配但存在 `AppxManifest.xml` 的目录应被接受」；「Codex # 安装目录仍必须被拒」。normalize 内核分别对四种输入返回可区分的错误/成功。
 
 ### 4.22 #2351 —— 提权运行时 AUMID 激活失败被静默降级（P1，confirmed）
 
@@ -493,7 +493,7 @@
 **修复方案**：**采纳 PR #2371**（+59 行，`launcher.rs` 与 `windows_integration.rs`）：
 - `windows_integration.rs` 新增 `current_process_is_elevated()`（`IsUserAnAdmin`，非 Windows 恒 false）。**必须新写而不是复用 `relay_config.rs:2185` 的私有 `windows_process_is_elevated`**——后者在非 Windows 上刻意返回 true 以保留 sandbox 设置语义，语义不同。
 - `launcher.rs` 把回退决策抽成纯函数 `packaged_activation_fallback_block_reason(is_elevated)`：提权 → `bail!` 带「取消 属性→兼容性→以管理员身份运行 勾选」指引，错误沿既有 `Err` 分支如实写 `latest-status.json` `status=failed` 并清理已启动进程；非提权 → 保留原回退，零行为变化。
-- 对「非提权代理激活」的取舍（PR 作者判断正确）：explorer 代启动会丢 `--remote-debugging-port`，受限令牌降权 spawn 基建复杂且易被杀软拦；Codex++ 全家（NSIS `RequestExecutionLevel user`、manager、launcher）都是用户级设计，与 Codex 应用的通信走本地 TCP，无任何功能需要管理员身份。
+- 对「非提权代理激活」的取舍（PR 作者判断正确）：explorer 代启动会丢 `--remote-debugging-port`，受限令牌降权 spawn 基建复杂且易被杀软拦；Codex # 全家（NSIS `RequestExecutionLevel user`、manager、launcher）都是用户级设计，与 Codex 应用的通信走本地 TCP，无任何功能需要管理员身份。
 
 **影响面**：非提权路径零行为变化；把「提权」与「#2308/#2310 AUMID 解析失败」在日志上分开（两者文案相同，过去排查成本极高）。
 
@@ -541,7 +541,7 @@
 
 ### 4.26 #2359 —— Windows 白色主题下黑底黑字（P1，confirmed）
 
-**现象**：Windows 白色主题下 Codex++ 页面黑底黑字完全看不清，切深色主题反而正常。
+**现象**：Windows 白色主题下 Codex # 页面黑底黑字完全看不清，切深色主题反而正常。
 
 **根因**：`assets/inject/renderer-inject/10-style.js:1123-1140` 定义面板语义变量，`:1128 --codex-plus-bg-primary: var(--color-token-bg-primary, var(--token-bg-primary, #fff))`、`:1132 --codex-plus-text: var(--color-token-text-primary, var(--token-text-primary, #171717))`；页面容器硬规则在 `:1238-1242` 用 `!important` 覆盖成 `var(--codex-plus-bg-primary)`。问题在三级回退链的中间那级：Codex 提供 `--color-token-*` 还是 `--token-*` 会随版本与主题切换变化，两层回退同时落空时前景背景同明度。
 **同类隐患（独立条目）**：`10-style.js` 里散布写死的深色系色值——`:969/:985`（`#3f3f46` + `#f3f4f6`）、`:1018`、`:1103/1108/1115`（`#f3f4f6/#f8fafc/#a1a1aa/#71717a/#9ca3af` + `rgba(255,255,255,.05/.16)`）、`:705/:803-805`——深色下正常，浅色下无对比度。这不是「黑底黑字」的直接原因，但属同类不同侧面。
@@ -592,7 +592,7 @@
 
 **现象**：微信链接不可用，app-server 拒绝 sandbox variant。
 
-**根因**：Codex++ 内部以 kebab-case 存储沙箱档位，三处同一套映射且都是 kebab-case：`settings.rs:1909-1911`（`"workspace-write" => "workspace-write", _ => "read-only"`）、`crates/codex-plus-core/src/connect/mod.rs:457-459` 与 `:469`、`connect/app_server.rs:493-495`。`app_server.rs` 是真正构造 app-server 请求的地方，`:493-495` 的 match 只做内部档位透传与兜底，**没有任何地方把它转成 camelCase**。
+**根因**：Codex # 内部以 kebab-case 存储沙箱档位，三处同一套映射且都是 kebab-case：`settings.rs:1909-1911`（`"workspace-write" => "workspace-write", _ => "read-only"`）、`crates/codex-plus-core/src/connect/mod.rs:457-459` 与 `:469`、`connect/app_server.rs:493-495`。`app_server.rs` 是真正构造 app-server 请求的地方，`:493-495` 的 match 只做内部档位透传与兜底，**没有任何地方把它转成 camelCase**。
 
 **修复方案**：在 `connect/app_server.rs:493` 起的 match 旁新增 `sandbox_variant_wire_value`，把内部档位映射为 app-server 接受的枚举：`read-only → readOnly`、`workspace-write → workspaceWrite`、`danger-full-access → dangerFullAccess`。**只在构造 app-server 请求那一处转换**，内部存储与设置界面保持 kebab-case。确认 `connect/mod.rs:457` 那条 match 是否也在构造请求路径上——是则复用同一函数，若只是内部归一化则保持原样。参照 `ad76ae51` 的既有处理保持一致。
 
@@ -655,7 +655,7 @@
 | #2219 | 图标布局错位 + 按模型设思考级别 | 布局同 #2151 流程；思考级别是新能力，与 #2279 同构——`model_suffix.rs:509-580` 加按模型 reasoning effort 覆盖字段，前端 `model-windows.ts:26-31` 加一列。**先探 catalog schema 是否接受该字段** | M |
 | #2215 | 微信连接支持图片（带补丁） | 按 feature 流程：下载 `weixin-image-support.patch` 检查能否干净应用；确认用 app-server 官方 `localImage`；补「图片下载失败不阻塞文本通道」用例。**合入与否由用户决定** | M |
 | #2226 | 主代理等子代理期间无响应 | 先抓 SSE 帧序列区分「上游不发」与「代理攒批」；若是代理，在 responses 流式转发路径放行不应聚合的事件。**没抓到帧序列之前不要动代码** | M |
-| #2273 | 同一 key 在 CCS 正常、Codex++ 报 401 | 让用户自查 profile（relayMode / no_auth / custom_headers）；临时解法显式加 `Authorization: Bearer` 头；代码侧加「请求未带鉴权」的诊断可见化（与 #2236 同一改动） | S |
+| #2273 | 同一 key 在 CCS 正常、Codex # 报 401 | 让用户自查 profile（relayMode / no_auth / custom_headers）；临时解法显式加 `Authorization: Bearer` 头；代码侧加「请求未带鉴权」的诊断可见化（与 #2236 同一改动） | S |
 | #2270 | 换账号后会话不见 | 安抚 + 取证：会话按身份隔离是上游设计，rollout 不会被删；要用户贴切换前后 auth.json 字段对比与 relayMode，重点看切回官方是否保留认证状态 | S |
 | #2261 | 纯 API 下界面部分汉化 | 先确认用户是否开了「强制中文」与 `codexPlus.forceChineseLocale.managed.v1` 是否存在；若值对但仍英文，需补齐「宿主 UI 另一份语言来源」的托管。**留意 1.4.0 刚修过的刷新循环不要回归** | M |
 | #2158 | 畸形路径 `D:\Users\AppData\...` os error 2 | 先分清拼接问题 vs 杀软隔离（让用户直接粘贴报错路径）；`install_root_or_default` 改用 `current_exe` 父目录为首选来源 | S |
@@ -725,7 +725,7 @@
 
 ### 6.4 错误可观测性的系统性缺失（覆盖 #2343 #2314 #2204 #2129 #2244 #2336 #2351 #2140 #2354）
 
-**根因**：`DefaultLaunchHooks::resolve_app_dir`（`launcher.rs:792-802`）在任何探测失败时只抛一句 `anyhow!("Codex App directory not found")`，三个平台、四种失败原因（目录不存在 / 被误判为 Codex++ 目录 / 枚举不到 exe / 包名判据不匹配）**共用这一句**。同一错误文案「该进程没有程序包标识符」对应至少四条互不相同的产生路径。这也是 #2244 那条「80~110 秒内 codex-plus.log 一条都不写」的同源问题。
+**根因**：`DefaultLaunchHooks::resolve_app_dir`（`launcher.rs:792-802`）在任何探测失败时只抛一句 `anyhow!("Codex App directory not found")`，三个平台、四种失败原因（目录不存在 / 被误判为 Codex # 目录 / 枚举不到 exe / 包名判据不匹配）**共用这一句**。同一错误文案「该进程没有程序包标识符」对应至少四条互不相同的产生路径。这也是 #2244 那条「80~110 秒内 codex-plus.log 一条都不写」的同源问题。
 
 **架构级改法**：
 1. 给 `launcher.rs:497-660` 的每个前置步骤加「进入/离开 + 耗时」诊断日志，让所有路径解析失败都带上探测轨迹与拒绝理由。
@@ -794,10 +794,10 @@
 
 | issue | 要问什么 | 要到的证据能定什么 |
 |---|---|---|
-| #2107 | Windows 上是任务栏点击还是托盘图标点击？最小化后多久失效？是否装了 Codex++ 托盘？ | 区分「托盘/任务栏不 restore」与「上游 cua_node 部署」两件事 |
+| #2107 | Windows 上是任务栏点击还是托盘图标点击？最小化后多久失效？是否装了 Codex # 托盘？ | 区分「托盘/任务栏不 restore」与「上游 cua_node 部署」两件事 |
 | #2114 | 脱敏 config.toml 的 `model_providers` 段与顶层 `model/model_provider`；profile 的 protocol；复现时含协议代理转发条目的 `codex-plus.log` | 二分「协议代理是否收到请求」 |
-| #2139 | 模式控件的 DOM 片段（DevTools 复制 outerHTML）；官方直启对照截图；`codexAppVersion` | 是否是 Codex++ 主动改的外观 |
-| #2205 | 干净环境下用原生 codex（不经 Codex++）复现同一操作序列，记录 `.codex\sqlite\codex-dev.db` 的 mtime 与会话列表 | 判断是否与 Codex++ 无关 |
+| #2139 | 模式控件的 DOM 片段（DevTools 复制 outerHTML）；官方直启对照截图；`codexAppVersion` | 是否是 Codex # 主动改的外观 |
+| #2205 | 干净环境下用原生 codex（不经 Codex #）复现同一操作序列，记录 `.codex\sqlite\codex-dev.db` 的 mtime 与会话列表 | 判断是否与 Codex # 无关 |
 | #2206 | `gh issue view 2206 --json body,comments` 取正文；核对 `gh pr list` 是否仍有 open PR | 按其自身主题（Taskboard）单独立项 |
 | #2223 | Computer Use 每个动作（cua 枚举窗口、截图、点击、键盘输入）单独的成功/失败与错误串；版本号 | 填 `docs/` 的四列依赖表 |
 | #2226 | 用 CDP 抓该会话的 SSE 事件序列（或开转发诊断日志），对比 GPT 官方直连与 deepseek 经代理两条路径 | 区分「上游不发增量」与「代理攒批」 |

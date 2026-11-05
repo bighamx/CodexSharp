@@ -30,7 +30,7 @@ const LAST_CLIENT_FILE: &str = "cu/last-client.json";
 pub const SELF_CHECK_CLIENT: &str = "codex-plus";
 /// 转发的审批表单里加的勾选项：勾上 = 「始终允许」。
 pub const ALWAYS_FIELD: &str = "alwaysAllow";
-/// Computer Use 自己记的「始终允许」（相对用户主目录）。Codex 和 Codex++ 共用这一份。
+/// Computer Use 自己记的「始终允许」（相对用户主目录）。Codex 和 Codex # 共用这一份。
 const NATIVE_APPROVALS: &str = "Library/Group Containers/2DC432GLL2.com.openai.sky.CUAService/Library/Application Support/Software/ComputerUseAppApprovals.json";
 
 /// 记下最近一次连上来的 MCP 客户端，以及它**自己**有没有声明 elicitation。
@@ -116,7 +116,7 @@ pub struct AppApproval {
     pub display_name: String,
     #[serde(default)]
     pub decided_at: u64,
-    /// `computer-use`：Computer Use 自己记的（与 Codex 共用）；空 = 旧版 Codex++ 文件。
+    /// `computer-use`：Computer Use 自己记的（与 Codex 共用）；空 = 旧版 Codex # 文件。
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub source: String,
 }
@@ -296,7 +296,7 @@ pub fn offer_always(params: &mut serde_json::Value) -> bool {
         serde_json::json!({
             "type": "boolean",
             "title": "始终允许（以后不再询问这个应用）",
-            "description": "与 Codex 共用这份授权，可在 Codex++ 的 Computer Use 页撤销。",
+            "description": "与 Codex 共用这份授权，可在 Codex # 的 Computer Use 页撤销。",
             "default": false,
         }),
     );

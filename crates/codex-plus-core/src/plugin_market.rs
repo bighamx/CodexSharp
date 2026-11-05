@@ -686,7 +686,7 @@ enum GitFailure {
 impl GitFailure {
     fn message(self, private: bool) -> &'static str {
         match self {
-            Self::Missing => "未找到 Git，请安装 Git 并重新启动 Codex++",
+            Self::Missing => "未找到 Git，请安装 Git 并重新启动 Codex #",
             Self::Network => {
                 "Git 网络连接失败，请检查代理、DNS、证书或网络连接；此错误不需要重新登录 gh"
             }
@@ -1632,7 +1632,7 @@ fn configured_plugin_enabled(home: &Path) -> anyhow::Result<BTreeMap<String, boo
         .unwrap_or_default())
 }
 
-/// 仅返回 Codex++ 插件市场托管的本地安装记录，不枚举其他来源的 Codex 插件。
+/// 仅返回 Codex # 插件市场托管的本地安装记录，不枚举其他来源的 Codex 插件。
 /// 不检查包目录、不拉取索引、不创建缓存；source 仅为 public/full，不包含仓库或路径。
 pub fn installed_summary(home: &Path) -> anyhow::Result<Value> {
     let state = read_state(home)?;

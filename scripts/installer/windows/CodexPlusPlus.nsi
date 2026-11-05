@@ -9,7 +9,7 @@ ${Using:StrFunc} UnStrStr
 !endif
 !define ROOT "..\..\.."
 
-Name "Codex++"
+Name "Codex #"
 OutFile "${ROOT}\dist\windows\CodexPlusPlus-${VERSION}-windows-x64-setup.exe"
 InstallDir "$LOCALAPPDATA\Programs\Codex++"
 ; 沿用旧安装目录登记，覆盖升级继续安装到原目录。
@@ -56,7 +56,7 @@ Var LegacyDeleteTries
     Sleep 500
     Goto wait_loop
   wait_prompt:
-    MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "请从系统托盘退出 Codex++，等待后台服务清理完成后重试。" IDRETRY wait_retry IDCANCEL wait_cancel
+    MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "请从系统托盘退出 Codex #，等待后台服务清理完成后重试。" IDRETRY wait_retry IDCANCEL wait_cancel
   wait_retry:
     StrCpy $2 0
     Goto wait_loop
@@ -95,13 +95,13 @@ Section "Install"
     Sleep 500
     Goto legacy_binary_delete_loop
   legacy_binary_delete_failed:
-    MessageBox MB_OK|MB_ICONSTOP "旧管理工具仍被占用。请退出 Codex++ 后重新安装。"
+    MessageBox MB_OK|MB_ICONSTOP "旧管理工具仍被占用。请退出 Codex # 后重新安装。"
     Abort
   legacy_binary_removed:
   File "${ROOT}\dist\windows\app\codex-plus-plus.exe"
 
   ; 只迁移确实存在的桌面入口，用户删掉的入口在升级时仍不补建（issue #2376）。
-  ; 入口名从 Codex++ 换成 Codex #：老名字只用来判断「用户本来有桌面图标」并在删掉后按新名重建，
+  ; 入口名从 Codex # 换成 Codex #：老名字只用来判断「用户本来有桌面图标」并在删掉后按新名重建，
   ; 这样升级上来的人不会丢掉桌面入口，也不会同时留着两个图标。
   StrCpy $HadDesktopEntry 0
   IfFileExists "$DESKTOP\Codex #.lnk" desktop_entry_found 0
@@ -134,11 +134,11 @@ Section "Install"
   WriteRegStr HKCU "Software\Codex++" "InstallDir" "$INSTDIR"
   ; 卸载项键名统一到运行时的正式键 CodexPlusPlus（issue #2339）。
   ; 运行时 install/windows.rs 把 Uninstall\CodexPlusPlus 当正式键、Uninstall\Codex++
-  ; 当 legacy；这里若继续写 Codex++，经安装器装过又被管理工具碰过的机器会留下两条
+  ; 当 legacy；这里若继续写 Codex #，经安装器装过又被管理工具碰过的机器会留下两条
   ; 卸载项，而运行时装过、之后走 NSIS 卸载的机器永远删不掉 CodexPlusPlus 那条。
   ; 写之前先清掉 legacy 键：存量用户靠这一步收尸，别删。
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Codex++"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodexPlusPlus" "DisplayName" "Codex++"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodexPlusPlus" "DisplayName" "Codex #"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodexPlusPlus" "DisplayVersion" "${VERSION}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodexPlusPlus" "Publisher" "BigPizzaV3"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodexPlusPlus" "DisplayIcon" "$INSTDIR\codex-plus-plus.exe"
@@ -148,7 +148,7 @@ Section "Install"
   ; 注册 codexplusplus:// 与 dreamskin:// URL 协议（issue #2354）。
   ; 键名与值同 codex-plus-core 的 install::windows::register_url_protocol 保持一致，
   ; 应用内"修复快捷方式"会以相同键幂等覆盖，两边互不冲突。
-  WriteRegStr HKCU "Software\Classes\codexplusplus" "" "URL:Codex++ Import Protocol"
+  WriteRegStr HKCU "Software\Classes\codexplusplus" "" "URL:Codex # Import Protocol"
   WriteRegStr HKCU "Software\Classes\codexplusplus" "URL Protocol" ""
   WriteRegStr HKCU "Software\Classes\codexplusplus\shell\open\command" "" '"$INSTDIR\codex-plus-plus.exe" "%1"'
   WriteRegStr HKCU "Software\Classes\dreamskin" "" "URL:DreamSkin Community Theme Protocol"
@@ -198,13 +198,13 @@ Section "Uninstall"
   ; NSIS 的 Delete 遇到被占用文件会静默失败，用户会误以为卸载干净。
   ; 残留检测提示用户先从托盘退出，避免“卸载后重装”继续失败（issue #2362）。
   IfFileExists "$INSTDIR\codex-plus-plus.exe" 0 +2
-    MessageBox MB_OK|MB_ICONEXCLAMATION "Codex++ 仍被占用，未能删除。请从系统托盘退出 Codex++（或结束该进程）后重新卸载或安装。"
+    MessageBox MB_OK|MB_ICONEXCLAMATION "Codex # 仍被占用，未能删除。请从系统托盘退出 Codex #（或结束该进程）后重新卸载或安装。"
 
   Delete "$INSTDIR\uninstall.exe"
   RMDir "$INSTDIR"
 
   ; 正式键 + legacy 键都删（issue #2339）：正式键是运行时写入的 CodexPlusPlus，
-  ; legacy 是历史安装器和旧版运行时的 Codex++，存量机器上可能两条并存。
+  ; legacy 是历史安装器和旧版运行时的 Codex #，存量机器上可能两条并存。
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\CodexPlusPlus"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\Codex++"
   DeleteRegKey HKCU "Software\Codex++"

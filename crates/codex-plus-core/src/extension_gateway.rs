@@ -1,9 +1,9 @@
-//! 拓展的网关请求中间件：Codex 经 Codex++ 本地代理 / 网关发出的模型请求，在发往上游前
+//! 拓展的网关请求中间件：Codex 经 Codex # 本地代理 / 网关发出的模型请求，在发往上游前
 //! 交给拓展按顺序改写（例如往 `instructions` 追加段落、过滤 `input`、改 `reasoning`）。
 //!
 //! 只在有启用中的拓展声明了 `gateway.request` 时才起一个 Node 进程；没有时零开销。中间件
 //! 拿到的是 Responses 请求体的副本，返回新对象即替换、返回 null 即不改；任何出错、超时
-//! 都保留原请求，绝不能挡住发往模型的请求。官方直连（不经 Codex++ 代理）的请求不经过这里。
+//! 都保留原请求，绝不能挡住发往模型的请求。官方直连（不经 Codex # 代理）的请求不经过这里。
 
 use std::time::Duration;
 
@@ -26,7 +26,7 @@ let body = input.body;
 let changed = false;
 let rejected = null;
 const errors = [];
-// 中间件可以往 context.headers 里加请求头（发给上游时附上）；鉴权类的头由 Codex++ 过滤掉。
+// 中间件可以往 context.headers 里加请求头（发给上游时附上）；鉴权类的头由 Codex # 过滤掉。
 // 关掉了 builtin:auth-headers 的拓展（item.credential）加的头另记一份，鉴权头只认它们给的。
 const headers = {};
 const authHeaders = {};
@@ -120,7 +120,7 @@ pub fn builtin_replaced(segment: &str) -> bool {
     cache.as_ref().is_some_and(|(_, list)| list.iter().any(|(_, name)| name == segment))
 }
 
-/// Codex++ 自己的启动器把请求转给本机网关时带上的请求头：说明拓展中间件已在外层跑过。
+/// Codex # 自己的启动器把请求转给本机网关时带上的请求头：说明拓展中间件已在外层跑过。
 pub const EXTENSIONS_APPLIED_HEADER: &str = "x-codex-plus-extensions";
 const RESPONSE_PASSTHROUGH_HEADER: &str = "x-codex-plus-response-passthrough";
 
@@ -315,7 +315,7 @@ fn set_extension_headers(headers: Vec<(String, String)>) {
     let _ = EXTENSION_HEADERS.try_with(|current| *current.borrow_mut() = headers);
 }
 
-/// 拓展只能加自定义头：鉴权、Cookie、Host、内容长度 / 类型这类由 Codex++ 自己管。
+/// 拓展只能加自定义头：鉴权、Cookie、Host、内容长度 / 类型这类由 Codex # 自己管。
 pub fn allowed_headers(raw: &Value) -> Vec<(String, String)> {
     const BLOCKED: &[&str] = &["authorization", "proxy-authorization", "cookie", "host", "content-length", "content-type", "transfer-encoding", "connection", "x-api-key", "api-key"];
     raw.as_object()
@@ -338,7 +338,7 @@ pub fn allowed_headers(raw: &Value) -> Vec<(String, String)> {
 }
 
 /// 关掉了 `builtin:auth-headers` 的拓展在 upstream 段给的头：鉴权头（Authorization、x-api-key、api-key、Cookie……）
-/// 也认，传输头（Host、内容长度 / 类型、连接）与 Codex++ 自己的标记仍不认。
+/// 也认，传输头（Host、内容长度 / 类型、连接）与 Codex # 自己的标记仍不认。
 pub fn allowed_auth_headers(raw: &Value) -> Vec<(String, String)> {
     const BLOCKED: &[&str] = &["host", "content-length", "content-type", "transfer-encoding", "connection"];
     raw.as_object()
@@ -404,7 +404,7 @@ pub async fn apply_request_with(manager: &UserScriptManager, request: &mut Value
     apply_middlewares(&middlewares, request, request_path, Value::Null, None).await
 }
 
-/// upstream 段：Codex++ 自己的压缩、路由、协议转换之后，改真正发给上游的请求体（`context` 带上
+/// upstream 段：Codex # 自己的压缩、路由、协议转换之后，改真正发给上游的请求体（`context` 带上
 /// `stage: "upstream"`、`wireApi`、`relay`、`model`）。没有声明这一段的拓展时零开销；拒绝时返回 `Err(原因)`。
 pub async fn apply_upstream_request(body: &mut Value, request_path: &str, context: Value) -> Result<(), String> {
     if already_applied() {

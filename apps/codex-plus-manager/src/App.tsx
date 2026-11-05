@@ -1,3 +1,9 @@
+/*
+ * 本文件由 bighamx 修改（2026-11-04）：
+ * - App.tsx：移除首页（原「推荐内容」并入的落脚页）的赞助商推荐区块与广告拉取
+ * - HubOverview.tsx / HubOverview.css：把拓扑卡抽成 HubTopologyCard 供总览与首页共用，并加上首页的宽松尺寸
+ * 修改版整体仍以 GNU AGPL v3.0 授权，许可证见仓库根目录 LICENSE。
+ */
 import {
   closestCenter,
   DndContext,
@@ -425,7 +431,7 @@ type OverviewResult = CommandResult<{
     local_server: RuntimeServiceState;
     debugger: RuntimeServiceState;
     protocol_conversion_enabled: boolean | null;
-    /** Codex 在运行但不是经 Codex++ 启动的（外部启动、增强脚本未挂载）；旧后端没有这个字段。 */
+    /** Codex 在运行但不是经 Codex # 启动的（外部启动、增强脚本未挂载）；旧后端没有这个字段。 */
     codex_unattached?: boolean;
   };
   current_version: string;
@@ -473,7 +479,7 @@ type BackendSettings = WhaleBalanceSettings & {
   /** 「启动前修复会话索引」与 providerSyncEnabled 分开（#2846）：只补投影、不改会话归属。 */
   sessionIndexRepairEnabled?: boolean;
   threadModelFollowSwitchEnabled?: boolean;
-  /** 启动时及运行期间自动检查 Codex++ 更新（#1272），默认开。 */
+  /** 启动时及运行期间自动检查 Codex # 更新（#1272），默认开。 */
   updateAutoCheck?: boolean;
   /** 检查到新版本时在后台下好安装包，但不安装；点「安装」才安装。默认开。 */
   updateAutoDownload?: boolean;
@@ -1405,7 +1411,7 @@ type StartupResult = CommandResult<{
 /** 左侧 Agent 切换栏的工具标识。后端 `list_tools` 返回同名字符串。 */
 type ToolId = string;
 
-/** Codex++ 自己的 logo：与应用图标（src-tauri/icons/icon.png）同一张图。 */
+/** Codex # 自己的 logo：与应用图标（src-tauri/icons/icon.png）同一张图。 */
 const APP_LOGO_URL = new URL("./assets/codex-plus-logo.png", import.meta.url).href;
 
 type Route = "home" | "overview" | "relay" | "multiLaunch" | "claude" | "relayEnvironment" | "requestLog" | "sessions" | "context" | "skills" | "weixin" | "enhance" | "dreamSkin" | "userScripts" | "pluginMarket" | "recommendations" | "agentCache" | "agentCollaboration" | "computerUse" | "hub" | "gateway" | "gatewayProviders" | "gatewayRouting" | "gatewayUsage" | "gatewaySettings" | "maintenance" | "about" | "settings" | "agentSettings" | "extension";
@@ -1449,7 +1455,7 @@ const routes: Array<{ id: Route; label: string; icon: LucideIcon; badge?: string
   // 跨客户端协作属于应用级能力，各工具下共用同一组任务。
   { id: "agentCollaboration", get label() { return t("Agent 协作"); }, icon: GitBranch, badge: "实验" },
   { id: "computerUse", get label() { return t("Computer Use"); }, icon: MousePointerClick, badge: "实验" },
-  // 网关：任意 Agent 经 Codex++ 接入任意供应商，与具体 Agent 无关，是应用级页面。
+  // 网关：任意 Agent 经 Codex # 接入任意供应商，与具体 Agent 无关，是应用级页面。
   { id: "hub", get label() { return t("总览"); }, icon: Waypoints },
   // 先有供应商，再接 Agent；路由是进阶设置，放在 Agent 接入之后。
   { id: "gatewayProviders", get label() { return t("供应商池"); }, icon: Server },
@@ -1492,7 +1498,7 @@ const lastAgentRoute = new Map<string, Route>();
  * 所以和 Agent 协作一样放在「工具」里，而不是重复出现在每个 Agent 的「扩展」分组里。
  */
 const globalNavigationRoutes: Route[] = ["home", "extension", "hub", "gatewayProviders", "gateway", "gatewayRouting", "gatewayUsage", "gatewaySettings", "requestLog", "sessions", "context", "skills", "userScripts", "computerUse", "agentCollaboration", "agentCache", "recommendations", "about", "settings"];
-/** 侧栏「网关」分组：任意 Agent 经 Codex++ 接入任意供应商。 */
+/** 侧栏「网关」分组：任意 Agent 经 Codex # 接入任意供应商。 */
 // 「用量」并进全局管理：统计（gatewayUsage）与请求日志（requestLog）是同一页的两个页签。
 const gatewayNavigationRoutes: Route[] = ["hub", "gatewayProviders", "gateway", "gatewayRouting", "gatewaySettings"];
 /** 侧栏「全局管理」分组：万物皆拓展置顶，其后是用量、会话、MCP、Skills。 */
@@ -1533,12 +1539,12 @@ const gatewayTabByRoute: Partial<Record<Route, GatewayTab>> = {
 const gatewayRouteByTab = { ...Object.fromEntries(Object.entries(gatewayTabByRoute).map(([route, tab]) => [tab, route])), sessions: "sessions" } as Record<GatewayTab, Route>;
 /**
  * 每个 Agent 在侧栏里的落脚页：点 Agent 名字先到这里。
- * Claude Code / Grok 的供应商不再在 Codex++ 里单独配置：要么经网关接入供应商池（「Agent 接入」），
+ * Claude Code / Grok 的供应商不再在 Codex # 里单独配置：要么经网关接入供应商池（「Agent 接入」），
  * 要么不接入、照它自己的配置文件直连。
  */
 const agentHomeRoute: Record<string, Route> = { codex: "overview", claude: "claude", grok: "overview" };
 /**
- * 侧栏 Agent 列表里不显示的工具。Grok 在 Codex++ 里没有专属的增强页面，只经网关接入，
+ * 侧栏 Agent 列表里不显示的工具。Grok 在 Codex # 里没有专属的增强页面，只经网关接入，
  * 在「Agent 接入」里管理；请求日志、MCP 等跨 Agent 的页面照常支持它。
  */
 const hiddenSidebarTools = new Set<string>(["grok"]);
@@ -2213,7 +2219,7 @@ export function App() {
     const result = await run(() => call<PendingProviderImportResult>("load_pending_provider_import"));
     if (result) {
       setPendingProviderImport(pendingProviderImportFromResult(result));
-      if (!silent && !isSuccessStatus(result.status)) showResultNotice(t("Codex++ 导入"), result, { silentSuccess: true });
+      if (!silent && !isSuccessStatus(result.status)) showResultNotice(t("Codex # 导入"), result, { silentSuccess: true });
     }
     return result;
   };
@@ -2225,7 +2231,7 @@ export function App() {
     if (result) {
       setSettings(result);
       setSettingsForm(normalizeSettings(result.settings));
-      showResultNotice(t("Codex++ 导入"), result);
+      showResultNotice(t("Codex # 导入"), result);
       if (isSuccessStatus(result.status)) setPendingProviderImport(null);
       else await refreshPendingProviderImport(true);
       await refreshCcsProviders(true);
@@ -2237,7 +2243,7 @@ export function App() {
     const result = await run(() => call<PendingProviderImportResult>("dismiss_pending_provider_import", { fingerprint }));
     if (result) {
       setPendingProviderImport(isSuccessStatus(result.status) ? pendingProviderImportFromResult(result) : null);
-      showResultNotice(t("Codex++ 导入"), result, { silentSuccess: true });
+      showResultNotice(t("Codex # 导入"), result, { silentSuccess: true });
     }
   };
 
@@ -3186,7 +3192,7 @@ export function App() {
     const result = await run(() => call<WatcherResult>("set_watcher_enabled", { enabled }));
     if (result) {
       setWatcher(result);
-      showNotice(t("开机打开 Codex++"), result.message, result.status);
+      showNotice(t("开机打开 Codex #"), result.message, result.status);
     }
   };
 
@@ -3210,7 +3216,7 @@ export function App() {
     const result = await run(() => call<WatcherResult>("set_watcher_start_codex_on_open", { enabled }));
     if (result) {
       setWatcher(result);
-      showNotice(t("打开 Codex++ 时自动启动 Codex"), result.message, result.status);
+      showNotice(t("打开 Codex # 时自动启动 Codex"), result.message, result.status);
     }
   };
 
@@ -3564,7 +3570,7 @@ export function App() {
   const exportSettings = async () => {
     try {
       const selected = await saveDialog({
-        title: t("导出 Codex++ 配置"),
+        title: t("导出 Codex # 配置"),
         defaultPath: "codex-plus-plus-settings.json",
         filters: [{ name: "JSON", extensions: ["json"] }],
       });
@@ -3573,16 +3579,16 @@ export function App() {
         path: selected,
         settings: normalizeSettings(settingsForm),
       }));
-      if (result) showNotice(t("导出 Codex++ 配置"), result.message, result.status);
+      if (result) showNotice(t("导出 Codex # 配置"), result.message, result.status);
     } catch (error) {
-      showNotice(t("导出 Codex++ 配置"), stringifyError(error), "failed");
+      showNotice(t("导出 Codex # 配置"), stringifyError(error), "failed");
     }
   };
 
   const importSettings = async () => {
     try {
       const selected = await open({
-        title: t("导入 Codex++ 配置"),
+        title: t("导入 Codex # 配置"),
         multiple: false,
         directory: false,
         filters: [{ name: "JSON", extensions: ["json"] }],
@@ -3590,14 +3596,14 @@ export function App() {
       if (typeof selected !== "string" || !selected.trim()) return;
       const result = await run(() => call<SettingsResult>("preview_import_settings", { path: selected }));
       if (!result || !isSuccessStatus(result.status)) {
-        if (result) showNotice(t("导入 Codex++ 配置"), result.message, result.status);
+        if (result) showNotice(t("导入 Codex # 配置"), result.message, result.status);
         return;
       }
       setSettings(settings ?? result);
       setSettingsForm(normalizeSettings(result.settings));
-      showNotice(t("导入 Codex++ 配置"), result.message, "ok");
+      showNotice(t("导入 Codex # 配置"), result.message, "ok");
     } catch (error) {
-      showNotice(t("导入 Codex++ 配置"), stringifyError(error), "failed");
+      showNotice(t("导入 Codex # 配置"), stringifyError(error), "failed");
     }
   };
 
@@ -4389,7 +4395,7 @@ export function App() {
       void invoke("update_tray_labels", {
         showLabel: "Show window",
         quitLabel: "Quit",
-        windowTitle: "Codex++",
+        windowTitle: "Codex #",
       });
     }
   }, []);
@@ -4837,7 +4843,7 @@ export function App() {
   const isGlobalPage = globalNavigationRoutes.includes(route);
   const isManagementScreen = route === "relay" || route === "multiLaunch" || route === "sessions" || route === "context" || route === "skills";
   const codexAppRunning = overview?.runtime_health?.codex_app?.status === "running";
-  // Codex 可能在它自己的窗口里被退出，既不经过 Codex++ 也不触发窗口聚焦（#2778）。
+  // Codex 可能在它自己的窗口里被退出，既不经过 Codex # 也不触发窗口聚焦（#2778）。
   // 窗口可见时每 5 秒只查一次进程是否还在，和当前显示不一致再完整刷新概览。
   useEffect(() => {
     let disposed = false;
@@ -6387,7 +6393,7 @@ function OverviewScreen({
   const gatewayManaged = activeProfile?.id === CODEX_GATEWAY_RELAY_ID;
   // Codex 的状态栏：经网关 / 直连哪家供应商，操作是网关管理或切换供应商。
   const codexStatus: DashboardStatus = gatewayManaged
-    ? { tone: "gateway", text: codexGatewayModelCount(activeProfile) ? tf("经 Codex++ 网关 · {0} 个模型", [codexGatewayModelCount(activeProfile)]) : t("经 Codex++ 网关") }
+    ? { tone: "gateway", text: codexGatewayModelCount(activeProfile) ? tf("经 Codex # 网关 · {0} 个模型", [codexGatewayModelCount(activeProfile)]) : t("经 Codex # 网关") }
     : activeProfile
       ? { tone: "relay", text: tf("直连 · {0}", [[activeProfile.name || t("未命名供应商"), relayProtocolLabel(activeProfile.protocol), activeProfile.model].filter(Boolean).join(" · ")]) }
       : { tone: "missing", text: t("还没有配置供应商。") };
@@ -6751,7 +6757,7 @@ function ProxySettingsScreen({
       <SettingsAutoSave dirty={dirty} form={form} actions={actions} />
       {takenOverByGateway ? (
         <CxRow
-          detail={t("Codex 正由 Codex++ 网关接管，旧版代理设置不起作用，已隐藏。断开并还原后恢复。")}
+          detail={t("Codex 正由 Codex # 网关接管，旧版代理设置不起作用，已隐藏。断开并还原后恢复。")}
           muted
           title={t("目录外模型映射（旧版）")}
         />
@@ -6869,7 +6875,7 @@ function requestLogRetryLabel(entry: RequestLogEntry) {
     : entry.attempts > 1
       ? tf("切换 ×{0}", [String(entry.attempts)])
       : "";
-  // 网关因 Codex++ 本地限速排过队：标出排了多久。
+  // 网关因 Codex # 本地限速排过队：标出排了多久。
   const queued = queueWaitMs(entry.retryReasons);
   const queue = queued === null ? "" : tf("限速排队 {0}", [formatQueueWait(queued)]);
   // 换上游后去掉了别家签发的压缩上下文：较早的对话内容上游已看不到，必须让用户看得见。
@@ -7441,7 +7447,7 @@ function codexGatewayKeepsLogin(profile: RelayProfile | undefined): boolean {
 }
 
 /**
- * 「Codex 连接」页顶部的「连接方式」：Codex 要么经 Codex++ 网关（供应商池），要么直连下面某个供应商，二选一。
+ * 「Codex 连接」页顶部的「连接方式」：Codex 要么经 Codex # 网关（供应商池），要么直连下面某个供应商，二选一。
  * - Codex 还指向托管供应商、网关里却没有它的接入记录（降级后又升级、gateway.json 换过或坏了）：
  *   给「切回直连」，否则页面一直显示「被网关接管」却断不开；
  * - Codex 正经网关接入：网关一行「使用中」，可去管理或断开并还原；
@@ -7490,7 +7496,7 @@ function LegacyRelayGatewayHint({
   const status = orphan
     ? t("Codex 还指向网关托管的供应商")
     : viaGateway
-      ? t("Codex 当前经 Codex++ 网关（新版）")
+      ? t("Codex 当前经 Codex # 网关（新版）")
       : managed
         ? t("Codex 已从网关切回直连")
         : t("建议改用新版网关");
@@ -7504,7 +7510,7 @@ function LegacyRelayGatewayHint({
         disabled={connecting || viaGateway || !form.relayProfilesEnabled}
         onClick={connect}
         role="radio"
-        title={form.relayProfilesEnabled ? t("Codex 改走 Codex++ 网关，用供应商池里的模型；新开的会话生效") : t("先在页面底部「高级」里打开供应商配置切换")}
+        title={form.relayProfilesEnabled ? t("Codex 改走 Codex # 网关，用供应商池里的模型；新开的会话生效") : t("先在页面底部「高级」里打开供应商配置切换")}
         type="button"
       >
         {connecting ? <Loader2 className="animate-spin" /> : <Waypoints />}
@@ -7529,7 +7535,7 @@ function LegacyRelayGatewayHint({
   const title = orphan
     ? t("Codex 还指向网关托管的供应商")
     : viaGateway
-      ? t("经 Codex++ 网关")
+      ? t("经 Codex # 网关")
       : direct
         ? tf("直连 · {0}", [direct.name || t("未命名供应商")])
         : t("直连");
@@ -8036,8 +8042,8 @@ function RelayScreen({
       {!normalized.relayProfilesEnabled ? (
         <CxBanner
           detail={takenOverByGateway
-            ? t("Codex++ 无法重新接入 Codex。重新开启只恢复配置写入能力，不会切换直连供应商或断开当前网关。")
-            : t("Codex++ 不会写入 Codex 的 config.toml / auth.json，直连供应商列表已隐藏。")}
+            ? t("Codex # 无法重新接入 Codex。重新开启只恢复配置写入能力，不会切换直连供应商或断开当前网关。")
+            : t("Codex # 不会写入 Codex 的 config.toml / auth.json，直连供应商列表已隐藏。")}
           icon={<PowerOff />}
           title={t("供应商配置切换已关闭")}
           tone="warn"
@@ -8052,7 +8058,7 @@ function RelayScreen({
         <CxCard className="cx-takeover">
           <CxEmpty
             detail={tf("{0} 个直连供应商在接入网关期间不生效，已隐藏。点上方「直连」断开网关后恢复；要把它们加进供应商池，去「供应商池」→「添加供应商」→「导入」。", [directProfiles.length])}
-            title={t("Codex 正由 Codex++ 网关接管")}
+            title={t("Codex 正由 Codex # 网关接管")}
           >
             {onOpenGateway ? <button className="cx-secondary" onClick={onOpenGateway} type="button">{t("打开供应商池")}</button> : null}
           </CxEmpty>
@@ -8125,9 +8131,9 @@ function RelayScreen({
               <span className="cx-set-summary-hint">{normalized.relayProfilesEnabled ? t("配置切换已开启") : t("配置切换已关闭")}</span>
             </summary>
             <CxRow
-              detail={t("关闭后 Codex++ 不再写入 Codex 的 config.toml / auth.json；启动 Codex 时始终不会自动改这些文件。")}
+              detail={t("关闭后 Codex # 不再写入 Codex 的 config.toml / auth.json；启动 Codex 时始终不会自动改这些文件。")}
               title={t("供应商配置切换")}
-              tooltip={takenOverByGateway ? t("重新开启配置切换只恢复 Codex++ 写入 Codex 配置的能力，不会切换直连供应商或断开当前网关。") : undefined}
+              tooltip={takenOverByGateway ? t("重新开启配置切换只恢复 Codex # 写入 Codex 配置的能力，不会切换直连供应商或断开当前网关。") : undefined}
             >
               <label className="switch-row compact relay-master-switch relay-master-switch-compact">
                 <input
@@ -8481,7 +8487,7 @@ function EnvConflictNotice({
 
 const SSH_REMOTE_LOOPBACK_DISMISS_KEY = "codex-plus-ssh-remote-loopback-dismissed";
 
-// Codex++ 不往 SSH 远端写配置；远端 Codex 若沿用本机 127.0.0.1 中转地址会连到服务器自己（issue #1195）。
+// Codex # 不往 SSH 远端写配置；远端 Codex 若沿用本机 127.0.0.1 中转地址会连到服务器自己（issue #1195）。
 // 这里只提示 ssh -R 反向转发的做法。「知道了」按端口 + 远端记住，组合变了再提示。
 function SshRemoteLoopbackNotice({ notice }: { notice: SshRemoteLoopbackNoticeData | null }) {
   const signature = notice
@@ -8502,7 +8508,7 @@ function SshRemoteLoopbackNotice({ notice }: { notice: SshRemoteLoopbackNoticeDa
       </div>
       <div className="env-conflict-body">
         <strong>{t("SSH 远端连不上本机中转地址")}</strong>
-        <p>{t("当前中转地址是本机回环地址，在 SSH 服务器上它指向服务器自己。Codex++ 不会往远端写配置；如果远端 Codex 用的也是这个地址，连接时需要把端口反向转发回本机（本机 Codex++ 要保持运行），或在远端单独配置可访问的上游地址。")}</p>
+        <p>{t("当前中转地址是本机回环地址，在 SSH 服务器上它指向服务器自己。Codex # 不会往远端写配置；如果远端 Codex 用的也是这个地址，连接时需要把端口反向转发回本机（本机 Codex # 要保持运行），或在远端单独配置可访问的上游地址。")}</p>
         <div className="env-conflict-tags">
           {notice.loopbackEndpoints.map((endpoint) => (
             <span key={endpoint.key}>
@@ -10768,7 +10774,7 @@ function SessionRepairPanel({ dirty, form, providerSyncProgress, sessionIndexRep
           ) : null}
           {sessionIndexRepairReport ? (
             <div className="provider-sync-progress session-repair-progress" aria-live="polite">
-              <strong title={`${t("自动检查需要从此界面启动 Codex，并保持 Codex++ 运行，且自动修复开关已开启并保存；每次检查完成后间隔 30 分钟复查。此页面每 15 秒刷新报告，不会单独启动修复；再次检查不保证恢复。")}\n${t("短暂等待最长 30 分钟；原文和记录文件都已超过 24 小时未更新的项目直接转入需核查。缺少对应轮次或结束状态，当前证据不足以安全补回；后续检查仍会核验。")}`}>{t("最近一次会话索引修复报告")}</strong>
+              <strong title={`${t("自动检查需要从此界面启动 Codex，并保持 Codex # 运行，且自动修复开关已开启并保存；每次检查完成后间隔 30 分钟复查。此页面每 15 秒刷新报告，不会单独启动修复；再次检查不保证恢复。")}\n${t("短暂等待最长 30 分钟；原文和记录文件都已超过 24 小时未更新的项目直接转入需核查。缺少对应轮次或结束状态，当前证据不足以安全补回；后续检查仍会核验。")}`}>{t("最近一次会话索引修复报告")}</strong>
               <p>{t("最后检查：")}{sessionIndexRepairReport.checkedAtMs ? formatTime(sessionIndexRepairReport.checkedAtMs) : t("旧版报告未记录时间")}</p>
               <p>
                 {t("读取文件")} {sessionIndexRepairReport.scannedFiles} · {t("复用缓存")} {sessionIndexRepairReport.cachedFiles} · {t("耗时")} {(sessionIndexRepairReport.elapsedMs / 1000).toFixed(1)} s
@@ -11101,7 +11107,7 @@ function HomeScreen({
     }
     return (
       <CxRow
-        detail={viaGateway ? t("已经通过 Codex++ 网关接入") : t("未接入网关")}
+        detail={viaGateway ? t("已经通过 Codex # 网关接入") : t("未接入网关")}
         icon={<CxStatusIcon tone={viaGateway ? "ok" : "off"}><AgentGlyph agent={tool.id} className="home-agent-glyph" /></CxStatusIcon>}
         key={tool.id}
         onClick={() => onOpenAgent(tool.id)}
@@ -11228,7 +11234,7 @@ function MaintenanceScreen({
               <MenuItem danger disabled={!savedCodexAppPath} onClick={() => void actions.clearCodexAppPath()}>{t("清除保存路径")}</MenuItem>
             </Menu>
           </CxRow>
-          <CxRow detail={<code className="cx-set-path">{overview?.management_shortcut.path || t("未记录路径")}</code>} title={t("Codex++ 应用入口")}>
+          <CxRow detail={<code className="cx-set-path">{overview?.management_shortcut.path || t("未记录路径")}</code>} title={t("Codex # 应用入口")}>
             <StatusBadge status={overview?.management_shortcut.status} />
             <Menu>
               <MenuItem onClick={() => void actions.repairShortcuts()}>{t("修复快捷方式")}</MenuItem>
@@ -11248,13 +11254,13 @@ function MaintenanceScreen({
             />
             <span>
               <strong>{t("登录时自动打开")}</strong>
-              <small>{t("登录系统后打开 Codex++")}</small>
+              <small>{t("登录系统后打开 Codex #")}</small>
             </span>
             <ToggleVisual />
           </label>
           {watcher?.enabled ? (
             <>
-              <label className="switch-row cx-set-sub" title={t("仅登录启动 Codex++ 时自动启动 Codex；手动打开 Codex++ 仍不会自动启动。")}>
+              <label className="switch-row cx-set-sub" title={t("仅登录启动 Codex # 时自动启动 Codex；手动打开 Codex # 仍不会自动启动。")}>
                 <input
                   checked={Boolean(watcher?.start_codex)}
                   disabled={!watcher}
@@ -11267,7 +11273,7 @@ function MaintenanceScreen({
                 </span>
                 <ToggleVisual />
               </label>
-              <label className="switch-row cx-set-sub" title={t("仅登录启动时隐藏到托盘；手动打开 Codex++ 仍显示主窗口。")}>
+              <label className="switch-row cx-set-sub" title={t("仅登录启动时隐藏到托盘；手动打开 Codex # 仍显示主窗口。")}>
                 <input
                   checked={Boolean(watcher?.start_minimized)}
                   disabled={!watcher}
@@ -11282,7 +11288,7 @@ function MaintenanceScreen({
               </label>
             </>
           ) : null}
-          <label className="switch-row" title={t("仅手动打开 Codex++ 时生效；已有 Codex 会先恢复，不会重复启动。")}>
+          <label className="switch-row" title={t("仅手动打开 Codex # 时生效；已有 Codex 会先恢复，不会重复启动。")}>
             <input
               checked={Boolean(watcher?.start_codex_on_open)}
               disabled={!watcher}
@@ -11290,7 +11296,7 @@ function MaintenanceScreen({
               type="checkbox"
             />
             <span>
-              <strong>{t("打开 Codex++ 时自动启动 Codex")}</strong>
+              <strong>{t("打开 Codex # 时自动启动 Codex")}</strong>
               <small>{t("已有 Codex 会先恢复，不会重复启动")}</small>
             </span>
             <ToggleVisual />
@@ -11301,7 +11307,7 @@ function MaintenanceScreen({
         <CxCard className="cx-set-switches">
           <label
             className="switch-row"
-            title={`${t("开启后，你自己启动官方 App 时 Codex++ 会自动接管。官方 App 已在运行且没有调试端口时，会先退出再带参数重开（可能中断正在进行的操作）。")}\n${t("仅在 Codex++ 正在运行时生效；建议同时开启上面的「开机打开 Codex++」。")}`}
+            title={`${t("开启后，你自己启动官方 App 时 Codex # 会自动接管。官方 App 已在运行且没有调试端口时，会先退出再带参数重开（可能中断正在进行的操作）。")}\n${t("仅在 Codex # 正在运行时生效；建议同时开启上面的「开机打开 Codex #」。")}`}
           >
             <input
               checked={takeoverOn}
@@ -11310,7 +11316,7 @@ function MaintenanceScreen({
             />
             <span>
               <strong>{t("开启自动接管")}</strong>
-              <small>{t("你自己双击启动官方 App 时，Codex++ 自动接管并注入增强")}</small>
+              <small>{t("你自己双击启动官方 App 时，Codex # 自动接管并注入增强")}</small>
             </span>
             <ToggleVisual />
           </label>
@@ -11319,7 +11325,7 @@ function MaintenanceScreen({
               badges={<StatusBadge status={takeoverStatus} label={autoTakeover?.state === "degraded" ? t("已降级") : autoTakeover?.running ? t("监听中") : t("未运行")} />}
               detail={takeoverDetail}
               title={t("接管状态")}
-              tooltip={t("仅在 Codex++ 正在运行时生效；需要重启官方 App 时会自动重启。")}
+              tooltip={t("仅在 Codex # 正在运行时生效；需要重启官方 App 时会自动重启。")}
             >
               <button className="cx-secondary" onClick={() => void actions.takeOverNow()} type="button">{t("立即接管")}</button>
               <Menu>
@@ -11413,7 +11419,7 @@ function AboutScreen({
               const downloading = !ready && download?.state === "downloading";
               const detail = latest
                 ? ready
-                  ? t("新版本已下载，点「安装」更新；安装时 Codex++ 会关闭并自动重启")
+                  ? t("新版本已下载，点「安装」更新；安装时 Codex # 会关闭并自动重启")
                   : downloading
                     ? download?.percent != null
                       ? tf("正在后台下载 {0}%，下完不会自动安装", [Math.round(download.percent)])
@@ -11429,7 +11435,7 @@ function AboutScreen({
                   badges={latest ? <CxBadge tone="ok">{ready ? tf("{0} 已下载", [latest]) : tf("有新版本 {0}", [latest])}</CxBadge> : null}
                   detail={<>{detail}{latest && update?.assetName ? ` · ${update.assetName}` : ""}</>}
                   icon={<img alt="" src={APP_LOGO_URL} />}
-                  title={`Codex++ ${version}`}
+                  title={`Codex # ${version}`}
                   tooltip={download?.state === "failed" ? download.message : undefined}
                 >
                   <button className="cx-secondary" onClick={() => void actions.checkUpdate()} type="button"><RefreshCw />{t("检查更新")}</button>
@@ -11446,14 +11452,14 @@ function AboutScreen({
             <CxRow
               detail={t("打开时及运行期间每隔几小时检查一次")}
               title={t("启动时自动检查更新")}
-              tooltip={t("打开 Codex++ 时及运行期间每隔几小时在后台检查新版本并提示。关闭后不再自动检查，仍可随时点「检查更新」。")}
+              tooltip={t("打开 Codex # 时及运行期间每隔几小时在后台检查新版本并提示。关闭后不再自动检查，仍可随时点「检查更新」。")}
             >
               <Switch label={t("启动时自动检查更新")} on={form.updateAutoCheck !== false} onToggle={() => onFormChange({ ...form, updateAutoCheck: form.updateAutoCheck === false })} />
             </CxRow>
             <CxRow
               detail={t("在后台把安装包下好，但不安装；点「安装」才更新")}
               title={t("有可用更新时自动下载")}
-              tooltip={t("检查到新版本后，在后台下载安装包并校验，下好后这里和侧栏会提示「安装」。不会自动安装，也不会重启 Codex++。")}
+              tooltip={t("检查到新版本后，在后台下载安装包并校验，下好后这里和侧栏会提示「安装」。不会自动安装，也不会重启 Codex #。")}
             >
               <Switch label={t("有可用更新时自动下载")} on={form.updateAutoDownload !== false} onToggle={() => onFormChange({ ...form, updateAutoDownload: form.updateAutoDownload === false })} />
             </CxRow>
@@ -11470,7 +11476,7 @@ function AboutScreen({
       <div className="cx-set-group" id="app-settings-about">
         <CxSection>
           <CxCard>
-            <CxRow detail={t("本地 Codex 增强、管理工具和安装包维护")} icon={<img alt="" src={APP_LOGO_URL} />} title={`Codex++ ${version}`} />
+            <CxRow detail={t("本地 Codex 增强、管理工具和安装包维护")} icon={<img alt="" src={APP_LOGO_URL} />} title={`Codex # ${version}`} />
             <CxRow title={t("Codex 版本")}>
               <span className="cx-set-value">{overview?.codex_version ?? t("未检测到")}</span>
             </CxRow>
@@ -11975,8 +11981,8 @@ function SortableRelayProfileCard({
         <small>
           {gatewayManaged
             ? codexGatewayModelCount(profile)
-              ? tf("经 Codex++ 本地网关，用供应商池里的 {0} 个模型；在「Agent 接入」里管理", [codexGatewayModelCount(profile)])
-              : t("经 Codex++ 本地网关，用供应商池里的模型；在「Agent 接入」里管理")
+              ? tf("经 Codex # 本地网关，用供应商池里的 {0} 个模型；在「Agent 接入」里管理", [codexGatewayModelCount(profile)])
+              : t("经 Codex # 本地网关，用供应商池里的模型；在「Agent 接入」里管理")
             : profile.relayMode === "official"
             ? profile.officialMixApiKey
               ? profile.baseUrl || t("未填写 URL")
@@ -12005,7 +12011,7 @@ function SortableRelayProfileCard({
                 : active
                   ? t("当前正在使用")
                   : gatewayManaged
-                    ? t("重新接入 Codex++ 网关")
+                    ? t("重新接入 Codex # 网关")
                     : t("设为当前")
           }
           variant={active ? "secondary" : "outline"}
@@ -12702,7 +12708,7 @@ function RelayProfileEditor({
   const queryBuiltinCommand = async <T,>(command: string, args?: Record<string, unknown>): Promise<T | null> => {
     try { return await invoke<T>(command, args); } catch (error) {
       // 索引只影响行级标记与便利回填（失败是假阴性、不产错误数据），可诊断即可。
-      console.warn(`[Codex++] ${command} 查询失败`, error);
+      console.warn(`[Codex #] ${command} 查询失败`, error);
       return null;
     }
   };
@@ -13813,7 +13819,7 @@ function RelayProfileEditor({
                                   }
                                 }
                               }}
-                              placeholder={t("需要补充供应商模型信息时填写；不填则使用 Codex++ 默认配置（自动压缩 90%、图片原样发送）。从供应商的 models.json 或 model.json 复制，支持多个模型。")}
+                              placeholder={t("需要补充供应商模型信息时填写；不填则使用 Codex # 默认配置（自动压缩 90%、图片原样发送）。从供应商的 models.json 或 model.json 复制，支持多个模型。")}
                               rows={7}
                             />
                             {metadataImportError ? <div className="relay-model-metadata-import-error" role="alert">{metadataImportError}</div> : null}
@@ -13824,7 +13830,7 @@ function RelayProfileEditor({
                             ) : null}
                             {metadataImportPreview?.ignoredFields.length ? (
                               <div className="relay-model-metadata-import-warning" role="status">
-                                {tf("以下字段由 Codex++ 计算或维护，导入不会覆盖：{0}", [metadataImportPreview.ignoredFields.join(", ")])}
+                                {tf("以下字段由 Codex # 计算或维护，导入不会覆盖：{0}", [metadataImportPreview.ignoredFields.join(", ")])}
                               </div>
                             ) : null}
                             <div className="relay-model-metadata-import-actions">
@@ -13916,7 +13922,7 @@ function RelayProfileEditor({
                 <div className="relay-config-section-head">
                   <div>
                     <strong>{t("单模型协议转换")}</strong>
-                    <span>{t("仅在当前供应商启用时生效；精确匹配模型名并使用目标供应商的 URL 与 Key。目标必须是 Responses API，且需要从 Codex++ 启动。")}</span>
+                    <span>{t("仅在当前供应商启用时生效；精确匹配模型名并使用目标供应商的 URL 与 Key。目标必须是 Responses API，且需要从 Codex # 启动。")}</span>
                   </div>
                   <div className="relay-model-list-tools">
                     <Button
@@ -14212,7 +14218,7 @@ function RelayProfileEditor({
                 {showApiFields && profile.relayMode === "pureApi" ? (
                   <label className="switch-row compact relay-switch-row relay-field-pure-api-image-generation">
                     <input type="checkbox" checked={profile.pureApiImageGeneration === true} onChange={(event) => updateDraft({ pureApiImageGeneration: event.currentTarget.checked })} />
-                    <span><strong>{t("纯 API 启用 Codex 原生生图（实验）")}</strong><small>{t("Codex 默认只在登录 ChatGPT 时注册 image_gen 工具。开启后 Codex++ 在 config.toml 里写入占位请求头让 Codex 注册该工具，生图请求经本地代理发给本供应商的 /images/generations、/images/edits，占位头不会发往上游。上游需支持 OpenAI 图片接口；依赖 Codex 内部判据，Codex 更新后可能失效。默认关闭。")}</small></span><ToggleVisual />
+                    <span><strong>{t("纯 API 启用 Codex 原生生图（实验）")}</strong><small>{t("Codex 默认只在登录 ChatGPT 时注册 image_gen 工具。开启后 Codex # 在 config.toml 里写入占位请求头让 Codex 注册该工具，生图请求经本地代理发给本供应商的 /images/generations、/images/edits，占位头不会发往上游。上游需支持 OpenAI 图片接口；依赖 Codex 内部判据，Codex 更新后可能失效。默认关闭。")}</small></span><ToggleVisual />
                   </label>
                 ) : null}
                 </div>
@@ -14290,8 +14296,8 @@ function RelayProfileEditor({
                 <MessageCircle className="h-4 w-4" />
                 <span>
                   {profile.protocol === "anthropicMessages"
-                    ? t("此上游说 Anthropic Messages（/v1/messages）：本地 127.0.0.1:57321 会把请求转成 Anthropic 协议发出，再转回 Responses，需要从 Codex++ 启动 Codex。")
-                    : t("此上游会通过本地 127.0.0.1:57321 转成 Responses API，需要从 Codex++ 启动 Codex。")}
+                    ? t("此上游说 Anthropic Messages（/v1/messages）：本地 127.0.0.1:57321 会把请求转成 Anthropic 协议发出，再转回 Responses，需要从 Codex # 启动 Codex。")
+                    : t("此上游会通过本地 127.0.0.1:57321 转成 Responses API，需要从 Codex # 启动 Codex。")}
                 </span>
               </div>
             ) : null}
@@ -15850,7 +15856,7 @@ function LiveConflictDialog({
         </div>
         <div className="confirm-modal-body">
           <p className="modal-message">
-            {tf("当前生效的 config.toml / auth.json 里的供应商地址，和「{0}」保存的不一样。可能是其它工具改过，也可能是你手动改的，Codex++ 无法自动判断该保留哪一份。", [profileName])}
+            {tf("当前生效的 config.toml / auth.json 里的供应商地址，和「{0}」保存的不一样。可能是其它工具改过，也可能是你手动改的，Codex # 无法自动判断该保留哪一份。", [profileName])}
           </p>
           <p className="modal-message">{tf("导入为新供应商：把当前生效的地址和 Key 保存成一个新供应商，「{0}」保持原样，然后继续切换。", [profileName])}</p>
           <p className="modal-message">{tf("放弃实时改动：先把当前生效的文件备份一份，「{0}」保持原样，然后继续切换。", [profileName])}</p>
@@ -15955,8 +15961,8 @@ function PendingProviderImportDialog({
       <div className="modal-card provider-import-modal">
         <div className="modal-head">
           <div>
-            <h2>{t("导入 Codex++ 供应商")}</h2>
-            <p>{toPool ? t("检测到来自网页的供应商导入请求，确认后会加进网关供应商池，并自动从上游获取模型。") : t("检测到来自网页的供应商配置导入请求，确认后会写入本机 Codex++。")}</p>
+            <h2>{t("导入 Codex # 供应商")}</h2>
+            <p>{toPool ? t("检测到来自网页的供应商导入请求，确认后会加进网关供应商池，并自动从上游获取模型。") : t("检测到来自网页的供应商配置导入请求，确认后会写入本机 Codex #。")}</p>
           </div>
           <button className="toast-close" onClick={onDismiss} type="button">×</button>
         </div>
@@ -16103,7 +16109,7 @@ type ClaudeLocalizationStatus = {
 };
 
 /**
- * Claude 增强页跨挂载的记忆：Codex++ 运行期间只在第一次进入时自动检测一次，
+ * Claude 增强页跨挂载的记忆：Codex # 运行期间只在第一次进入时自动检测一次，
  * 之后再进来直接显示上次结果，需要时手动点「检测 Claude」刷新。
  *
  * 检测已在后台线程跑、带 15 秒超时，未安装 Claude 时直接早退（#2539 的死机不会再现），
@@ -16433,7 +16439,7 @@ function ClaudeLocalizationScreen() {
         <CxRow
           badges={<CxBadge tone={statusTone === "ok" ? "ok" : statusTone === "warn" ? "warn" : "neutral"}>{statusText}</CxBadge>}
           detail={<span title={t("所有增强的前置条件：官方 Claude.app 与 app.asar 保持原样，功能通过副本和启动时注入生效。")}>{s && !s.supported
-            ? t("未检测到 Claude，请先安装官方应用。你可以继续使用 Codex++ 的其他功能。")
+            ? t("未检测到 Claude，请先安装官方应用。你可以继续使用 Codex # 的其他功能。")
             : s?.supported && !s.prepared ? t("首次启动会先制作独立副本，官方应用不改动") : meta}</span>}
           icon={<CxStatusIcon tone={statusTone === "ok" ? "ok" : statusTone === "warn" ? "warn" : "off"}><PackageOpen /></CxStatusIcon>}
           title={t("受管增强版")}
@@ -16789,7 +16795,7 @@ function CustomizeTabs({ route, activeTool, onNavigate }: { route: Route; active
  * 主模式：
  * - 顶部是 ⌘K 搜索；其后几个常用入口：总览、供应商、Agent 接入、用量、自定义（拓展 / MCP / Skills）、会话；
  * - 「Agent」：每个 Agent 一行（状态点表示接入方式），它自己的页面在内容区顶部的胶囊里；
- * - 底部是网关状态卡和「Codex++ 版本 · 齿轮」。
+ * - 底部是网关状态卡和「Codex # 版本 · 齿轮」。
  *
  * 设置模式（停在设置类页面时）：「返回」+ 搜索设置 + 平铺的设置分类，语言与主题在底部。
  */
@@ -16931,7 +16937,7 @@ function AppSidebar({
           {!shown.length ? <p className="cx-side-empty">{t("没有匹配的设置")}</p> : null}
         </nav>
         <footer className="cx-side-foot">
-          <span className="cx-side-version">{version ? `Codex++ ${version}` : "Codex++"}</span>
+          <span className="cx-side-version">{version ? `Codex # ${version}` : "Codex #"}</span>
           <button aria-label={languageLabel} className="cx-icon-button" onClick={() => toggleLanguage()} title={languageLabel} type="button">
             <Languages aria-hidden="true" />
           </button>
@@ -17018,7 +17024,7 @@ function AppSidebar({
 
         {shownGateway.length ? (
           <div className="cx-side-group" data-group="gateway">
-            <div className="cx-side-heading" title={t("任意 Agent 经 Codex++ 接入任意供应商：一个 Agent 可以同时用多家，按模型路由、出错自动换下一家")}>
+            <div className="cx-side-heading" title={t("任意 Agent 经 Codex # 接入任意供应商：一个 Agent 可以同时用多家，按模型路由、出错自动换下一家")}>
               <span>{t("聚合网关")}</span>
             </div>
             {shownGateway.map(renderEntry)}
@@ -17041,11 +17047,11 @@ function AppSidebar({
             const title = tool.switchable
               ? tf("{0}｜{1}｜{2} 个供应商", [tool.name, tool.homeDir || t("未配置目录"), tool.relayCount])
               : tf("{0}｜{1}｜供应商配置尚未接入", [tool.name, tool.homeDir || t("未配置目录")]);
-            // 状态点表示接入方式：接入网关为绿色；Codex 没接入网关时是直连，由 Codex++ 直接管理供应商配置。
+            // 状态点表示接入方式：接入网关为绿色；Codex 没接入网关时是直连，由 Codex # 直接管理供应商配置。
             const access = connectedAgents.has(tool.id)
-              ? { tone: "ok", label: t("已经通过 Codex++ 网关接入") }
+              ? { tone: "ok", label: t("已经通过 Codex # 网关接入") }
               : tool.id === "codex"
-                ? { tone: "direct", label: t("Codex 的供应商配置由 Codex++ 直接管理") }
+                ? { tone: "direct", label: t("Codex 的供应商配置由 Codex # 直接管理") }
                 : { tone: "off", label: t("未接入网关") };
             return (
               <Fragment key={tool.id}>
@@ -17076,7 +17082,7 @@ function AppSidebar({
                       data-unavailable={!codexRun.running && Boolean(codexRun.unavailableReason)}
                       disabled={codexRun.busy || (!codexRun.running && Boolean(codexRun.unavailableReason))}
                       onClick={unattached ? codexRun.onRestart : codexRun.running ? codexRun.onStop : codexRun.onStart}
-                      title={codexRun.busy ? t("处理中…") : unattached ? t("Codex 不是经 Codex++ 启动的，增强脚本未挂载 · 点此重启并挂载") : codexRun.running ? t("停止 Codex") : codexRun.unavailableReason ?? t("启动 Codex")}
+                      title={codexRun.busy ? t("处理中…") : unattached ? t("Codex 不是经 Codex # 启动的，增强脚本未挂载 · 点此重启并挂载") : codexRun.running ? t("停止 Codex") : codexRun.unavailableReason ?? t("启动 Codex")}
                       type="button"
                     >
                       {codexRun.busy ? <Loader2 aria-hidden="true" className="animate-spin" /> : unattached ? <RotateCcw aria-hidden="true" /> : codexRun.running ? <Square aria-hidden="true" /> : <Play aria-hidden="true" />}
@@ -17144,7 +17150,7 @@ function AppSidebar({
       )}
       <footer className="cx-side-foot">
         <img alt="" className="cx-side-logo" draggable={false} src={APP_LOGO_URL} />
-        <span className="cx-side-version">{version ? `Codex++ ${version}` : "Codex++"}</span>
+        <span className="cx-side-version">{version ? `Codex # ${version}` : "Codex #"}</span>
         <button
           aria-label={t("设置")}
           className="cx-icon-button"
@@ -17233,7 +17239,7 @@ type ExtensionCreatorStatus = {
 };
 
 /// 「对话造拓展」：把拓展创作 MCP 接入 Codex 后，用户在 Codex 对话里描述需求，agent 直接写出拓展并热重载。
-/// 拓展页顶部的理念：Codex++ 的增强能力都以拓展的形式开放，下面列出拓展能改到的地方（放在悬停里）。
+/// 拓展页顶部的理念：Codex # 的增强能力都以拓展的形式开放，下面列出拓展能改到的地方（放在悬停里）。
 const extensionCapabilities = [
   "界面与页面", "斜杠命令", "消息与面板", "模型工具", "Codex 钩子", "网关中间件", "常驻后台", "会话历史", "拓展间服务", "多语言",
 ] as const;
@@ -17243,7 +17249,7 @@ function ExtensionsHero({ host, focus = null, onHostChange }: { host: ExtensionH
   const hosts = (["codex", "claude"] as const).filter((target) => agentVisible(focus, target));
   return (
     <section className="ext-hero" aria-label={t("万物皆拓展")}>
-      <p className="ext-hero-lead" title={host === "codex" ? `${t("Codex++ 构建于万物皆拓展的架构之上：界面、命令、模型能用的工具、agent 循环的钩子、发往模型的请求与回复，都能由拓展接管。在 Codex 对话里说一句，就能造一个属于自己的拓展。")}\n${extensionCapabilities.map((label) => t(label)).join(" · ")}` : undefined}>
+      <p className="ext-hero-lead" title={host === "codex" ? `${t("Codex # 构建于万物皆拓展的架构之上：界面、命令、模型能用的工具、agent 循环的钩子、发往模型的请求与回复，都能由拓展接管。在 Codex 对话里说一句，就能造一个属于自己的拓展。")}\n${extensionCapabilities.map((label) => t(label)).join(" · ")}` : undefined}>
         {host === "codex"
           ? t("界面、命令、工具、钩子、模型请求都能由拓展接管；在 Codex 对话里说一句就能造一个。")
           : t("给 Claude 增强版装拓展：只显示声明了适配 Claude 的拓展。")}
@@ -17319,7 +17325,7 @@ function localizedPackageText(
   return fallback;
 }
 
-/// 本地拓展列表底部的内置拓展入口：Codex++ 自带的功能都是内置拓展，开关与参数统一在「内置拓展」页管理，
+/// 本地拓展列表底部的内置拓展入口：Codex # 自带的功能都是内置拓展，开关与参数统一在「内置拓展」页管理，
 /// 这里只给个数和被顶替的项，免得两处各有一套开关。
 function BuiltinExtensionsSummary({ builtins, onOpen }: { builtins: BuiltinExtension[]; onOpen: () => void }) {
   const enabled = builtins.filter((builtin) => builtin.enabled && !builtin.replacedBy).length;
@@ -17331,11 +17337,11 @@ function BuiltinExtensionsSummary({ builtins, onOpen }: { builtins: BuiltinExten
           badges={<CxBadge tone={enabled ? "ok" : "neutral"}>{tf("已启用 {0} / 共 {1} 项", [String(enabled), String(builtins.length)])}</CxBadge>}
           detail={replaced.length
             ? tf("已被顶替：{0}", [replaced.map((builtin) => `${t(builtin.name)} → ${String(builtin.replacedBy).replace(/^user:/, "")}`).join("、")])
-            : t("Codex++ 自带的功能，开关与参数在「内置拓展」页管理")}
+            : t("Codex # 自带的功能，开关与参数在「内置拓展」页管理")}
           icon={<Blocks />}
           onClick={onOpen}
           title={t("内置拓展")}
-          tooltip={tf("Codex++ 自带的功能都是内置拓展：已启用 {0} / 共 {1} 项。可以被声明 replaces 的拓展顶替。", [String(enabled), String(builtins.length)])}
+          tooltip={tf("Codex # 自带的功能都是内置拓展：已启用 {0} / 共 {1} 项。可以被声明 replaces 的拓展顶替。", [String(enabled), String(builtins.length)])}
         >
           <ChevronRight className="ext-row-chevron" />
         </CxRow>
@@ -17557,16 +17563,16 @@ function routeTitle(route: Route) {
 
 /** 页面副标题；只管理 Codex（soloAgent）时网关两页不讲「任意 Agent」。 */
 function routeSubtitle(route: Route, soloAgent: string | null = null) {
-  if (soloAgent && route === "hub") return tf("{0} 经 Codex++ 接入任意供应商：走哪家、是否健康，一屏看全", [agentName(soloAgent)]);
-  if (soloAgent && route === "gateway") return tf("让 {0} 经 Codex++ 网关接入供应商池，并选它默认用的模型", [agentName(soloAgent)]);
+  if (soloAgent && route === "hub") return tf("{0} 经 Codex # 接入任意供应商：走哪家、是否健康，一屏看全", [agentName(soloAgent)]);
+  if (soloAgent && route === "gateway") return tf("让 {0} 经 Codex # 网关接入供应商池，并选它默认用的模型", [agentName(soloAgent)]);
   const subtitles: Record<Route, string> = {
-    home: t("赞助商推荐：支持 Codex++ 的服务"),
+    home: t("赞助商推荐：支持 Codex # 的服务"),
     overview: t("检查问题、启动与快速修复"),
     relay: t("管理 API 供应商、协议、Key 与配置文件"),
     multiLaunch: t("为不同供应商启动相互隔离的 Codex 实例"),
     claude: t("保留官方 Claude.app 原样，通过增强版为 Claude 应用增强功能"),
     relayEnvironment: t("旧版直连模式专用：目录外模型映射与供应商独立代理"),
-    requestLog: t("所有 Agent 经 Codex++ 的请求：状态、模型、重试、token 用量与缓存命中"),
+    requestLog: t("所有 Agent 经 Codex # 的请求：状态、模型、重试、token 用量与缓存命中"),
     sessions: t("Codex、Claude Code、Grok 的本地会话放在一起：在终端继续，Codex 会话还能删除、归档与修复"),
     context: t("同时管理 Codex、Claude Code、Grok 的 MCP 服务器：每列一个 Agent，打开即写入它的配置"),
     skills: t("从 GitHub 仓库安装 Skill，按 Agent 启用到 Codex、Claude Code 或 Grok"),
@@ -17575,12 +17581,12 @@ function routeSubtitle(route: Route, soloAgent: string | null = null) {
     dreamSkin: t("Codex-Dream-Skin 风格主题和换图"),
     userScripts: t("万物皆拓展：内置、市场和自己做的拓展"),
     pluginMarket: t("检索插件，按需下载并安装到 Codex"),
-    recommendations: t("来自 Codex++ 广告源的推荐，点卡片在浏览器里打开"),
-    agentCache: t("扫描 Codex、Claude 与 Codex++ 的已知缓存目录，由你选择清理项目。"),
+    recommendations: t("来自 Codex # 广告源的推荐，点卡片在浏览器里打开"),
+    agentCache: t("扫描 Codex、Claude 与 Codex # 的已知缓存目录，由你选择清理项目。"),
     agentCollaboration: t("连接 Codex、DeepSeek Harness 与 Claude Code，派发任务并查看结果。"),
     computerUse: t("复用 Codex 的 Computer Use，通过 MCP 接给 Claude Code、Claude Desktop 与 Codex。"),
-    hub: t("任意 Agent 经 Codex++ 接入任意供应商：谁在用、走哪家、是否健康，一屏看全"),
-    gateway: t("选择哪些 Agent 经 Codex++ 网关接入，以及它们默认用哪个模型"),
+    hub: t("任意 Agent 经 Codex # 接入任意供应商：谁在用、走哪家、是否健康，一屏看全"),
+    gateway: t("选择哪些 Agent 经 Codex # 网关接入，以及它们默认用哪个模型"),
     gatewayProviders: t("所有接入的 Agent 共用的供应商池，支持多 Key 轮换"),
     gatewayRouting: t("多家都有的模型怎么分、你建的组怎么走：路由方式、会话固定、出错换谁"),
     gatewayUsage: t("调用统计与每条请求：按 Agent、供应商与模型汇总 token、缓存与费用"),
@@ -18041,7 +18047,7 @@ function healthItems(overview: OverviewResult | null): Array<{ title: string; st
       title: t("调试连接状态"),
       status: "unattached",
       ok: false,
-      detail: t("Codex 不是经 Codex++ 启动的，增强脚本没有挂载；重启 Codex 即可挂载"),
+      detail: t("Codex 不是经 Codex # 启动的，增强脚本没有挂载；重启 Codex 即可挂载"),
       icon: Bug,
       action: "restart" as const,
     }

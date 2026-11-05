@@ -8,7 +8,7 @@
 //!   用户改过的；
 //! - 其余键（hooks、permissions、插件、状态栏……）归用户和 Claude Code，这里不写也不删。
 //!
-//! 供应商列表存在 Codex++ 状态目录的 `claude-providers.json`，不进 `settings.json` 的
+//! 供应商列表存在 Codex # 状态目录的 `claude-providers.json`，不进 `settings.json` 的
 //! `tools` 分片：那份文件由前端整份保存，独立文件不会被它覆盖。
 
 use std::fs;
@@ -366,7 +366,7 @@ pub fn switch_provider(ctx: &ClaudeContext, id: &str) -> anyhow::Result<ClaudePr
                     id: new_provider_id(&store),
                     name: "切换前的配置".to_string(),
                     website_url: String::new(),
-                    notes: "首次切换时由 Codex++ 从 settings.json 自动保存。".to_string(),
+                    notes: "首次切换时由 Codex # 从 settings.json 自动保存。".to_string(),
                     settings_config: projection.to_settings_config(),
                     created_at: now_millis(),
                     ccs_source_id: String::new(),
@@ -409,7 +409,7 @@ pub fn clear_current(ctx: &ClaudeContext) -> anyhow::Result<ClaudeProvidersPaylo
 /// 只清空当前指针，不动 settings.json。
 ///
 /// 网关断开时 settings.json 已经被别的工具改走：它现在的样子是用户的新选择，不能再写回，
-/// 只把 Codex++ 自己记的「当前供应商」清掉。
+/// 只把 Codex # 自己记的「当前供应商」清掉。
 pub fn forget_current(ctx: &ClaudeContext) -> anyhow::Result<()> {
     let mut store = read_store(&ctx.store_path)?;
     if store.current_id.is_empty() {

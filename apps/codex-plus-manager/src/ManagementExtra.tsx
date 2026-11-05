@@ -26,7 +26,7 @@ type Notify = (title: string, message: string, status?: "ok" | "failed") => Prom
 type Skill = { id: string; name: string; description: string; repoKey: string; repoPath?: string; installed: boolean; enabled: boolean; bundled: boolean; updateAvailable: boolean;
   /** 已经启用到哪些 Agent（codex / claude / grok）。 */
   agents?: string[];
-  /** Codex++ 的受控源里有它；只在某个 Agent 自己目录里的 Skill 为 false。 */
+  /** Codex # 的受控源里有它；只在某个 Agent 自己目录里的 Skill 为 false。 */
   managed?: boolean };
 type Repo = { owner: string; name: string; branch: string; subdir: string; enabled: boolean };
 type SkillPayload = Result & { skills: Skill[]; repos: Repo[]; repositorySkills: Skill[]; repoCounts: Record<string, number>; repoErrors: string[]; skillsDir: string; codexSkillsDir: string; agentSkillsDirs?: Record<string, string> };
@@ -513,7 +513,7 @@ export function SkillsPage({ notify }: { notify: Notify }) {
   // 标题右侧同一列位置是这一组的批量开关。详情、分组、卸载收进行末的三点菜单。
   const renderSkillRow = (s: Skill) => {
     const update = s.bundled ? undefined : updates.find((item) => item.id === s.id);
-    // 只卸载 Codex++ 管理的或 Codex 目录里的；Claude / Grok 自己目录里的 Skill 不动。
+    // 只卸载 Codex # 管理的或 Codex 目录里的；Claude / Grok 自己目录里的 Skill 不动。
     const canUninstall = s.installed && !s.bundled && (s.managed || skillAgents(s).includes("codex") || s.agents === undefined);
     const assignment = skillGroupAssignment(s, customGroupNames, customGroupAssignments, assignmentsByIdentity);
     const on = s.installed && agentColumns.some((agent) => skillAgents(s).includes(agent));

@@ -791,7 +791,7 @@ fn expand_model(
         return serving;
     }
     // `<供应商 id>/<模型>` 指向的供应商已经不在池里（删了 / 关了 / 被挑选排除），又没人把整串当
-    // 模型名声明：前缀只是 Codex++ 的供应商 id，原样发给别家上游必然报「无权访问模型」（#2897）。
+    // 模型名声明：前缀只是 Codex # 的供应商 id，原样发给别家上游必然报「无权访问模型」（#2897）。
     // 池里有别家提供去掉前缀的同名模型时，改由它们回答。只对 Agent 直接请求的模型（depth 0）这样做：
     // 路由组成员钉在某家上，那家关了就该跳过，不能换成别家。
     if depth == 0
@@ -1145,7 +1145,7 @@ fn resolve_plan_with(
 ) -> anyhow::Result<RoutePlan> {
     let binding = gateway
         .active_binding(agent)
-        .with_context(|| format!("Codex++ 网关模式没有为 {} 开启", agent.as_str()))?;
+        .with_context(|| format!("Codex # 网关模式没有为 {} 开启", agent.as_str()))?;
     if binding_pool_relays(gateway, binding).is_empty() {
         bail!("网关的供应商池是空的或都已关闭：请在网关的「供应商」里添加或打开供应商");
     }

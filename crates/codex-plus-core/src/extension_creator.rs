@@ -1,6 +1,6 @@
 //! 「对话造拓展」：给 Codex 用的本机 stdio MCP 服务。
 //!
-//! 用户在 Codex 对话里描述想要的功能，agent 通过这里的工具写出 Codex++ 拓展包、立刻热重载、
+//! 用户在 Codex 对话里描述想要的功能，agent 通过这里的工具写出 Codex # 拓展包、立刻热重载、
 //! 读回加载状态与报错再迭代。走 MCP 而不是让 agent 自己写文件、跑命令，是因为 Codex 的沙箱通常
 //! 不能写工作区以外的目录，也连不上本机调试端口；MCP 服务在沙箱外运行，写入还会经过 Codex 的工具审批。
 //!
@@ -29,7 +29,7 @@ pub const SPEC: ManagedMcp = ManagedMcp {
     server_id: SERVER_ID,
     flag: MCP_FLAG,
     label: "拓展创作 MCP",
-    comment: "Managed by Codex++: extension creator MCP",
+    comment: "Managed by Codex #: extension creator MCP",
     lock_file: ".codex-plus-extension-mcp.lock",
     backup_dir: ".codex-plus-extension-mcp-backups",
     legacy: &[(LEGACY_SERVER_ID, LEGACY_MCP_FLAG)],
@@ -50,7 +50,7 @@ const EXTENSION_API_SOURCE: &str =
 
 /// Codex 把 MCP 工具折叠成「Deferred tool namespaces」，只给模型看说明的前 ~240 字，
 /// 工具要模型先调 `tool_search` 才加载。所以触发条件、加载方式和「别改仓库源码」必须放在最前面。
-const INSTRUCTIONS: &str = "用户要做或改 Codex++ 拓展（加功能、改界面、做小工具，或说「做个插件 / 做个拓展」）时，一律用本服务的工具在对话里完成；工具还没出现就先用 tool_search 搜 codex_plus_extensions 加载。即使当前工作区就是 CodexPlusPlus 源码仓库，也不要改仓库文件、不要做成内置拓展。第一步调用 codexpp_extension_guide。（这不是 Codex 自带的插件，Codex 插件是 skills/MCP 包，不归这里管。）创作指南只需读一次；要改 Codex 原生界面时先用 codexpp_extension_inspect 查清页面结构，不要猜选择器；再用 codexpp_extension_write 写入，写完用 codexpp_extension_screenshot 截图确认效果，根据返回的加载状态和报错迭代到能用为止，最后告诉用户在哪里使用。同一个对话默认继续修改已关联的拓展，保留已有功能；先 codexpp_extension_read 读取当前代码，read/write 省略 id 即使用本对话关联。只有用户明确说新建另一个拓展才传 newExtension: true；不要因新增需求或遇到错误而自行新建。用户明确要修改另一个已有拓展时，read 传 id 和 select: true 切换本对话目标。关联按工具调用携带的 threadId 隔离并持久保存，不得猜测对话 ID 或借用其他对话的目标。拓展在用户自己的 Codex 页面里运行，写入前确认需求，不要做用户没要求的事。跟用户交流时称它为「拓展」。";
+const INSTRUCTIONS: &str = "用户要做或改 Codex # 拓展（加功能、改界面、做小工具，或说「做个插件 / 做个拓展」）时，一律用本服务的工具在对话里完成；工具还没出现就先用 tool_search 搜 codex_plus_extensions 加载。即使当前工作区就是 CodexPlusPlus 源码仓库，也不要改仓库文件、不要做成内置拓展。第一步调用 codexpp_extension_guide。（这不是 Codex 自带的插件，Codex 插件是 skills/MCP 包，不归这里管。）创作指南只需读一次；要改 Codex 原生界面时先用 codexpp_extension_inspect 查清页面结构，不要猜选择器；再用 codexpp_extension_write 写入，写完用 codexpp_extension_screenshot 截图确认效果，根据返回的加载状态和报错迭代到能用为止，最后告诉用户在哪里使用。同一个对话默认继续修改已关联的拓展，保留已有功能；先 codexpp_extension_read 读取当前代码，read/write 省略 id 即使用本对话关联。只有用户明确说新建另一个拓展才传 newExtension: true；不要因新增需求或遇到错误而自行新建。用户明确要修改另一个已有拓展时，read 传 id 和 select: true 切换本对话目标。关联按工具调用携带的 threadId 隔离并持久保存，不得猜测对话 ID 或借用其他对话的目标。拓展在用户自己的 Codex 页面里运行，写入前确认需求，不要做用户没要求的事。跟用户交流时称它为「拓展」。";
 
 /// 服务依赖：拓展目录与 Codex 页面调试端口。端口为空时只写文件、不热重载。
 pub struct ExtensionCreator {
@@ -269,7 +269,7 @@ fn tool_result(result: anyhow::Result<Value>) -> Value {
 fn gateway_schema_description() -> String {
     format!(
         "网关中间件声明，例如 {{\"request\": [{{\"script\": \"gateway/request.mjs\"}}], \"response\": [{{\"script\": \"gateway/response.mjs\"}}]}}；\
-         request 改写发给模型的请求（stage 为 route 时在选好候选供应商后重排 / 筛选，stage 为 upstream 时改 Codex++ 转换后真正发给上游的请求体，order 决定先后），\
+         request 改写发给模型的请求（stage 为 route 时在选好候选供应商后重排 / 筛选，stage 为 upstream 时改 Codex # 转换后真正发给上游的请求体，order 决定先后），\
          response 改写模型回复的事件流，error 决定失败后是否重试，replaces 关掉内置环节（{}）。\
          写法见指南「网关请求中间件」「网关响应流中间件」",
         user_scripts::BUILTIN_GATEWAY_SEGMENTS.join(" / ")
@@ -282,13 +282,13 @@ fn tool_definitions() -> Value {
     json!([
         {
             "name": "codexpp_extension_guide",
-            "description": "读取 Codex++ 拓展创作指南与本对话关联的拓展：ctx API、约定、示例和可用路由。写拓展前先调用一次；后续需求默认继续修改 conversation.extensionId。",
+            "description": "读取 Codex # 拓展创作指南与本对话关联的拓展：ctx API、约定、示例和可用路由。写拓展前先调用一次；后续需求默认继续修改 conversation.extensionId。",
             "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false},
             "annotations": read_only,
         },
         {
             "name": "codexpp_extension_list",
-            "description": "列出用户已有的 Codex++ 拓展与脚本，含启用状态、加载状态、报错和本对话的拓展关联；不切换当前目标。",
+            "description": "列出用户已有的 Codex # 拓展与脚本，含启用状态、加载状态、报错和本对话的拓展关联；不切换当前目标。",
             "inputSchema": {"type": "object", "properties": {}, "additionalProperties": false},
             "annotations": read_only,
         },
@@ -315,7 +315,7 @@ fn tool_definitions() -> Value {
                     "selector": {"type": "string", "description": "CSS 选择器"},
                     "limit": {"type": "integer", "minimum": 1, "maximum": 50, "description": "最多返回几个元素，默认 20"},
                     "visibleOnly": {"type": "boolean", "description": "只返回可见元素，默认 true"},
-                    "includeCodexPlus": {"type": "boolean", "description": "是否包含 Codex++ 与拓展自己插入的节点，默认 false"}
+                    "includeCodexPlus": {"type": "boolean", "description": "是否包含 Codex # 与拓展自己插入的节点，默认 false"}
                 },
                 "additionalProperties": false,
             },
@@ -336,7 +336,7 @@ fn tool_definitions() -> Value {
         },
         {
             "name": "codexpp_extension_write",
-            "description": "创建或更新本对话关联的 Codex++ 拓展并热重载。后续需求默认继续更新：省略 id/name/清单字段会沿用原值，先 read 保留原功能。只有用户明确说新建另一个拓展才传 newExtension: true 和未占用的 id。不同对话分别保存目标，不能默认覆盖别的拓展。",
+            "description": "创建或更新本对话关联的 Codex # 拓展并热重载。后续需求默认继续更新：省略 id/name/清单字段会沿用原值，先 read 保留原功能。只有用户明确说新建另一个拓展才传 newExtension: true 和未占用的 id。不同对话分别保存目标，不能默认覆盖别的拓展。",
             "inputSchema": {
                 "type": "object",
                 "properties": {
@@ -349,17 +349,17 @@ fn tool_definitions() -> Value {
                     "renderer": {"type": ["array", "string"], "items": {"type": "string"}, "description": "按顺序执行的页面入口文件；省略时若 files 里有 renderer.js 就用它，只声明 hooks 的拓展可以没有页面入口"},
                     "hooks": {"type": "object", "description": "Codex 钩子声明，例如 {\"PreToolUse\": [{\"matcher\": \"^Bash$\", \"script\": \"hooks/guard.mjs\", \"timeout\": 30}]}；写法见指南「Codex 钩子」"},
                     "toolPipeline": {"type": "object", "description": "工具管道声明，例如 {\"preExecute\": [{\"matcher\": \"^Bash$\", \"script\": \"tools/pre.mjs\"}], \"execute\": [...], \"postExecute\": [...]}：preExecute 改参数或拦截，execute 代为执行，postExecute 改写工具结果。写法见指南「工具管道」"},
-                    "providers": {"type": "array", "description": "模型供应商，例如 [{\"id\": \"myrelay\", \"protocol\": \"chat\", \"baseUrl\": \"https://…/v1\", \"apiKey\": {\"config\": \"apiKey\"}, \"models\": [\"m1\"]}]：并入 Codex++ 网关供应商池，模型名是 <id>/<模型>。写法见指南「模型供应商」"},
+                    "providers": {"type": "array", "description": "模型供应商，例如 [{\"id\": \"myrelay\", \"protocol\": \"chat\", \"baseUrl\": \"https://…/v1\", \"apiKey\": {\"config\": \"apiKey\"}, \"models\": [\"m1\"]}]：并入 Codex # 网关供应商池，模型名是 <id>/<模型>。写法见指南「模型供应商」"},
                     "skills": {"type": "array", "items": {"type": "string"}, "description": "技能目录（包内含 SKILL.md 的目录），例如 [\"skills/review\"]；省略时自动收 skills/*/SKILL.md。启用后装进 ~/.codex/skills，新开对话可用"},
                     "agents": {"type": "array", "description": "子 agent 预设，例如 [{\"name\": \"reviewer\", \"description\": \"代码审查\", \"instructions\": \"prompts/reviewer.md\", \"model\": \"gpt-5\", \"reasoningEffort\": \"high\"}]：写成 Codex 的 agents 角色"},
                     "mcpServers": {"type": "object", "description": "外部 MCP 服务器，例如 {\"weather\": {\"command\": \"node\", \"args\": [\"${extensionDir}/mcp/server.mjs\"], \"env\": {\"KEY\": \"${config.apiKey}\"}}} 或 {\"docs\": {\"url\": \"https://…/mcp\"}}：写进 Codex 配置"},
                     "schedules": {"type": "array", "description": "定时任务，例如 [{\"method\": \"digest\", \"at\": \"09:00\"}, {\"method\": \"poll\", \"everyMinutes\": 30}]：到点调用后台导出的方法，需要同时声明 backend"},
-                    "prompts": {"type": "array", "description": "提示词模板，例如 [{\"name\": \"review\", \"description\": \"审查\", \"arguments\": [{\"name\": \"focus\"}], \"template\": \"prompts/review.md\"}]：模板里写 {{focus}}，经 Codex++ 拓展 MCP 提供"},
-                    "resources": {"type": "array", "description": "只读资源，例如 [{\"name\": \"规范\", \"file\": \"docs/style.md\"}]：经 Codex++ 拓展 MCP 提供给模型读取"},
-                    "instructions": {"type": "string", "description": "全局指令：包内 .md 路径或文字，合并进 ~/.codex/AGENTS.md 里 Codex++ 托管的一段（官方直连也生效）"},
+                    "prompts": {"type": "array", "description": "提示词模板，例如 [{\"name\": \"review\", \"description\": \"审查\", \"arguments\": [{\"name\": \"focus\"}], \"template\": \"prompts/review.md\"}]：模板里写 {{focus}}，经 Codex # 拓展 MCP 提供"},
+                    "resources": {"type": "array", "description": "只读资源，例如 [{\"name\": \"规范\", \"file\": \"docs/style.md\"}]：经 Codex # 拓展 MCP 提供给模型读取"},
+                    "instructions": {"type": "string", "description": "全局指令：包内 .md 路径或文字，合并进 ~/.codex/AGENTS.md 里 Codex # 托管的一段（官方直连也生效）"},
                     "instances": {"type": "array", "items": {"type": "object"}, "description": "同一个拓展按多组配置各跑一份，例如 [{\"id\": \"work\", \"name\": \"工作\", \"config\": {\"minutes\": 50}}, {\"id\": \"rest\", \"name\": \"休息\", \"config\": {\"minutes\": 10}}]：页面脚本对每个实例各调用一次 apply，ctx.config 是实例自己的配置（与 config 声明合并）"},
-                    "dsh": {"type": "string", "description": "包内按 dsh 插件写法写的插件目录（如 \"dsh\"，目录里有 package.json 与插件入口）：拓展启用时由 Codex++ 的 dsh 兼容宿主导入运行。写法见指南「在拓展包里带 dsh 插件」"},
-                    "replaces": {"type": "array", "items": {"type": "string"}, "description": "顶替的内置拓展 id，例如 [\"model-picker-groups\"]：本拓展启用时这些内置拓展让位、停用时回来（写已改成官方拓展包的 usage-statusline / proxy-request-status 时让位的是对应的官方拓展包）。写法见指南「顶替 Codex++ 内置功能」"},
+                    "dsh": {"type": "string", "description": "包内按 dsh 插件写法写的插件目录（如 \"dsh\"，目录里有 package.json 与插件入口）：拓展启用时由 Codex # 的 dsh 兼容宿主导入运行。写法见指南「在拓展包里带 dsh 插件」"},
+                    "replaces": {"type": "array", "items": {"type": "string"}, "description": "顶替的内置拓展 id，例如 [\"model-picker-groups\"]：本拓展启用时这些内置拓展让位、停用时回来（写已改成官方拓展包的 usage-statusline / proxy-request-status 时让位的是对应的官方拓展包）。写法见指南「顶替 Codex # 内置功能」"},
                     "manager": {"type": "object", "description": "管理器面板，例如 {\"page\": \"manager.html\", \"title\": \"统计\"}：管理器「本地拓展」里这一行的菜单出现「打开面板」；nav 放进侧栏分组（gateway / management / tools），replaces 顶替管理器的内置页面，data 声明能经 codexPlusManager.data() 读的只读数据。页面放在沙箱 iframe 里，经 window.codexPlusManager 读写本拓展配置、调本拓展后台（backend.call）、取 assets 资源；页面不能联网，资源要内联或用 asset()。写法见指南「管理器面板」"},
                     "preload": {"type": ["object", "array", "string"], "description": "页面最早期脚本，例如 {\"scripts\": [\"preload/patch.js\"], \"reloadOnLaunch\": true}：在 Codex 自己的脚本之前执行（拿不到 codexPlus，只读 codexPlusPreload），改了要重启 Codex。写法见指南「赶在 Codex 之前（preload）与启动前后（launch）」"},
                     "launch": {"type": "object", "description": "启动前后，例如 {\"args\": [\"--lang=zh-CN\"], \"before\": \"launch/before.mjs\", \"after\": \"launch/after.mjs\"}：args 追加到 Codex 启动参数，before / after 在启动 Codex 之前、退出之后跑 Node 脚本（默认导出函数，拿到 codexHome、stateDir、config）"},
@@ -863,7 +863,7 @@ async fn reload_and_report(creator: &ExtensionCreator, key: &str) -> anyhow::Res
     // 拓展声明的 Codex 钩子：让 Codex 配置里的分发条目与之一致。新增条目时提醒用户去信任。
     let mut hooks = crate::extension_hooks::sync_default(&creator.manager);
     if hooks["added"].as_array().is_some_and(|added| !added.is_empty()) {
-        hooks["note"] = json!("Codex 配置里新增了 Codex++ 拓展钩子的分发条目：Codex 会在用户信任后才运行它们（每个事件信任一次），请提醒用户在 Codex 的 Hooks 设置里信任「Codex++ 拓展钩子」，并新开对话生效。");
+        hooks["note"] = json!("Codex 配置里新增了 Codex # 拓展钩子的分发条目：Codex 会在用户信任后才运行它们（每个事件信任一次），请提醒用户在 Codex 的 Hooks 设置里信任「Codex # 拓展钩子」，并新开对话生效。");
     }
     // 写入 / 启停 / 配置单个拓展时只回这一个，不带全部列表（几十个拓展的摘要会白白占满 agent 的上下文）。
     let mut result = json!({ "reload": reload, "extension": target, "hooks": hooks });
@@ -876,7 +876,7 @@ async fn reload_and_report(creator: &ExtensionCreator, key: &str) -> anyhow::Res
 /// 只有页内重载才自动执行。某个已加载脚本没登记清理函数时，重载会整页刷新 Codex，
 /// 可能打断用户正在进行的对话，这种情况交给用户在管理器里手动点。
 async fn reload(creator: &ExtensionCreator) -> Value {
-    let mut last_error = String::from("没有找到已连接的 Codex 页面；拓展文件已写好，Codex 下次启动或在 Codex++ 管理器点「热重载」后生效");
+    let mut last_error = String::from("没有找到已连接的 Codex 页面；拓展文件已写好，Codex 下次启动或在 Codex # 管理器点「热重载」后生效");
     for port in &creator.debug_ports {
         let Ok(status) = user_scripts::live_runtime_status(*port).await else {
             continue;
@@ -899,7 +899,7 @@ async fn reload(creator: &ExtensionCreator) -> Value {
         if !blockers.is_empty() {
             return json!({
                 "reloaded": false,
-                "reason": "有旧脚本不支持页内热重载，自动重载会刷新整个 Codex 页面、可能打断当前对话，所以没有自动执行。拓展文件已写好，请让用户在 Codex++ 管理器的「本地拓展」里点「热重载」。",
+                "reason": "有旧脚本不支持页内热重载，自动重载会刷新整个 Codex 页面、可能打断当前对话，所以没有自动执行。拓展文件已写好，请让用户在 Codex # 管理器的「本地拓展」里点「热重载」。",
                 "blockingScripts": blockers,
             });
         }
@@ -922,7 +922,7 @@ fn extension_tool_definitions(manager: &UserScriptManager) -> Vec<Value> {
         .map(|(id, tool)| {
             json!({
                 "name": user_scripts::extension_tool_public_name(&id, &tool.name),
-                "description": format!("[Codex++ 拓展 {id}] {}", tool.description),
+                "description": format!("[Codex # 拓展 {id}] {}", tool.description),
                 "inputSchema": tool.input_schema,
             })
         })
@@ -1010,7 +1010,7 @@ async fn codex_page_websocket(ports: &[u16]) -> anyhow::Result<String> {
             return Ok(websocket);
         }
     }
-    anyhow::bail!("没有找到已连接的 Codex 页面：请确认 Codex 由 Codex++ 启动并且正在运行")
+    anyhow::bail!("没有找到已连接的 Codex 页面：请确认 Codex 由 Codex # 启动并且正在运行")
 }
 
 async fn evaluate_value(websocket: &str, expression: &str) -> anyhow::Result<Value> {

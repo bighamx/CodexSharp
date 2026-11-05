@@ -1,7 +1,7 @@
 /**
  * 实时请求流的纯数据逻辑：托盘「流量」页签和总览拓扑图共用。
  * 数据来自 `load_request_flow`（请求日志末尾 + 进行中的请求）；按当前进行中的请求分组，
- * 沿 Agent → Codex++ → 供应商的完整路线流动，响应反向，结束即停止。
+ * 沿 Agent → Codex # → 供应商的完整路线流动，响应反向，结束即停止。
  * 页面只负责画和动画。
  */
 import { maskAccountName } from "./gateway-model.ts";

@@ -175,7 +175,7 @@ export function AgentCachePanel() {
             <AppSelection app={app.name} groups={app.groups} selected={selected} disabled={busy !== null} onChange={setSelected} />
           </>}
           title={<span className="cx-cache-app">
-            <span className="cache-app-icon">{app.name === "Codex++" ? <img alt="" src={APP_LOGO_URL} /> : <AgentGlyph agent={app.name === "Claude" ? "claude" : "codex"} />}</span>
+            <span className="cache-app-icon">{app.name === "Codex #" ? <img alt="" src={APP_LOGO_URL} /> : <AgentGlyph agent={app.name === "Claude" ? "claude" : "codex"} />}</span>
             {app.name}
             {report ? <span className="cx-section-count">{bytes(app.totalBytes)}</span> : null}
           </span>}>

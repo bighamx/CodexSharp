@@ -131,7 +131,7 @@ fn memory() -> &'static Mutex<Memory> {
 
 /// 带不透明加密内容的项返回它属于哪一批与内容；其它项（含空内容）返回 `None`。
 ///
-/// Codex++ 自己的本地压缩摘要在进入代理时已经展开成普通 user 消息（见
+/// Codex # 自己的本地压缩摘要在进入代理时已经展开成普通 user 消息（见
 /// `protocol_proxy::expand_local_compaction_history`），到这里不会再是 compaction 项。
 fn encrypted_item(item: &Value) -> Option<(Batch, &str)> {
     let batch = match item.get("type").and_then(Value::as_str)? {

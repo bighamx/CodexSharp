@@ -14,7 +14,7 @@ const source = ts.transpileModule(component.getText(app), {
 
 type Element = { type: string; props: Record<string, any> };
 type Memo = { status: unknown; autoDetected: boolean };
-/** memo 对应模块级的 claudeLocalizationMemo：传同一个对象模拟「Codex++ 运行期间再次进入页面」。 */
+/** memo 对应模块级的 claudeLocalizationMemo：传同一个对象模拟「Codex # 运行期间再次进入页面」。 */
 function harness(memo: Memo = { status: null, autoDetected: false }, cuStatus: unknown = {}) {
   const hooks: any[] = [];
   /** 页头槽位：createPortal 渲染进来的元素记在这里，用来断言「启动增强版」在右上角。 */
@@ -130,7 +130,7 @@ test("首次进入自动检测一次，再次进入沿用上次结果；手动�
   assert.equal(buttons(page).find((button) => text(button) === "制作增强版")!.props.disabled, true);
   screen.unmount();
 
-  // Codex++ 没退出，再次进入：直接显示上次结果，不再自动探测。
+  // Codex # 没退出，再次进入：直接显示上次结果，不再自动探测。
   const again = harness(memo);
   page = again.render();
   assert.equal(again.calls.length, 0, "同一次运行内只自动检测一次");

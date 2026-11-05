@@ -60,7 +60,7 @@ async function main() {
     && rspack.isRuntime(asar.read(`webview${new URL(url).pathname}`)))) {
     console.log(`入口：${entries.join(", ")}`);
     console.log("结果：无法静态判定（rspack-runtime-check-required）。");
-    console.log("检测到 Rspack 入口，需要运行中的模块工厂。请通过 Codex++ 启动 Codex 并查看原生 Fast 状态；此结果不代表 Fast 不支持。");
+    console.log("检测到 Rspack 入口，需要运行中的模块工厂。请通过 Codex # 启动 Codex 并查看原生 Fast 状态；此结果不代表 Fast 不支持。");
     process.exit(2);
   }
 

@@ -17,7 +17,7 @@ import test from "node:test";
 import ts from "typescript";
 
 // 用量状态栏是官方拓展包（assets/extensions/usage-statusline）；引擎在 statusline.js，
-// 后端调用、诊断与 Codex++ 认的当前会话由 main.js 经 codexPlusUsageHost 传入。
+// 后端调用、诊断与 Codex # 认的当前会话由 main.js 经 codexPlusUsageHost 传入。
 const packageDir = path.resolve(import.meta.dirname, "../../../assets/extensions/usage-statusline");
 const shardSource = readFileSync(path.join(packageDir, "statusline.js"), "utf8");
 const shard = ts.createSourceFile("statusline.js", shardSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
@@ -489,7 +489,7 @@ test("旧版 Codex 的 composer 没有根标记与会话标识时，会话退回
   );
   assert.equal(withRef("").codexPlusUsageResolveThread(legacyCard).reason, "no-thread-id");
   assert.equal(withRef("local:client-new-thread:dac7b41a").codexPlusUsageThreadId(legacyCard), "");
-  // 拿不到 Codex++ 认的当前会话：按缺失处理，不能抛错。
+  // 拿不到 Codex # 认的当前会话：按缺失处理，不能抛错。
   assert.equal(sandbox(Date.now()).codexPlusUsageResolveThread(legacyCard).reason, "no-thread-id");
 
   const rooted = (placement: string) => fakeElement({

@@ -205,7 +205,7 @@ export type GatewayAgentView = {
   drift?: { by?: string | null; endpoint: string } | null;
   /** 配置与最近实际请求的联合诊断；旧版后端没有。 */
   diagnostics?: GatewayAgentDiagnostics | null;
-  /** Agent 自带的模型：用它自己的登录或 Key 直连厂商，不经 Codex++；选中即断开网关。 */
+  /** Agent 自带的模型：用它自己的登录或 Key 直连厂商，不经 Codex #；选中即断开网关。 */
   ownModels?: OwnModels | null;
 };
 
@@ -404,7 +404,7 @@ export function foreignCompactionDropped(reasons: string[] | null | undefined): 
   return (reasons ?? []).includes(FOREIGN_COMPACTION_DROPPED_REASON);
 }
 
-/** 这次请求因 Codex++ 本地限速排队了多久（毫秒）；没排过队返回 null。 */
+/** 这次请求因 Codex # 本地限速排队了多久（毫秒）；没排过队返回 null。 */
 export function queueWaitMs(reasons: string[] | null | undefined): number | null {
   const reason = (reasons ?? []).find((item) => item.startsWith(QUEUE_REASON_PREFIX));
   if (reason === undefined) return null;
@@ -599,7 +599,7 @@ export type PickerItem = {
   sub: string;
   avatar: string;
   custom?: boolean;
-  /** Agent 自带的模型：直连的对象（不经 Codex++）。 */
+  /** Agent 自带的模型：直连的对象（不经 Codex #）。 */
   direct?: string;
 };
 

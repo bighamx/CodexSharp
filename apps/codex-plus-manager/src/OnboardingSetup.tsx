@@ -224,7 +224,7 @@ export function OnboardingSetup({
     <section aria-label={t("入门清单")} className="onboarding-setup" data-expanded={expanded}>
       <header className="setup-header">
         <div>
-          <strong title={t("开始使用 Codex++")}>{t("开始使用")}</strong>
+          <strong title={t("开始使用 Codex #")}>{t("开始使用")}</strong>
           <span className="setup-progress" title={tf("已完成 {0} / 3 步", [doneSteps])}>
             {`${doneSteps}/3`}
             <svg aria-hidden="true" className="setup-ring" viewBox="0 0 16 16">

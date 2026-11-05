@@ -113,7 +113,7 @@ export function ExtensionPublishDialog({ id, onClose, onOpenUrl }: { id: string;
                 <span>{tf("{0} 个文件，{1} KB", [report.files, Math.ceil(report.bytes / 1024)])}</span>
               </div>
               {report.gh.ready ? (
-                <p className="community-ext-dialog-section">{tf("将以 GitHub 账号 {0} 发布为公开仓库，打上 codexpp-extension 标签，其他 Codex++ 用户能在「社区拓展」里看到并安装。", [report.gh.account ?? ""])}</p>
+                <p className="community-ext-dialog-section">{tf("将以 GitHub 账号 {0} 发布为公开仓库，打上 codexpp-extension 标签，其他 Codex # 用户能在「社区拓展」里看到并安装。", [report.gh.account ?? ""])}</p>
               ) : (
                 <p className="community-ext-dialog-warning">{tf("还不能发布：{0}", [report.gh.message ?? ""])}</p>
               )}

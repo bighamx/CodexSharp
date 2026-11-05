@@ -1,6 +1,6 @@
-# Codex++ 拓展开发指南
+# Codex # 拓展开发指南
 
-Codex++ 把注入到 Codex 页面里的 UI 能力开放给用户脚本（拓展）调用。入口只有一个全局对象：
+Codex # 把注入到 Codex 页面里的 UI 能力开放给用户脚本（拓展）调用。入口只有一个全局对象：
 
 ```js
 window.codexPlus
@@ -59,7 +59,7 @@ window.codexPlus.registerPage(
   { navLabel: "我的面板", icon: "P" },
 );
 
-// 3. Codex++ 菜单的「主页」面板里加一个开关
+// 3. Codex # 菜单的「主页」面板里加一个开关
 let enabled = false;
 window.codexPlus.registerMenuItem({
   label: "我的开关",
@@ -93,13 +93,13 @@ window.codexPlus.registerMenuItem({
 
 **注册表持久，DOM 瞬态。**
 
-Codex++ 的 UI 宿主会被反复重建：
+Codex # 的 UI 宿主会被反复重建：
 
 | 宿主 | 何时重建 |
 | --- | --- |
 | 整页 overlay | 每次打开都先清空再重建 |
 | 会话行按钮组 | 内部版本号变化时整组重建 |
-| Codex++ 菜单 | 每次打开都重新构建 |
+| Codex # 菜单 | 每次打开都重新构建 |
 | 浮层面板 | 设置开关变化时 runtime 重启 |
 
 所以要遵守三条：
@@ -161,7 +161,7 @@ codexPlus.extension((ctx) => {
 | `intercept(name, handler, { order })` / `waterfall(name, value)` | 中间件链：`handler(value, next)` 调 `next(v)` 交给下一个，不调即短路；出错的中间件被跳过；没有中间件时原样返回 |
 | `listen(target, type, handler, options)` | 自动撤销的 `addEventListener` |
 | `setTimeout / setInterval` | 自动清理的定时器 |
-| `onScan(handler, { phase })` | 跟着 Codex++ 的页面扫描跑：Codex 界面变了（会话切换、侧栏 / 输入框重建……）时调用，按帧合并、页面隐藏时不跑。`phase` 为 `deferred`（默认，完整扫描）或 `light`（每次变化都跑，handler 要便宜）。适合「Codex 重建了某块界面，把自己的东西补回去」，不必自己开 MutationObserver。插进页面的节点必须带 `data-codex-plus-ext` 属性，否则会触发自喂扫描循环。返回的撤销函数带 `run()`：立即跑一次 |
+| `onScan(handler, { phase })` | 跟着 Codex # 的页面扫描跑：Codex 界面变了（会话切换、侧栏 / 输入框重建……）时调用，按帧合并、页面隐藏时不跑。`phase` 为 `deferred`（默认，完整扫描）或 `light`（每次变化都跑，handler 要便宜）。适合「Codex 重建了某块界面，把自己的东西补回去」，不必自己开 MutationObserver。插进页面的节点必须带 `data-codex-plus-ext` 属性，否则会触发自喂扫描循环。返回的撤销函数带 `run()`：立即跑一次 |
 | `call(route, payload, options)` | 拓展包只能调清单里声明的路由；单文件脚本沿用全局白名单 |
 | `toast / fail / dispose` | 提示、上报失败、主动卸载 |
 | `registerComposerAction(def)` | 输入区（发送按钮那一行）的图标按钮，`onActivate({ editor, insertText, close })` |
@@ -229,9 +229,9 @@ codexPlus.extension((ctx) => {
 ```
 
 - `message` 是 `{ role, id, turnId, conversationId, text, element }`：`role` 为 `user` / `assistant`；`text` 是正文纯文本，
-  流式输出时是已输出的部分；`element` 只读用。消息节点会随滚动被 Codex 重建，Codex++ 负责每次补上按钮和装饰，
+  流式输出时是已输出的部分；`element` 只读用。消息节点会随滚动被 Codex 重建，Codex # 负责每次补上按钮和装饰，
   拓展不要缓存这些节点。
-- 只有存在消息插槽注册时，Codex++ 才观察对话区的变化（去抖 300ms）；没有注册时零开销。
+- 只有存在消息插槽注册时，Codex # 才观察对话区的变化（去抖 300ms）；没有注册时零开销。
 - 侧边面板同一时间只开一个，挂在 Codex 的 React 树外面；拓展卸载、热重载时自动关闭。
 
 ### Codex 会话事件与请求中间件
@@ -258,7 +258,7 @@ codexPlus.extension((ctx) => {
   `codex/item/tool/userInputAnswered`、`codex/item/approval/responded`；处理器参数是通知的原样 `params` 和 `{ method }`。
   **新版 Codex 的通知不再经过页面，这些事件收不到**；要跟踪会话进展请用下面「会话历史」里的 `session/event` / `agent/status`。
 - `codex/request` 的值是 `{ method, params }`，只能改 `params`，改 `method` 无效。没有任何中间件时请求原样发出。
-  新版 Codex 的请求经页面与宿主进程之间的 RPC 发出，Codex++ 在这一层拦截，中间件可以返回 Promise，
+  新版 Codex 的请求经页面与宿主进程之间的 RPC 发出，Codex # 在这一层拦截，中间件可以返回 Promise，
   超过 5 秒或出错时原样发出；旧版 Codex 的消息分发路径是同步的，那里返回 Promise 视为出错并原样放行。
 - 一条用户消息会同时备好 `turn/start` 和 `turn/steer` 两份候选（会话空闲时发前者，正在回复时发后者），
   中间件会各收到一次，要改写用户输入就两种都处理。新会话的首条消息按 `turn/start` 交给中间件，
@@ -305,7 +305,7 @@ codexPlus.extension((ctx) => {
 - `agent/pre-step`：`params` 是 `{ agent, turn, step, messages, signal, conversationId }`，`messages` 是本轮要进入的用户消息
   （`{ role: "user", id, source: { kind: "user" }, content: [{ type: "text", text }, …] }`，图片、提及等非文本条目原样在 `content` 里）。
   返回 `{ kind: "enter", messages }` 改写本轮输入（可以增删消息、改文字），或 `{ kind: "reject", reason? }` 不发这一轮，
-  Codex 会显示发送失败，Codex++ 用 `reason` 弹提示。
+  Codex 会显示发送失败，Codex # 用 `reason` 弹提示。
 - `agent/request`：`params` 是 `{ agent, turn, step, signal, conversationId }`，`next()` 返回
   `{ provider, model, reasoningEffort }`。`model` 是 Codex 里的完整模型 id（如 `jojocodemax/gpt-6.1-sol`），`provider` 是斜杠前的部分；
   改 `model` 或 `reasoningEffort` 会写回本轮的协作模式设置，只改 `provider` 时按「供应商/模型」拼回去。
@@ -316,7 +316,7 @@ codexPlus.extension((ctx) => {
 
 ### 拓展配置
 
-拓展包可以在清单里声明配置项，Codex++ 管理器（拓展列表里的「设置」）和 Codex「拓展」页面详情的「设置」页签都会自动生成设置表单：
+拓展包可以在清单里声明配置项，Codex # 管理器（拓展列表里的「设置」）和 Codex「拓展」页面详情的「设置」页签都会自动生成设置表单：
 
 ```json
 {
@@ -337,7 +337,7 @@ codexPlus.extension((ctx) => {
 - `title` / `description` 可以是字符串，也可以是 `{ "zh": "…", "en": "…" }`，管理器按界面语言显示。
 - 本机文件路径：`string` 加 `"format": "file"`，管理器表单在输入框旁给「选择文件」按钮（系统对话框）；`"extensions": ["png", "jpg"]`
   限定可选的扩展名（不带点，最多 20 个，只能和 `format: "file"` 一起用）。值仍是普通字符串，页面拿不到本机文件，要读内容
-  得经 Codex++ 的路由或常驻后台（背景图拓展就是这样，见 `assets/extensions/image-overlay/`）。
+  得经 Codex # 的路由或常驻后台（背景图拓展就是这样，见 `assets/extensions/image-overlay/`）。
 - 嵌套示例：`"proxy": { "type": "object", "properties": { "host": { "type": "string" }, "port": { "type": "number", "min": 1, "max": 65535 } } }`，
   `"words": { "type": "array", "items": { "type": "string" } }`。保存时对象可以只给部分键（其余取默认），未声明的键会被拒绝。
 - 读取：页面代码用 `ctx.config`；钩子、网关中间件、工具脚本用第二个参数的 `context.config`。都是生效配置
@@ -358,7 +358,7 @@ codexPlus.extension((ctx) => {
 
 ### 给模型加工具
 
-拓展包可以声明给 Codex 模型调用的工具，由已接入的 Codex++ 拓展 MCP（`codex_plus_extensions`）对外提供：
+拓展包可以声明给 Codex 模型调用的工具，由已接入的 Codex # 拓展 MCP（`codex_plus_extensions`）对外提供：
 
 ```json
 {
@@ -413,17 +413,17 @@ export default (payload) => /rm\s+-rf\s+\//.test(payload.tool_input?.command ?? 
   （计步、计时、记用量、按步提醒）。payload 有 `session_id`、`turn_id`、`model`、`transcript_path`、`cwd`；
   `PostModelRequest` 另有 `status`、`error`、`token_usage`。不带消息内容，要看内容用 `context.sessionQuery`
   按 `session_id` 读。**只能观察**：Codex 不采用它们的输出，拦不下这一步，也加不了上下文；要改请求请用网关中间件
-  （需经 Codex++ 代理）。`matcher` 按模型名匹配。它们挡在每一步前面，脚本要快。
-- `payload` 与输出都按 Codex 钩子协议；多个拓展的输出由 Codex++ 合并：任一 `deny` 即拒绝、`allow` 只采用第一个
+  （需经 Codex # 代理）。`matcher` 按模型名匹配。它们挡在每一步前面，脚本要快。
+- `payload` 与输出都按 Codex 钩子协议；多个拓展的输出由 Codex # 合并：任一 `deny` 即拒绝、`allow` 只采用第一个
   `updatedInput`、`decision: "block"` 与 `continue: false` 任一即生效、`additionalContext` 与 `systemMessage` 按拓展顺序拼接。
-- 运行方式：Codex++ 只往 `~/.codex/config.toml` 写**固定的分发条目**（每个用到的事件一条，命令
-  `CodexPlusPlus --codex-plus-hook <事件>`，超时 120 秒，状态文字「Codex++ 拓展钩子」）。Codex 要求钩子经用户
+- 运行方式：Codex # 只往 `~/.codex/config.toml` 写**固定的分发条目**（每个用到的事件一条，命令
+  `CodexPlusPlus --codex-plus-hook <事件>`，超时 120 秒，状态文字「Codex # 拓展钩子」）。Codex 要求钩子经用户
   信任后才运行，所以第一次用到某个事件时，需要在 Codex 的 Hooks 设置里信任这条条目一次；之后拓展增删、启停都不用
-  重新信任，由 Codex++ 的拓展开关决定哪些钩子在跑。拓展启停、删除、热重载以及对话造拓展写入后都会自动同步条目，
+  重新信任，由 Codex # 的拓展开关决定哪些钩子在跑。拓展启停、删除、热重载以及对话造拓展写入后都会自动同步条目，
   没有拓展再用到的事件会移除。
 - 每次触发只起一个 Node 进程（优先用 Codex App 自带的 Node，或 `CODEX_PLUS_NODE` 指定），按 `matcher` 过滤后并发
   运行命中的脚本；单个脚本出错或超时只记诊断日志，不影响其它拓展，也不挡 Codex。
-- 钩子脚本以你的用户权限运行、没有沙箱。信任分发条目即信任了 Codex++ 拓展开关里启用的全部钩子。
+- 钩子脚本以你的用户权限运行、没有沙箱。信任分发条目即信任了 Codex # 拓展开关里启用的全部钩子。
 
 ### 网关请求中间件
 
@@ -444,14 +444,14 @@ export default (body) => ({ ...body, instructions: `${body.instructions ?? ""}\n
   `{ index, toolResults, userText, firstStep }`（本轮第几步、已有几个工具结果、本轮用户输入、是否第一步）。
   返回 `{ reject: "原因" }` 即不发这一步，Codex 收到带原因的错误，后面的中间件不再跑（与页面侧 `agent/pre-step` 的 reject 相同）。`timeout` 1~10 秒（默认 5），整条链最多 15 秒。
 - 加请求头：往第二个参数的 `headers` 对象里写（`context.headers["x-trace"] = "1"`），发往上游时附上。
-  鉴权、Cookie、Host、内容长度 / 类型这类头由 Codex++ 管，写了也会被忽略。失败重试时沿用同一组头。
-- 只对经 Codex++ 本地代理 / 网关发出的请求生效（中转、聚合、网关模式）；官方直连不经过 Codex++，不受影响。
+  鉴权、Cookie、Host、内容长度 / 类型这类头由 Codex # 管，写了也会被忽略。失败重试时沿用同一组头。
+- 只对经 Codex # 本地代理 / 网关发出的请求生效（中转、聚合、网关模式）；官方直连不经过 Codex #，不受影响。
 - 只有存在启用中的网关中间件时才会为每个请求起一个 Node 进程；任何中间件出错或超时都会保留原请求并记诊断日志。
 - 中间件能看到完整的请求内容（含对话），以你的用户权限运行。只启用你信任的拓展。
 
 #### 段、顺序与关掉内置环节
 
-Codex++ 自己在发请求前也会做几件事（本地压缩、第三方推理折叠、exec 工具适配、按供应商路由与协议转换）。
+Codex # 自己在发请求前也会做几件事（本地压缩、第三方推理折叠、exec 工具适配、按供应商路由与协议转换）。
 拓展的中间件可以排在这些内置环节之前或之后，也可以关掉其中可替换的环节自己实现：
 
 ```json
@@ -494,17 +494,17 @@ Codex++ 自己在发请求前也会做几件事（本地压缩、第三方推理
   两种模式都还能关：
   - `builtin:request-conversion`：把 Responses 请求转成 Chat Completions / Anthropic Messages。关掉后 upstream 段拿到的请求体
     仍是 Responses 形状（上下文 `requestConversion: "extension"`，`wireApi` / `relay.protocol` 是上游协议，`endpoint` 是按上游协议选好的地址），
-    由拓展转成上游要的格式。响应方向仍由 Codex++ 按上游协议转回 Responses，响应流中间件拿到的照旧是 Responses 事件。
-  - `builtin:auth-headers`：按供应商注入 `Authorization` / `x-api-key` / `anthropic-version`。关掉后 Codex++ 只带供应商的自定义头，
+    由拓展转成上游要的格式。响应方向仍由 Codex # 按上游协议转回 Responses，响应流中间件拿到的照旧是 Responses 事件。
+  - `builtin:auth-headers`：按供应商注入 `Authorization` / `x-api-key` / `anthropic-version`。关掉后 Codex # 只带供应商的自定义头，
     upstream 段里**只有声明了这一项的拓展**拿到 `context.credential = { apiKey, protocol }`（这个候选的 Key，网关模式里是轮换选中的那个），
     它往 `context.headers` 里写的鉴权头也才被采用；别的拓展看不到 Key，写的鉴权头照旧被丢掉。官方登录成员的 OAuth 凭据、
-    转给 Codex++ 本机网关那一跳的令牌仍由 Codex++ 带；网关模式的 Anthropic 原生直通改走协议代理链路（直通不经过 upstream 段）。
+    转给 Codex # 本机网关那一跳的令牌仍由 Codex # 带；网关模式的 Anthropic 原生直通改走协议代理链路（直通不经过 upstream 段）。
   - `builtin:official-shaping`：官方登录 / ChatGPT 后端的请求整理（请求体改成 Codex CLI 的样子、UA 与版本头、ChatGPT API 账号的
-    请求整理、官方请求自动补 web_search 声明）。关掉后由拓展在 upstream 段整理（上下文 `official: true`）；会话头与官方凭据仍由 Codex++ 处理。
+    请求整理、官方请求自动补 web_search 声明）。关掉后由拓展在 upstream 段整理（上下文 `official: true`）；会话头与官方凭据仍由 Codex # 处理。
   - `builtin:request-log`：请求日志与用量统计。关掉后经代理的请求不再写请求日志、不计入用量，「请求状态条」也看不到进行中的请求；
     要记就在响应流中间件里自己记（`response.completed` 事件带 usage）。
 
-  仍由 Codex++ 做、不开放的只有：响应方向的协议转换（响应流中间件排在它之后，拿到的是转好的 Responses 事件，要改回复在那里改），
+  仍由 Codex # 做、不开放的只有：响应方向的协议转换（响应流中间件排在它之后，拿到的是转好的 Responses 事件，要改回复在那里改），
   以及官方登录凭据本身（OAuth token 不交给拓展）。
 
 ### 网关响应流中间件
@@ -532,7 +532,7 @@ export default async function* (context, next) {
   `tools` 工具名、`inputItems`、`lastUserText`、`sessionId` 会话 id），不含完整对话。
 - 多个拓展按拓展 key 顺序嵌套，先声明的在最外层。所有响应中间件跑在一个常驻 Node 工作进程里，每个事件一次往返。
 - 任一中间件出错、超时（`timeout` 1~10 秒，按单个事件计）或工作进程退出，这次回复剩下的部分原样放行。
-- 只对经 Codex++ 本地代理 / 网关的流式回复生效；官方直连、远程压缩回复不经过这里。
+- 只对经 Codex # 本地代理 / 网关的流式回复生效；官方直连、远程压缩回复不经过这里。
 
 ### 网关失败重试
 
@@ -549,7 +549,7 @@ export default (error) => (error.status === 429 && error.attempt < 2 ? { retry: 
 - 被拓展请求中间件拒绝的那一步不会进入这里。
 - 上游返回错误状态时调用，`error` 为 `{ status, body, json, path, attempt }`（`body` 最多 64 KiB）。多个拓展按顺序问，
   第一个要求重试的生效；同一请求最多重发 3 次，间隔最多 10 秒。不重试时 Codex 照常收到原错误。
-- 只对经 Codex++ 代理 / 网关的请求生效；没有拓展声明时不读响应体，零开销。流式回复中途断开不在此列。
+- 只对经 Codex # 代理 / 网关的请求生效；没有拓展声明时不读响应体，零开销。流式回复中途断开不在此列。
 
 ### 工具管道
 
@@ -575,13 +575,13 @@ export default (output) => (typeof output === "string" ? output.replace(/sk-\w+/
 ```
 
 - `preExecute` / `execute` 在 Codex 的 PreToolUse 钩子里运行（`matcher` 匹配钩子里的工具名，如 `Bash`），上下文
-  `{ name, callId, cwd, payload, config, sessionQuery, service }`；用到时 Codex 配置里会写入「Codex++ 拓展钩子」分发条目，
+  `{ name, callId, cwd, payload, config, sessionQuery, service }`；用到时 Codex 配置里会写入「Codex # 拓展钩子」分发条目，
   需要在 Codex 的 Hooks 设置里信任一次。
-- `execute` 返回结果后，原工具调用以「拒绝 + 结果」结束；经 Codex++ 代理时，下一次请求里网关把这条工具输出整个换成
+- `execute` 返回结果后，原工具调用以「拒绝 + 结果」结束；经 Codex # 代理时，下一次请求里网关把这条工具输出整个换成
   纯结果，模型看到的就是执行结果。不经代理时模型从拒绝理由里读到结果。
 - `postExecute` 在网关请求侧改写 `function_call_output` / `custom_tool_call_output`（`matcher` 匹配模型侧工具名，如
   `exec_command`、`apply_patch`、`mcp__服务__工具`），上下文 `{ name, input, callId, config }`。按「拓展 + 脚本 + 调用 +
-  输出」缓存，同一条结果只改一次。只对经 Codex++ 代理的请求生效。
+  输出」缓存，同一条结果只改一次。只对经 Codex # 代理的请求生效。
 - Codex 界面里显示的仍是原工具结果；改写只影响模型看到的内容。
 
 ### 会话历史（只读）
@@ -661,12 +661,12 @@ codexPlus.extension({ inject: ["sessions", "sessionQuery"], async apply(ctx) {
 | `compact(id)` | 压缩会话上下文 |
 
 - 只开放上面几个方法（没有删除）。页面里 `inject: ["sessions"]`；常驻后台、模型工具、钩子的上下文里也有 `sessions`，
-  由 Codex++ 在 Codex 页面里执行，所以 Codex 需要开着。
+  由 Codex # 在 Codex 页面里执行，所以 Codex 需要开着。
 - `startTurn` 会真的让模型回复（消耗额度），只在用户要求时用。读会话用 `sessionQuery`。
 
 ### 模型供应商
 
-拓展可以声明模型供应商，并入 Codex++ 网关的供应商池（网关模式下 Codex 的模型列表里出现 `<id>/<模型>`）：
+拓展可以声明模型供应商，并入 Codex # 网关的供应商池（网关模式下 Codex 的模型列表里出现 `<id>/<模型>`）：
 
 ```json
 {
@@ -690,7 +690,7 @@ codexPlus.extension({ inject: ["sessions", "sessionQuery"], async apply(ctx) {
 
 ### 拓展调模型
 
-页面里 `ctx.llm`，常驻后台、模型工具、钩子的上下文里 `llm`，经 Codex++ 协议代理用当前的供应商与模型路由发一次请求：
+页面里 `ctx.llm`，常驻后台、模型工具、钩子的上下文里 `llm`，经 Codex # 协议代理用当前的供应商与模型路由发一次请求：
 
 ```js
 const { text, model, usage } = await ctx.llm.complete({
@@ -707,7 +707,7 @@ const { models, default: current } = await ctx.llm.listModels(); // Codex 当前
 
 ### 技能、子 agent、MCP 服务器与全局指令
 
-这几类是 Codex 自己的能力，拓展启用时由 Codex++ 写进 Codex 的配置目录，停用时撤掉（只动自己写过的，不覆盖你已有的同名条目）：
+这几类是 Codex 自己的能力，拓展启用时由 Codex # 写进 Codex 的配置目录，停用时撤掉（只动自己写过的，不覆盖你已有的同名条目）：
 
 ```json
 {
@@ -724,10 +724,10 @@ const { models, default: current } = await ctx.llm.listModels(); // Codex 当前
 
 - `skills`：包内含 `SKILL.md` 的目录列表；省略时自动收 `skills/*/SKILL.md`。装进 `~/.codex/skills/<拓展 id>-<目录名>`。
 - `agents`：写成 Codex 的 `[agents.<拓展 id>-<名字>]` 角色；`instructions`（文字或包内 .md）、`model`、`reasoningEffort`
-  放进 Codex++ 生成的角色配置文件。`nicknames` 可给角色起几个昵称。
+  放进 Codex # 生成的角色配置文件。`nicknames` 可给角色起几个昵称。
 - `mcpServers`：本地进程（`command` / `args` / `env` / `cwd`）或 HTTP（`url` / `headers`），二选一；
   写成 `[mcp_servers.<拓展 id>-<名字>]`。字符串里的 `${extensionDir}` 换成包目录，`${config.键}` 换成拓展配置值。
-- `instructions`：文字或包内 .md，合并进 `~/.codex/AGENTS.md` 里 Codex++ 托管的一段——官方直连也生效，适合改系统提示词。
+- `instructions`：文字或包内 .md，合并进 `~/.codex/AGENTS.md` 里 Codex # 托管的一段——官方直连也生效，适合改系统提示词。
 - 改动在新开的 Codex 对话里生效。
 
 ### 提示词与资源
@@ -739,7 +739,7 @@ const { models, default: current } = await ctx.llm.listModels(); // Codex 当前
 }
 ```
 
-- 经 Codex++ 拓展 MCP（`codex_plus_extensions`）提供：提示词对外名 `<拓展 id>__<名字>`，模板里的 `{{参数}}` 换成调用时的值；
+- 经 Codex # 拓展 MCP（`codex_plus_extensions`）提供：提示词对外名 `<拓展 id>__<名字>`，模板里的 `{{参数}}` 换成调用时的值；
   资源地址 `codexpp://<拓展 id>/<包内路径>`，单个文件最多 1 MiB。
 
 ### HTTP 路由与定时任务
@@ -754,7 +754,7 @@ const { models, default: current } = await ctx.llm.listModels(); // Codex 当前
 ```js
 // backend/main.mjs
 export default ({ sessions }) => ({
-  // POST http://127.0.0.1:<Codex++ 本地代理端口>/ext/<拓展 id>/hook
+  // POST http://127.0.0.1:<Codex # 本地代理端口>/ext/<拓展 id>/hook
   http(request) {          // { method, path, query, headers, body, json? }
     if (request.path === "/hook") return { status: 200, json: { ok: true } };
     return { status: 404, body: "not found" };
@@ -767,8 +767,8 @@ export default ({ sessions }) => ({
 - `backend.http: true` 才开放 `/ext/<拓展 id>/…`；返回字符串当纯文本，返回 `{ status?, headers?, body?, json? }` 按字段组装。
   带 `Origin` 的请求（网页发来的）一律拒绝。
 - `schedules`：`everyMinutes`（1~10080）或 `at: "HH:MM"`（本机时区）二选一，最多 8 条，需要同时声明 `backend`。
-  Codex++ 每分钟检查一次，到点调用后台方法（参数 `{ scheduledAt, schedule }`）；上次运行时间记在拓展数据目录，重启不补跑也不重复。
-  Codex++ 没在运行时不会触发。
+  Codex # 每分钟检查一次，到点调用后台方法（参数 `{ scheduledAt, schedule }`）；上次运行时间记在拓展数据目录，重启不补跑也不重复。
+  Codex # 没在运行时不会触发。
 
 ### 输入触发、快捷键、主题与提问
 
@@ -791,19 +791,19 @@ codexPlus.extension((ctx) => {
 - `@`（提及）、`$`（技能）、`/`（命令）是 Codex 自己的触发符，拓展注册会报错。
 - 输入触发在光标前是「触发符 + 查询词」（触发符前是开头或空白、查询词里没有空白）时弹出，↑↓ 选、回车 / Tab 确认、Esc 关。
 - 主题切换时发 `theme/change` 事件；拓展装上 / 卸下后合并发一次 `extensions/changed`（`{ extensions: [{ id, scriptKey, version }] }`）。
-- 每次从 Codex++ 读到设置（启动时、之后每次心跳）发 `settings/loaded`（`{ reason: "startup" | "heartbeat", changedKeys? }`）。
+- 每次从 Codex # 读到设置（启动时、之后每次心跳）发 `settings/loaded`（`{ reason: "startup" | "heartbeat", changedKeys? }`）。
   心跳时 `changedKeys` 是这次值变了的设置字段名（只有名字没有值，空数组表示没变），管理器里改的设置靠它识别；启动时不带。
 - 当前供应商换了发 `relayProfile/switched`（`{ previous, profile }`）；决定模型目录的字段变了（模型列表、每模型窗口 / 自动压缩 /
   元数据、聚合成员、换供应商）发 `modelCatalog/changed`（`{ profile }`），新目录用 `/model-catalog/public` 取。
   `profile` 形状同 `/settings/public` 的 `activeProfile`。页面里改的立即发，管理器里改的经心跳（约 5 秒）发；第一次读到设置时不发。
-- 在 Codex 页面里改了一项 Codex++ 设置后发 `settings/changed`（`{ key, value, persisted }`）：`key` 是改动的设置字段
-  （存在 Codex++ 后端的用后端字段名，如 `codexAppCapacityAutoRetry`），先按新值发一次 `persisted: false`（这时读设置已是新值），
+- 在 Codex 页面里改了一项 Codex # 设置后发 `settings/changed`（`{ key, value, persisted }`）：`key` 是改动的设置字段
+  （存在 Codex # 后端的用后端字段名，如 `codexAppCapacityAutoRetry`），先按新值发一次 `persisted: false`（这时读设置已是新值），
   写进后端后再发一次 `persisted: true`。管理器里改的设置经心跳的 `settings/loaded` 过来。
-  跟着设置走的内置拓展都靠订阅这两个事件跟上设置变化，Codex++ 读写设置的地方不点名任何功能。
+  跟着设置走的内置拓展都靠订阅这两个事件跟上设置变化，Codex # 读写设置的地方不点名任何功能。
 
 ### 内置拓展与顶替
 
-Codex++ 自带的功能全部是内置拓展：管理器「Codex → 内置拓展」页与 Codex 里的 Codex++ 设置页按同一份清单
+Codex # 自带的功能全部是内置拓展：管理器「Codex → 内置拓展」页与 Codex 里的 Codex # 设置页按同一份清单
 （`crates/codex-plus-core/assets/enhancement-settings.json`）列出它们，每项一个开关。页面里跑的内置功能各是一个
 内置拓展实例（`scriptKey` 为 `builtin:<id>`），和第三方拓展走同一套生命周期，在 `extensions/changed` 里也能看到。
 
@@ -816,7 +816,7 @@ Codex++ 自带的功能全部是内置拓展：管理器「Codex → 内置拓�
   粘贴修复的监听经 `ctx.listen` 挂上；Codex 重建界面后要补回去的（语音听写、轮次回退、梦皮、会话 ID 角标、
   滚动位置恢复、对话宽度、已删会话的行过滤……）经 `ctx.onScan` 登记扫描步骤；跟着设置走的订阅 `settings/loaded`、`settings/changed`。
   它们的共同写法是「装上时对齐一次、卸下时再对齐一次（这时功能读到的已是停用，自己撤下）」，第三方顶替时照抄即可。
-  Codex++ 的扫描循环与读写设置的地方不再点名功能，内置拓展卸下时它的监听、中间件、扫描步骤、定时器都跟着撤掉；
+  Codex # 的扫描循环与读写设置的地方不再点名功能，内置拓展卸下时它的监听、中间件、扫描步骤、定时器都跟着撤掉；
   同页重复注入时先卸下上一份注入装上的实例。会话删除、Markdown 导出也是经 `registerRowAction` 注册的会话行操作
   （删除是 `placement: "inline"`，导出带 `surfaces: ["sidebar", "archived"]`），内核只是按注册项画按钮组的宿主；
   语音听写的快捷键监听在内置拓展装上时才开始，没装着时什么也不跑。
@@ -830,8 +830,8 @@ Codex++ 自带的功能全部是内置拓展：管理器「Codex → 内置拓�
   已经改成官方拓展包的原内置拓展（`usage-statusline`、`proxy-request-status`）仍可写进 `replaces`：
   你的拓展启用时对应的官方拓展包让位（管理器里显示停用、`replacedBy` 是你的拓展），停用时它回来。
 
-  在 Codex++ 后台生效的内置拓展（原生 Fast 强制解锁、原生输入预测、模型白名单解锁、强制中文界面、第三方推理折叠、
-  纯 API 禁用 Work 视图、原生浏览器请求标识兼容、历史轮次补全、桌宠跟随鼠标）同样能顶替：被顶替时 Codex++ 后台把它们的设置项
+  在 Codex # 后台生效的内置拓展（原生 Fast 强制解锁、原生输入预测、模型白名单解锁、强制中文界面、第三方推理折叠、
+  纯 API 禁用 Work 视图、原生浏览器请求标识兼容、历史轮次补全、桌宠跟随鼠标）同样能顶替：被顶替时 Codex # 后台把它们的设置项
   按「关」处理（多数要重启 Codex 才完全生效），顶替它们的拓展用下面这些接口写出等价功能：
 
   | 内置拓展 | 等价写法 |
@@ -843,11 +843,11 @@ Codex++ 自带的功能全部是内置拓展：管理器「Codex → 内置拓�
   | 桌宠跟随鼠标 | 路由 `/system/cursor-position`（系统鼠标位置）+ `/cdp/evaluate` 往 `avatar-overlay` 页面推坐标 |
 
   只有「官方额度解锁」不能顶替：它只在关闭增强时生效，那时拓展根本不加载。
-- **官方拓展包**：随 Codex++ 一起发布、来源为 `bundled` 的拓展包（脚本 key `bundled:<目录名>`），嵌在程序里，第一次用到时写到
+- **官方拓展包**：随 Codex # 一起发布、来源为 `bundled` 的拓展包（脚本 key `bundled:<目录名>`），嵌在程序里，第一次用到时写到
   `<配置目录>/bundled_extensions/` 下，之后和别的拓展包一样扫描、启停、热重载，可以停用、不能删除。目前有「Agent 桌宠」
   （`bundled:agent-pet`，源码在 `assets/extensions/agent-pet/`）：原来的内置桌宠与大肥鱼整体改成了它，页面代码只用公开接口，
   数据服务是白名单路由 `/agent-pet/catalog`、`/agent-pet/image`、`/agent-pet/sound`、`/agent-pet/import-sound`、`/whale/media`、
-  `/whale/full`、`/whale/history`、`/whale/session`——这些路由只在有启用中的拓展在清单里声明了它们时才干活，供应商 Key 只在 Codex++ 里用。
+  `/whale/full`、`/whale/history`、`/whale/session`——这些路由只在有启用中的拓展在清单里声明了它们时才干活，供应商 Key 只在 Codex # 里用。
   它的设置界面也在包里（`settings.js`），Codex「拓展」详情页和管理器「设置」用的是同一份。可以照着它写自己的桌宠。
   另有「打字特效」（`bundled:typing-effects`）与「背景图」（`bundled:image-overlay`），源码在 `assets/extensions/` 下：
   打字特效是纯页面功能，不用任何路由；背景图的图片经白名单路由 `/image-overlay/image` 读，这条路由只读背景图拓展自己配置里的
@@ -874,12 +874,12 @@ Codex++ 自带的功能全部是内置拓展：管理器「Codex → 内置拓�
 }
 ```
 
-- `preload`：经 CDP 的「新文档脚本」登记，Codex 页面每次新建文档时在 Codex 自己的脚本之前执行（同 Codex++ 的原生模块补丁）。
+- `preload`：经 CDP 的「新文档脚本」登记，Codex 页面每次新建文档时在 Codex 自己的脚本之前执行（同 Codex # 的原生模块补丁）。
   脚本里能读 `codexPlusPreload`（`{ id, key, config }`），这时 `codexPlus` 与拓展内核还不在，只能用浏览器原生接口；
   各拓展分别 try/catch，抛错记进 `window.__codexPlusPreloadErrors`。`reloadOnLaunch: true` 时启动 Codex 后整页重载一次，
   脚本才赶得上第一份文档。改了 preload 要重启 Codex 才生效。单个脚本最大 512 KiB。
 - `launch.args`：追加到 Codex 的启动参数（用户在管理器里填的同名参数优先）。只能是 `--名字` 或 `--名字=值`，最多 16 个；
-  调试端口、用户数据目录、远程调试来源由 Codex++ 管，不能设。
+  调试端口、用户数据目录、远程调试来源由 Codex # 管，不能设。
 - `launch.before` / `launch.after`：启动 Codex 之前 / Codex 退出之后各跑一次（Node，默认导出函数），拿到
   `{ event, extension, codexHome, stateDir, appDir, platform, config }`，不含任何凭据。超时 `timeout` 秒（1~30，默认 10）；
   出错、超时只记诊断日志，不挡 Codex 启动。
@@ -910,7 +910,7 @@ codexPlus.extension((ctx) => {
 
 ### 按事件找写法
 
-同一类能力在 Codex++ 里按层落在不同地方：页面里的 `ctx.on` 只能观察和改写页面经手的东西，工具执行、模型请求要在 Node 侧
+同一类能力在 Codex # 里按层落在不同地方：页面里的 `ctx.on` 只能观察和改写页面经手的东西，工具执行、模型请求要在 Node 侧
 （清单的 `toolPipeline` / `hooks` / `gateway`）插手。
 
 | 想做的事 | 写法 |
@@ -930,7 +930,7 @@ codexPlus.extension((ctx) => {
 { "id": "my-kit", "renderer": "renderer.js", "dsh": "dsh-plugin" }
 ```
 
-`dsh-plugin/` 是包内一个带 `package.json` 的目录（单个插件或 bundle 都行）。对话造拓展的写入工具同样认 `dsh` 与 `instances`。拓展启用时 Codex++ 把它作为 dsh 插件导入
+`dsh-plugin/` 是包内一个带 `package.json` 的目录（单个插件或 bundle 都行）。对话造拓展的写入工具同样认 `dsh` 与 `instances`。拓展启用时 Codex # 把它作为 dsh 插件导入
 （id 为 `ext-<拓展 id>`）并生成配套拓展包，拓展停用时一起停用、删除时一起移除；插件目录或拓展版本变了会重新分析。
 包里的 `Service` 子类插件会实例化并提供给同包插件 `inject`（支持行上的 `isolate` 与 `ctx.isolate`）；插件之间的自定义事件
 （`ctx.emit` / `serial` / `waterfall` …）跨包也能收到；包导出的 `./typert` 会自动登记，前端半边用 `ctx.remote.<namespace>.<method>()` 调；
@@ -981,7 +981,7 @@ export default ({ provide }) => {
 - 服务名要在 `backend.provides` 里声明（字母开头，字母、数字、`_ . -`），后台代码里用 `provide(name, impl)` 实现；
   同名时按拓展 key 顺序先声明的生效。调用参数和返回值要能 JSON 序列化，方法都是异步的。
 - 页面：注入包把后台服务清单交给页面，登记成可 `inject` 的服务；页面里已有同名服务时以页面的为准。
-- 拓展 MCP（模型工具）与钩子进程不托管后台，它们的调用经 Codex 页面桥接转给托管后台的 Codex++ 进程，
+- 拓展 MCP（模型工具）与钩子进程不托管后台，它们的调用经 Codex 页面桥接转给托管后台的 Codex # 进程，
   所以 Codex 需要开着。
 
 ### 多语言
@@ -1034,7 +1034,7 @@ codexPlus.extension((ctx) => {
 });
 ```
 
-- 第一次 `call` 时用 Node 启动（优先 Codex App 自带的 Node，或 `CODEX_PLUS_NODE`），之后常驻在 Codex++ 启动器里；
+- 第一次 `call` 时用 Node 启动（优先 Codex App 自带的 Node，或 `CODEX_PLUS_NODE`），之后常驻在 Codex # 启动器里；
   页面加载、拓展热重载 / 启停时全部停止，下次调用重新启动。内存状态不持久，要持久就写文件。
 - 工作目录是 `~/.config/Codex++/extension-data/<拓展 id>/`（即 `ctx.dataDir`）。
 - 与后台之间是行式 JSON：方法只收一个 JSON 参数、返回可序列化的值，抛错即 reject。默认超时 20 秒，最多 24 秒。
@@ -1043,7 +1043,7 @@ codexPlus.extension((ctx) => {
 
 ### 管理器面板
 
-拓展可以在 Codex++ 管理器里有自己的一块界面（统计、批量操作、比设置表单更复杂的配置）。清单里声明 `manager`：
+拓展可以在 Codex # 管理器里有自己的一块界面（统计、批量操作、比设置表单更复杂的配置）。清单里声明 `manager`：
 
 ```json
 { "id": "notes", "name": "便签", "backend": { "script": "backend/main.mjs" }, "manager": { "page": "manager.html", "title": "便签统计" } }
@@ -1072,7 +1072,7 @@ codexPlus.extension((ctx) => {
 | `theme()` / `onTheme(fn)` | 管理器当前是 `dark` 还是 `light`；`<html data-theme>` 也会跟着设好 |
 | `data(name, params)` | 读清单 `manager.data` 里声明过的只读管理器数据（见下） |
 | `navigate(target)` | 跳到管理器的另一个页面 |
-| `call(route, payload)` | 调本拓展清单 `permissions.routes` 声明过、且开放给拓展页面的 Codex++ 数据路由（目前是 `/agent-pet/*`） |
+| `call(route, payload)` | 调本拓展清单 `permissions.routes` 声明过、且开放给拓展页面的 Codex # 数据路由（目前是 `/agent-pet/*`） |
 
 - 页面放在**沙箱 iframe** 里，允许脚本和表单交互：拿不到管理器页面与它的接口，不能弹窗、不能跳转顶层页面。
 - CSP 限制外部资源请求和表单外发（`default-src 'none'`、`form-action 'none'`）：脚本、样式写在页面里，图片等资源用 `asset()` 取，
@@ -1110,7 +1110,7 @@ codexPlus.extension((ctx) => {
 | `gatewayHealth` | `{ scope: "managerProcess", providers, speeds, agents }`：供应商熔断状态、剩余冷却时间、连续错误数；模型首字耗时样本；Agent 请求／改道／失败计数及进行中的供应商 id。不返回 Key id、错误原文、完整请求轨迹 |
 | `gatewayQuota` | `{ scope: "managerProcess", cachedOnly: true, providers: [{ id, name, quota }] }`：已有额度缓存，`quota` 为 `{ windows: [{ windowMinutes, usedPercent, resetsAtMs }], updatedAtMs }`；无缓存时为 `null`，不是零额度 |
 | `installedSkills` | `{ skills: [{ id, name, enabled, bundled, managed, agents, contentHash }] }`：本地已装技能；`enabled` 对应 Codex，其他 Agent 看 `agents`；不读远端目录，版本以内容哈希表示 |
-| `installedPlugins` | `{ plugins: [{ id, name, version, source, enabled }] }`：仅 Codex++ 插件市场托管的本地安装记录，不代表全部 Codex 插件；`source` 仅 `public/full`，`id` 沿用原生 `name@market` 标识 |
+| `installedPlugins` | `{ plugins: [{ id, name, version, source, enabled }] }`：仅 Codex # 插件市场托管的本地安装记录，不代表全部 Codex 插件；`source` 仅 `public/full`，`id` 沿用原生 `name@market` 标识 |
 | `agentCollaboration` | `{ enabled, agents, tasks, total }`：Agent 的 `id/name/enabled/model/maxConcurrentTasks`；任务的 `id/agentId/status/createdAtMs/updatedAtMs/cancelRequested`。参数 `{ limit }` 默认 50、范围 1–200，按更新时间倒序、同时间按 id 升序 |
 
 ```json
@@ -1173,7 +1173,7 @@ user_scripts/
 | `id` | 必填，只能包含字母、数字、`-`、`_` |
 | `name` / `version` / `description` | 管理页展示用 |
 | `icon` | 图标：包内 `assets/` 下的图片（png / jpg / gif / webp / svg / ico / avif，如 `"assets/icon.svg"`），或 https 地址。显示在 Codex「拓展」页面的侧栏、列表和详情头部；找不到或不是图片时用默认图标 |
-| `engines.codexpp` | 整数：需要的 `apiVersion`；字符串：对 Codex++ 版本的 semver 范围（如 `"^2.1"`、`">=2.1.0 <3"`、`"2.x"`、`"1.0 - 2.5"`、`"^1 \|\| ^2"`）。不满足时不加载并在管理页显示原因 |
+| `engines.codexpp` | 整数：需要的 `apiVersion`；字符串：对 Codex # 版本的 semver 范围（如 `"^2.1"`、`">=2.1.0 <3"`、`"2.x"`、`"1.0 - 2.5"`、`"^1 \|\| ^2"`）。不满足时不加载并在管理页显示原因 |
 | `renderer` | 字符串或数组，必须是包内相对路径；按顺序拼进同一个作用域执行。只声明 `hooks` 的拓展可以省略 |
 | `hooks` | Codex 钩子声明，见上文「Codex 钩子」 |
 | `gateway` | 网关请求中间件声明，见上文「网关请求中间件」 |
@@ -1194,9 +1194,9 @@ user_scripts/
 ### 在 Codex 对话里造拓展
 
 不想自己写代码时，可以让 Codex 帮你写：在管理器「拓展」页的「对话造拓展」一栏点「接入 Codex」，然后新开一个 Codex 对话，
-直接说需求，例如「帮我做个拓展：图标栏加一个番茄钟」。说「插件」也行，agent 知道这里指的是 Codex++ 拓展。
+直接说需求，例如「帮我做个拓展：图标栏加一个番茄钟」。说「插件」也行，agent 知道这里指的是 Codex # 拓展。
 
-接入后 Codex 多了一个本机 MCP 服务 `codex_plus_extensions`（由 Codex++ 主程序以 `--codex-plus-extension-mcp` 运行），提供：
+接入后 Codex 多了一个本机 MCP 服务 `codex_plus_extensions`（由 Codex # 主程序以 `--codex-plus-extension-mcp` 运行），提供：
 
 | 工具 | 作用 |
 | --- | --- |
@@ -1220,10 +1220,10 @@ user_scripts/
 
 ### 发布到社区拓展
 
-管理器「拓展」页的「社区拓展」分栏会列出 GitHub 上打了 `codexpp-extension` topic 的公开仓库，所有 Codex++ 用户都能看到并安装。
+管理器「拓展」页的「社区拓展」分栏会列出 GitHub 上打了 `codexpp-extension` topic 的公开仓库，所有 Codex # 用户都能看到并安装。
 
 **一键发布**：在「本地拓展」里点拓展包那一行的「发布」。需要本机装了 GitHub CLI 并登录（`gh auth login`），git 配好
-`user.name` / `user.email`；Codex++ 不读、不存 token，推送时只在那一条命令上借用 `gh auth git-credential`。
+`user.name` / `user.email`；Codex # 不读、不存 token，推送时只在那一条命令上借用 `gh auth git-credential`。
 发布前会检查清单（名称、描述、`x.y.z` 版本号）、密钥（`.env`、`*.pem`、`auth.json` 等文件名，`sk-…`、`ghp_…`、私钥等内容，
 `secret` 配置项的默认值）、软链与体积，有问题时不能发布；版本号已在远端存在时可以点「补丁号 +1」。发布会：
 建公开仓库 `codexpp-<id>`（可改名）或取回已有仓库 → 用拓展包整体替换仓库内容并写入 `repository` → 没有 README 时按清单生成、
@@ -1252,7 +1252,7 @@ user_scripts/
 
 ### 精选与官方拓展
 
-管理器「拓展 → 精选」分栏来自 Codex++ 维护的精选清单（`BigPizzaV3/CodexPlusPlusScriptMarket` 的 `index.json`），
+管理器「拓展 → 精选」分栏来自 Codex # 维护的精选清单（`BigPizzaV3/CodexPlusPlusScriptMarket` 的 `index.json`），
 每一条都经过审核。清单里除了老的单文件脚本，还可以放拓展包：
 
 ```json
@@ -1267,7 +1267,7 @@ user_scripts/
 
 - **锁定提交**：安装只按 `sha` 从 GitHub 下载这一个提交，不看作者后来发的 release 或 tag。作者更新后要重新审核、改清单里的
   `sha`，用户那边才会看到「更新」。`tag` 只用于展示。拓展包条目也可以单独放在顶层的 `packages` 数组里。
-- **官方**：条目写了 `"official": true`，**并且**仓库属于 Codex++ 官方账号（代码里的 `OFFICIAL_OWNERS`，目前是
+- **官方**：条目写了 `"official": true`，**并且**仓库属于 Codex # 官方账号（代码里的 `OFFICIAL_OWNERS`，目前是
   `BigPizzaV3`）才显示「官方」徽章并排在最前；只满足其一的按精选显示。拓展自己的清单里写什么都不算数。
 - **下架**：`blocked` 里的仓库在社区栏不显示、不能安装；本机已经装了的会在精选栏顶部提示停用（不会自动删除）。
 - **与社区栏的关系**：进了精选清单的仓库不再出现在社区栏。社区栏里和精选 / 官方拓展同 id 的条目、以及非官方仓库自称「官方」
@@ -1289,7 +1289,7 @@ user_scripts/
 
 ```js
 if (window.codexPlus.apiVersion < 1) {
-  window.codexPlus.toast("请升级 Codex++ 以使用本拓展", { type: "warn" });
+  window.codexPlus.toast("请升级 Codex # 以使用本拓展", { type: "warn" });
 }
 ```
 
@@ -1311,7 +1311,7 @@ if (window.codexPlus.apiVersion < 1) {
 
 ### `codexPlus.call(route, payload?, options?)`
 
-调用 Codex++ 后端，返回 Promise，**失败时 reject**。
+调用 Codex # 后端，返回 Promise，**失败时 reject**。
 
 ```js
 try {
@@ -1346,7 +1346,7 @@ try {
 | `onMount` | 否 | `({ button, row, session_id }) => void`：行内按钮建好、套原生外观之前调用，可设属性。按钮会随行重建，不要在这里挂监听 |
 
 `onActivate` 收到 `{ row, session_id, title, archived, resolve, close, button?, event? }`：`row` 是该行的 DOM 元素，
-`archived` 表示是不是归档页的行；归档页的行未必读得到会话 id，`await resolve()` 会按标题问 Codex++ 找到 `{ session_id, title }`。
+`archived` 表示是不是归档页的行；归档页的行未必读得到会话 id，`await resolve()` 会按标题问 Codex # 找到 `{ session_id, title }`。
 `close()` 关闭菜单。行内按钮被 React 摘掉时整组按指纹重建。
 
 ### `codexPlus.currentSessionId()`
@@ -1388,11 +1388,11 @@ try {
 
 页面外壳复用内置页面的骨架，所以自动获得：缩放跟随、深浅色主题、图标栏选中态同步、原生选中态压制、窗口 resize 跟随。
 
-> 为什么自动配入口：内置的三个页面（Codex++ / 拓展 / 推荐内容）都是「图标栏入口 + 整页」的形态。第三方沿用同一种形态，用户才不会去弹窗里找入口。
+> 为什么自动配入口：内置的三个页面（Codex # / 拓展 / 推荐内容）都是「图标栏入口 + 整页」的形态。第三方沿用同一种形态，用户才不会去弹窗里找入口。
 
 ### `codexPlus.registerMenuItem(definition, options?)`
 
-在 Codex++ 菜单的「主页」面板里加一行。根据你提供的字段决定形态：
+在 Codex # 菜单的「主页」面板里加一行。根据你提供的字段决定形态：
 
 **开关形态**：
 
@@ -1415,8 +1415,8 @@ try {
 行为说明：
 
 - 注册时如果菜单已经打开，会**立刻补上**
-- 菜单重新打开时，开关状态从 `toggleValue()` 重新读取（所以你应当把状态存在自己那边，而不是指望 Codex++ 替你保存）
-- Codex++ 没有把拓展的设置项写进后端配置——需要持久化就自己用 `localStorage` 或调后端
+- 菜单重新打开时，开关状态从 `toggleValue()` 重新读取（所以你应当把状态存在自己那边，而不是指望 Codex # 替你保存）
+- Codex # 没有把拓展的设置项写进后端配置——需要持久化就自己用 `localStorage` 或调后端
 
 **注册选项**（`register*` 通用的第二个参数）：
 
@@ -1430,13 +1430,13 @@ try {
 
 注册清理函数。热重载、禁用、删除脚本时，按「脚本逆序 + 注册逆序」执行。
 
-> **注意**：只有当**所有**已加载脚本都注册了清理函数时，热重载才走原地清理。任何一个脚本没注册（或清理抛错、返回 Promise），Codex++ 会回退到**整页刷新**。这是为了保证不残留旧实例——也意味着**你注册清理函数能让所有人的重载体验更好**。
+> **注意**：只有当**所有**已加载脚本都注册了清理函数时，热重载才走原地清理。任何一个脚本没注册（或清理抛错、返回 Promise），Codex # 会回退到**整页刷新**。这是为了保证不残留旧实例——也意味着**你注册清理函数能让所有人的重载体验更好**。
 
 ### `codexPlus.fail(error)`
 
 主动上报失败。
 
-脚本**初始化期间的同步错误**会被 Codex++ 自动捕获并显示在管理页；但 `await` 之后的**异步错误不会**——这类错误要用这个方法上报，否则脚本在管理页会一直显示正常，实际已经死了。
+脚本**初始化期间的同步错误**会被 Codex # 自动捕获并显示在管理页；但 `await` 之后的**异步错误不会**——这类错误要用这个方法上报，否则脚本在管理页会一直显示正常，实际已经死了。
 
 ```js
 window.codexPlus.call("/thread-usage-history", { session_id })
@@ -1463,11 +1463,11 @@ window.codexPlus.call("/thread-usage-history", { session_id })
 | `/request-log/recent` | 最近已完成的模型请求 `{ entries }`，按开始时间倒序；`limit` 默认 20、最多 100。每条有 `id`、`model` / `upstreamModel`、`relayName`、`durationMs`、`success`、`statusCode`、`usage.inputTokens` / `outputTokens`、`timestampMs` 等（只读，与托盘「实时请求」同源） |
 | `/proxy-status` | 进行中的模型请求 `{ requests }`，每条有 `id`、`model`、`threadId`、`relayName`、`startedAtMs`、`phase`、`firstTokenMs`、`attempts`、`autoRetries`、`retryReasons`、`estimatedOutputTokens`（只读，与官方拓展包「请求状态条」同源） |
 | `/thread-usage-live` | 会话最近的 token 事件 `{ session_id, events }`，参数同 `/thread-usage-history`。只读 rollout 尾部，可以秒级轮询（只读，与官方拓展包「用量状态栏」同源） |
-| `/backend/status` | Codex++ 版本与连接状态 `{ status, message, version }`（只读） |
+| `/backend/status` | Codex # 版本与连接状态 `{ status, message, version }`（只读） |
 | `/settings/public` | 设置的公开子集：`codexPlusVersion`、`codexAppVersion`、`enhancementsEnabled`、`relayProfilesEnabled`、`modelCatalogFingerprint`，以及 `activeProfile { id, name, relayMode, protocol, model, contextWindow, autoCompactLimit, aggregate }`。不含地址、Key 与 config / auth 内容（只读） |
 | `/model-catalog/public` | 当前供应商的模型目录：`models`、`modelMetadata`（每模型的 `contextWindow` 等）、`model`、`default_model`、`provider_name`、`model_provider`、`service_tier`。去掉了来源地址与本机路径（只读） |
 
-**写能力没有开放**：`/settings/set`、`/delete`、`/undo` 等都不在名单内。如果你确实需要某个路由，去 Codex++ 仓库提 issue 说明用途，不要在脚本里绕过白名单直接调底层桥接（见下方「限制」第 1 条）。
+**写能力没有开放**：`/settings/set`、`/delete`、`/undo` 等都不在名单内。如果你确实需要某个路由，去 Codex # 仓库提 issue 说明用途，不要在脚本里绕过白名单直接调底层桥接（见下方「限制」第 1 条）。
 
 `/cdp/evaluate` 是显式开放的底层注入能力，用来把脚本打进宠物 overlay 这类独立窗口。它**不是**任意 CDP 协议：只能 `Runtime.evaluate`，只能打到 `app://-/index.html` 的 Codex 页面，返回值里也不带 WebSocket URL。调用时必须提供 `kind` 或 `target_id` 其一：
 
@@ -1496,9 +1496,9 @@ await window.codexPlus.call("/cdp/evaluate", {
 | `pageNavAttribute` | `data-codex-plus-page-nav` | 页面左导航项属性 |
 | `extensionAttribute` | `data-codex-plus-ext` | 拓展节点标记，见下方说明 |
 
-**关于 `extensionAttribute`**：你自己 `appendChild` 进 Codex 容器的节点，应当带上 `data-codex-plus-ext` 属性。Codex++ 的扫描调度靠它把你的写入排除在自激循环之外——不带的话，你的每次写入都可能触发一轮全量扫描，严重时会吃满一个 CPU 核（这是真实踩过的 bug，见 issue #1960）。
+**关于 `extensionAttribute`**：你自己 `appendChild` 进 Codex 容器的节点，应当带上 `data-codex-plus-ext` 属性。Codex # 的扫描调度靠它把你的写入排除在自激循环之外——不带的话，你的每次写入都可能触发一轮全量扫描，严重时会吃满一个 CPU 核（这是真实踩过的 bug，见 issue #1960）。
 
-通过 `register*` 接口创建的节点，Codex++ 会自动加上这个属性，你不用管。只有你自己直接往页面插节点时才需要手动加。
+通过 `register*` 接口创建的节点，Codex # 会自动加上这个属性，你不用管。只有你自己直接往页面插节点时才需要手动加。
 
 ---
 
@@ -1516,7 +1516,7 @@ await window.codexPlus.call("/cdp/evaluate", {
 
 自己注入 `<style>` 时，请给节点带唯一 id 前缀（例如 `codex-plus-ext-<你的脚本名>`），避免与内置样式互相覆盖。
 
-复用内置的行样式可以让拓展页面看起来与 Codex++ 一致：
+复用内置的行样式可以让拓展页面看起来与 Codex # 一致：
 
 ```html
 <div class="codex-plus-row">
@@ -1535,8 +1535,8 @@ await window.codexPlus.call("/cdp/evaluate", {
 
 1. **这不是安全边界。** 脚本跑在 Codex 页面的主世界，和 Codex 自身的 JS 同权。你可以直接调 `window.__codexSessionDeleteBridge` 绕过路由白名单，也可以改任何 DOM。白名单和配额的设计目的是**防误用，不是防恶意**——既然你已经在写脚本，请遵守约定。
 2. **每个脚本最多注册 16 项，全局最多 64 项**，超出时 `register*` 会抛错。
-3. **`render` 里抛错不会白屏**。Codex++ 会捕获并把错误写进该脚本的状态（管理页可见），页面上显示一块错误占位。
-4. **回调抛错不会冒泡到点击处理**。所有你提供的回调都经过失败隔离包装，抛错会被记录并上报，但不会影响 Codex++ 自身 UI 的可用性。
+3. **`render` 里抛错不会白屏**。Codex # 会捕获并把错误写进该脚本的状态（管理页可见），页面上显示一块错误占位。
+4. **回调抛错不会冒泡到点击处理**。所有你提供的回调都经过失败隔离包装，抛错会被记录并上报，但不会影响 Codex # 自身 UI 的可用性。
 5. **图标仅支持单个字形或 SVG 字符串**，不接受任意 HTML（注入任意 HTML 会让拓展有机会破坏内置 UI 结构）。
 
 ---
@@ -1566,7 +1566,7 @@ await window.codexPlus.call("/cdp/evaluate", {
 
 | 能力 | 状态 |
 | --- | --- |
-| Codex 原生 DOM 的操作接口 | 不打算开放。那是脚本自己打补丁的事，Codex++ 不对其稳定性作任何承诺 |
+| Codex 原生 DOM 的操作接口 | 不打算开放。那是脚本自己打补丁的事，Codex # 不对其稳定性作任何承诺 |
 | 写类后端路由（`/settings/set`、`/delete` 等） | 未开放，需逐个评估后再决定 |
 
 ---

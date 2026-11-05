@@ -5,7 +5,7 @@
 //! Codex 官方的「窗口镜像」（Remote Hosted PiP）走 `SkyComputerUseService` 发布
 //! `CAContext` + H.264 帧通道，但发布端只认 `com.openai.chat` / `com.openai.codex` /
 //! `com.openai.atlas` 三个 bundle id，第三方无法加入。所以这里退一步：用系统公开的
-//! ScreenCaptureKit 自己抓目标窗口，在 Codex++ 里画预览。画面内容和官方 PiP 一致
+//! ScreenCaptureKit 自己抓目标窗口，在 Codex # 里画预览。画面内容和官方 PiP 一致
 //! （都是同一个窗口的实时画面），只是少了 XPC 那一层的低延迟。
 //!
 //! # 实测数据（2026-10-24，M 系列 Mac，1280×820 窗口）
@@ -233,7 +233,7 @@ mod imp {
                     let result = if image.is_null() {
                         // macOS 在锁屏时拒绝按窗口抓取，整段失败基本都是这个原因
                         Err(anyhow::anyhow!(
-                            "抓帧失败：{}。如果屏幕已锁定或 Codex++ 没有「屏幕录制」权限，都会落到这里。",
+                            "抓帧失败：{}。如果屏幕已锁定或 Codex # 没有「屏幕录制」权限，都会落到这里。",
                             describe_error(error as *mut _)
                         ))
                     } else {

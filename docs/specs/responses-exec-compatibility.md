@@ -14,7 +14,7 @@ model's ability to write correct Code Mode programs.
 
 ## Assumptions and Scope
 
-- The request already passes through the Codex++ local protocol proxy.
+- The request already passes through the Codex # local protocol proxy.
 - The first version supports full-history replay requests, not server-managed
   state using `previous_response_id`, `conversation`, or `conversation_id`.
 - The client remains responsible for approvals and tool execution. The adapter

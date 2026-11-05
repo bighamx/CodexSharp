@@ -1,7 +1,7 @@
 <!-- 独立设计预览稿。确认采用前不替换 README.md；图片路径按仓库根目录组织。 -->
 
 <p align="center">
-  <img src="docs/images/readme-preview/hero.svg" alt="Codex++ — 让 Codex 更顺手。供应商与模型、工作流增强、拓展与个性化。" width="100%">
+  <img src="docs/images/readme-preview/hero.svg" alt="Codex # — 让 Codex 更顺手。供应商与模型、工作流增强、拓展与个性化。" width="100%">
 </p>
 
 <p align="center">
@@ -26,15 +26,15 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/readme-preview/manager-enhancements.png" alt="Codex++ 管理工具：集中管理模型、会话、输入体验和挂件设置" width="100%">
+  <img src="docs/images/readme-preview/manager-enhancements.png" alt="Codex # 管理工具：集中管理模型、会话、输入体验和挂件设置" width="100%">
   <br><sub>从供应商配置到界面增强，一个管理工具就够了。</sub>
 </p>
 
-Codex++ 是面向 OpenAI Codex / ChatGPT 桌面应用的外部启动器与管理工具，通过 CDP 与本地辅助服务提供供应商切换、协议转换、会话管理和界面增强。它不修改官方应用的 `app.asar`，也不向安装目录写入补丁文件。
+Codex # 是面向 OpenAI Codex / ChatGPT 桌面应用的外部启动器与管理工具，通过 CDP 与本地辅助服务提供供应商切换、协议转换、会话管理和界面增强。它不修改官方应用的 `app.asar`，也不向安装目录写入补丁文件。
 
 ## 交流与支持
 
-遇到问题请通过 [GitHub Issues](https://github.com/BigPizzaV3/CodexPlusPlus/issues) 提交，附上系统、Codex++ 版本、复现步骤与已脱敏的日志。欢迎分享拓展、主题和使用经验。
+遇到问题请通过 [GitHub Issues](https://github.com/BigPizzaV3/CodexPlusPlus/issues) 提交，附上系统、Codex # 版本、复现步骤与已脱敏的日志。欢迎分享拓展、主题和使用经验。
 
 <p align="center">
   <a href="https://qm.qq.com/q/5h3pxpxg7S">QQ 交流 4 群 · 1127858981</a> &nbsp; · &nbsp;
@@ -176,7 +176,7 @@ Codex++ 是面向 OpenAI Codex / ChatGPT 桌面应用的外部启动器与管理
 
 1. 打开管理器「Codex 增强 → 常用增强」，开启增强总开关与「原生 Fast 强制解锁」（默认关闭）。
 2. 确认模型已声明 Fast 服务等级；需要手动配置时，在「供应商配置」中打开对应模型的配置，设置「Fast（priority）支持」，保存模型与供应商。
-3. 保存增强设置，从 Codex++ 重新启动 Codex，再打开模型或推理强度菜单，选择 **⚡ Fast**；需要恢复时选择 **Standard**。
+3. 保存增强设置，从 Codex # 重新启动 Codex，再打开模型或推理强度菜单，选择 **⚡ Fast**；需要恢复时选择 **Standard**。
 
 实际可用性、提速效果与计费由供应商决定，开启此功能不会让所有模型自动提速。关闭选项并重启 Codex 即可恢复原生身份判断。
 
@@ -185,10 +185,10 @@ Codex++ 是面向 OpenAI Codex / ChatGPT 桌面应用的外部启动器与管理
 从拓展市场发现社区脚本，为工作区添加用量面板、模型选择器、提示词优化等工具。你可以按需安装、启停，也可以编写自己的脚本。
 
 <p align="center">
-  <img src="docs/images/readme-preview/extension-market.png" alt="Codex++ 拓展市场：浏览社区脚本和工作流工具" width="100%">
+  <img src="docs/images/readme-preview/extension-market.png" alt="Codex # 拓展市场：浏览社区脚本和工作流工具" width="100%">
 </p>
 
-这里的「拓展」是 Codex++ 用户脚本，与 Codex 官方插件市场是两个入口。社区脚本的服务配置和使用要求以各自说明为准。开发说明见 [用户脚本热重载](docs/user-script-reload.md)。
+这里的「拓展」是 Codex # 用户脚本，与 Codex 官方插件市场是两个入口。社区脚本的服务配置和使用要求以各自说明为准。开发说明见 [用户脚本热重载](docs/user-script-reload.md)。
 
 ### 认真工作，也可以有点趣味
 
@@ -212,7 +212,7 @@ Agent 桌宠默认关闭，可在管理器「Agent 桌宠」页开启，目前�
 | macOS · Apple Silicon | `CodexPlusPlus-*-macos-arm64.dmg` |
 | macOS · Intel | `CodexPlusPlus-*-macos-x64.dmg` |
 
-Codex++ 配合官方桌面应用使用，首次启动前请确认本机已安装对应的 Codex / ChatGPT 应用。
+Codex # 配合官方桌面应用使用，首次启动前请确认本机已安装对应的 Codex / ChatGPT 应用。
 
 ### 2. 打开管理工具，完成配置
 
@@ -220,14 +220,14 @@ Codex++ 配合官方桌面应用使用，首次启动前请确认本机已安装
 
 | 入口 | 用来做什么 |
 | --- | --- |
-| **Codex++ 管理工具** | 检查应用路径与运行状态，配置供应商、模型和增强功能，管理更新与诊断。 |
-| **Codex++** | 静默启动官方桌面应用，并加载已保存的供应商与增强配置。 |
+| **Codex # 管理工具** | 检查应用路径与运行状态，配置供应商、模型和增强功能，管理更新与诊断。 |
+| **Codex #** | 静默启动官方桌面应用，并加载已保存的供应商与增强配置。 |
 
-首次使用先打开 **Codex++ 管理工具**，确认应用路径，再选择供应商模式，按需开启增强功能并保存。
+首次使用先打开 **Codex # 管理工具**，确认应用路径，再选择供应商模式，按需开启增强功能并保存。
 
-### 3. 从 Codex++ 入口开始工作
+### 3. 从 Codex # 入口开始工作
 
-从 **Codex++** 启动桌面应用。依赖注入脚本的设置通常需要保存后重启 Codex++ 才会生效。
+从 **Codex #** 启动桌面应用。依赖注入脚本的设置通常需要保存后重启 Codex # 才会生效。
 
 所有界面增强均可单独关闭；关闭增强总开关后，仍可使用供应商与启动管理能力。后续可在管理工具的「关于」页检查并启动更新。
 
@@ -254,16 +254,16 @@ your-model[200K]
 another-model[128000]
 ```
 
-支持 `1M`、`200K` 或纯数字。Codex++ 会生成独立的 `model_catalog_json`，让 Codex 按当前模型使用对应窗口；请按实际供应商能力填写。未指定后缀的模型继续使用供应商级上下文配置。
+支持 `1M`、`200K` 或纯数字。Codex # 会生成独立的 `model_catalog_json`，让 Codex 按当前模型使用对应窗口；请按实际供应商能力填写。未指定后缀的模型继续使用供应商级上下文配置。
 
 切换供应商时会先保存当前配置，再写入目标配置。API Key 保存在本机，提交反馈前请隐藏密钥与认证信息。
 
 ## 常见问题
 
 <details>
-  <summary><strong>启动后，为什么没有 Codex++ 菜单？</strong></summary>
+  <summary><strong>启动后，为什么没有 Codex # 菜单？</strong></summary>
 
-确认从 **Codex++** 入口启动。打开管理工具的「安装维护」与「关于」页面，检查应用路径、启动状态和诊断日志。
+确认从 **Codex #** 入口启动。打开管理工具的「安装维护」与「关于」页面，检查应用路径、启动状态和诊断日志。
 
 </details>
 
@@ -277,7 +277,7 @@ another-model[128000]
 <details>
   <summary><strong>增强功能可以关闭吗？官方应用更新后还能用吗？</strong></summary>
 
-可以分别关闭，也可以关闭增强总开关。Codex++ 依赖官方桌面应用的页面结构、CDP 和本地数据格式；官方应用更新后，部分功能可能需要跟随适配。修改供应商配置或会话数据前，请保留备份。
+可以分别关闭，也可以关闭增强总开关。Codex # 依赖官方桌面应用的页面结构、CDP 和本地数据格式；官方应用更新后，部分功能可能需要跟随适配。修改供应商配置或会话数据前，请保留备份。
 
 </details>
 
@@ -290,7 +290,7 @@ another-model[128000]
 | --- | --- |
 | Codex 配置与登录状态 | `~/.codex/config.toml`、`~/.codex/auth.json` |
 | 本地数据库 | 优先 `~/.codex/sqlite/*.db`，旧版回退 `~/.codex/state_5.sqlite` |
-| Codex++ 状态与日志 | `~/.codex-session-delete/` |
+| Codex # 状态与日志 | `~/.codex-session-delete/` |
 | Provider 同步备份 | `~/.codex/backups_state/provider-sync` |
 
 </details>
@@ -331,7 +331,7 @@ cargo build --release
 
 ## Star History
 
-如果 Codex++ 对你有帮助，欢迎 [点一颗 Star](https://github.com/BigPizzaV3/CodexPlusPlus)。
+如果 Codex # 对你有帮助，欢迎 [点一颗 Star](https://github.com/BigPizzaV3/CodexPlusPlus)。
 
 <p align="center">
   <a href="https://www.star-history.com/#BigPizzaV3/CodexPlusPlus&amp;Date">
@@ -347,8 +347,8 @@ cargo build --release
 ---
 
 <p align="center">
-  <img src="docs/images/codex-plus-plus.png" alt="Codex++ 项目标志" width="44"><br>
-  <strong>Codex++</strong> · 让 Codex 更顺手。<br>
+  <img src="docs/images/codex-plus-plus.png" alt="Codex # 项目标志" width="44"><br>
+  <strong>Codex #</strong> · 让 Codex 更顺手。<br>
   <sub>Copyright © 2026 BigPizzaV3 · <a href="LICENSE">AGPL-3.0-only</a></sub>
 </p>
 

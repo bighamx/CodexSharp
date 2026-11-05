@@ -1,4 +1,10 @@
-/* 网关总览：三列拓扑（Agent → Codex++ → 供应商池）+ 路由动态 + 今日用量。颜色全部取外壳的设计令牌。 */
+/*
+ * 本文件由 bighamx 修改（2026-11-04）：
+ * - App.tsx：移除首页（原「推荐内容」并入的落脚页）的赞助商推荐区块与广告拉取
+ * - HubOverview.tsx / HubOverview.css：把拓扑卡抽成 HubTopologyCard 供总览与首页共用，并加上首页的宽松尺寸
+ * 修改版整体仍以 GNU AGPL v3.0 授权，许可证见仓库根目录 LICENSE。
+ */
+/* 网关总览：三列拓扑（Agent → Codex # → 供应商池）+ 路由动态 + 今日用量。颜色全部取外壳的设计令牌。 */
 
 .hub-page {
   display: grid;

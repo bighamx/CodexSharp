@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans` 按任务执行。每一步使用 checkbox（`- [ ]`）跟踪。
 
-**Goal:** 为 Codex++ 供应商配置添加 Codex-only 的 MCP、skills、plugins 上下文管理，并支持供应商级上下文勾选、上下文大小和压缩上下文大小。
+**Goal:** 为 Codex # 供应商配置添加 Codex-only 的 MCP、skills、plugins 上下文管理，并支持供应商级上下文勾选、上下文大小和压缩上下文大小。
 
 **Architecture:** 核心层负责 TOML 结构化解析、过滤、合并和校验；Tauri 命令层负责把核心能力暴露给前端并维持 settings 保存流程；前端在供应商配置页展示公共上下文库和每个供应商的选择。切换供应商时只把当前供应商勾选的公共上下文项合并进 live `~/.codex/config.toml`。
 

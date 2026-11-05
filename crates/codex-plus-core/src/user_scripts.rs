@@ -173,7 +173,7 @@ pub struct UserScriptManager {
     config_lock: Arc<Mutex<()>>,
     /// 后台设置文件。内置拓展里有对应设置字段的，启停就读写这里（见 [`Self::with_settings_path`]）。
     settings_path: Option<PathBuf>,
-    /// 随 Codex++ 发布的官方拓展包所在目录（来源 `bundled`），见 [`crate::bundled_extensions`]。
+    /// 随 Codex # 发布的官方拓展包所在目录（来源 `bundled`），见 [`crate::bundled_extensions`]。
     bundled_dir: Option<PathBuf>,
 }
 
@@ -1824,7 +1824,7 @@ fn resolve_extension_config(schema: &[ExtensionConfigField], stored: Option<&Map
     Value::Object(resolved)
 }
 
-/// 拓展声明的一个模型工具（codexpp.json 的 `tools[]`），由 Codex++ 拓展 MCP 对外提供。
+/// 拓展声明的一个模型工具（codexpp.json 的 `tools[]`），由 Codex # 拓展 MCP 对外提供。
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ExtensionTool {
     /// 拓展内的工具名：字母、数字、_、-。对外名为 `<拓展 id>__<name>`。
@@ -1855,8 +1855,8 @@ pub struct ExtensionGatewayMiddleware {
     pub timeout_secs: u64,
     /// 所属拓展的生效配置，作为 context.config 交给脚本。
     pub config: Value,
-    /// 请求中间件跑在哪一段：`request`（默认，Codex++ 自己的转换之前，改原始 Responses 请求）、
-    /// `upstream`（Codex++ 的压缩、路由、协议转换之后，改真正发给上游的请求体）或
+    /// 请求中间件跑在哪一段：`request`（默认，Codex # 自己的转换之前，改原始 Responses 请求）、
+    /// `upstream`（Codex # 的压缩、路由、协议转换之后，改真正发给上游的请求体）或
     /// `route`（轮换选好候选供应商之后，按拓展给的顺序重排 / 筛选候选）。
     #[serde(default)]
     pub stage: String,
@@ -1865,8 +1865,8 @@ pub struct ExtensionGatewayMiddleware {
     pub order: i64,
 }
 
-/// 拓展能用 `gateway.replaces` 关掉的 Codex++ 内置网关环节（关掉后拓展自己在 request / route / upstream /
-/// error / response 段里实现）。内置环节都能关；仍由 Codex++ 做的只有响应方向的协议转换（响应流中间件拿到的是
+/// 拓展能用 `gateway.replaces` 关掉的 Codex # 内置网关环节（关掉后拓展自己在 request / route / upstream /
+/// error / response 段里实现）。内置环节都能关；仍由 Codex # 做的只有响应方向的协议转换（响应流中间件拿到的是
 /// 转好的 Responses 事件）和官方登录凭据本身，原因见 EXTENSIONS.md「网关中间件」一节。
 pub const BUILTIN_GATEWAY_SEGMENTS: &[&str] = &[
     "builtin:local-compaction",
@@ -2238,7 +2238,7 @@ pub struct ExtensionWrite {
     /// `files` 里从本机文件复制来的文本（打包产物等，不经模型逐字转写）：单个上限放宽到
     /// [`EXTENSION_COPIED_TEXT_MAX_BYTES`]，合计另算。
     pub copied_text: BTreeSet<String>,
-    /// 单个文本文件的上限，默认（None）是对话造拓展的 256 KiB。Codex++ 自己生成的包（dsh 配套拓展包里
+    /// 单个文本文件的上限，默认（None）是对话造拓展的 256 KiB。Codex # 自己生成的包（dsh 配套拓展包里
     /// 夹着前端插件的打包产物）可以放宽；文本文件总量上限随之放宽到它的 2 倍（至少 1 MiB）。
     pub max_file_bytes: Option<usize>,
 }
@@ -2610,7 +2610,7 @@ fn parse_extension_manifest(
     {
         anyhow::bail!("清单的 id 必填，且只能包含字母、数字、- 和 _");
     }
-    // engines.codexpp：整数是拓展 API 版本；字符串是对 Codex++ 版本的 semver 范围（如 "^2.1"、">=2.1.0 <3"）。
+    // engines.codexpp：整数是拓展 API 版本；字符串是对 Codex # 版本的 semver 范围（如 "^2.1"、">=2.1.0 <3"）。
     let mut engine_range = None;
     match raw.get("engines").and_then(|engines| engines.get("codexpp")) {
         None => {}
@@ -2739,12 +2739,12 @@ fn parse_extension_manifest(
         let ok = crate::extension_semver::satisfies(current, &range)
             .with_context(|| format!("engines.codexpp 的版本范围写法不对：{range}"))?;
         if !ok {
-            anyhow::bail!("需要 Codex++ {range}，当前是 {current}，请升级 Codex++ 或换用兼容的拓展版本");
+            anyhow::bail!("需要 Codex # {range}，当前是 {current}，请升级 Codex # 或换用兼容的拓展版本");
         }
     }
     if package.engine > EXTENSION_API_VERSION {
         anyhow::bail!(
-            "需要拓展 API v{}，当前 Codex++ 提供 v{}，请升级 Codex++",
+            "需要拓展 API v{}，当前 Codex # 提供 v{}，请升级 Codex #",
             package.engine,
             EXTENSION_API_VERSION
         );
@@ -3516,7 +3516,7 @@ mod runtime_status_tests {
         let targets = vec![
             target(
                 "manager",
-                "Codex++ 管理工具",
+                "Codex # 管理工具",
                 "http://127.0.0.1:1420/",
                 "ws://manager",
             ),

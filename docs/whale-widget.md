@@ -1,6 +1,6 @@
 # 大肥鱼（Codex 用量挂件）
 
-大肥鱼（DeepSeek 鲸鱼）现在是「Agent 桌宠」的一种类型（Agent 桌宠是随 Codex++ 发布的官方拓展包，见 [Agent 桌宠](agent-pet.md)）：在管理器「工具 → Agent 桌宠」打开「显示 Agent 桌宠」，「桌宠类型」选「大肥鱼（DeepSeek 鲸鱼）」即可。它和图库 / 自定义图片的简单桌宠互斥，同一时间只显示一个。Codex 应通过包含此功能的 Codex++ 启动器启动；运行中的新版支持通过设置同步开启、关闭和切换类型，无需重新安装插件。
+大肥鱼（DeepSeek 鲸鱼）现在是「Agent 桌宠」的一种类型（Agent 桌宠是随 Codex # 发布的官方拓展包，见 [Agent 桌宠](agent-pet.md)）：在管理器「工具 → Agent 桌宠」打开「显示 Agent 桌宠」，「桌宠类型」选「大肥鱼（DeepSeek 鲸鱼）」即可。它和图库 / 自定义图片的简单桌宠互斥，同一时间只显示一个。Codex 应通过包含此功能的 Codex # 启动器启动；运行中的新版支持通过设置同步开启、关闭和切换类型，无需重新安装插件。
 
 旧版在「Codex 增强 → 常用增强 → 挂件与桌宠」里打开过「Codex 用量挂件」、升级前还没有桌宠设置的用户，升级后桌宠自动开启并选中大肥鱼，余额配置原样保留；已经有桌宠设置的用户保持现状。
 
@@ -23,7 +23,7 @@
 
 | 内容 | 数据来源与含义 |
 | --- | --- |
-| 账户余额 | 当前 Codex++ 供应商提供的余额接口；复用该供应商已保存的凭据，不在挂件中输入密钥 |
+| 账户余额 | 当前 Codex # 供应商提供的余额接口；复用该供应商已保存的凭据，不在挂件中输入密钥 |
 | 账户今日观测消费 | 本机当天有效余额样本的下降额累计；首次样本建立基准，充值不冲减已记录消费 |
 | 当前会话今日 / 累计 token | 当前本机会话 JSONL 中的累计 usage 差值；重复事件不重复计数 |
 | 全机用量与模型费用 | 全机本地会话按日期、模型和轮次汇总；费用仅按用户填写的单价估算，不是账户账单 |
@@ -52,20 +52,20 @@
 
 自定义路径仅用于当前供应商的同源 HTTPS 地址，禁止完整外部网址、查询参数、片段和重定向。支持 `data.accounts[0].balance` 这样的数组字段。接口字段不存在或不是有效金额时返回不可用，不能按零记账。更换凭据、计量字段、币种或倍率会建立新的余额基准。
 
-原版挂件的模型菜单另提供多供应商模板、余额或订阅窗口、探活、自定义 HTTP、用户单价与资源包额度。选择 Codex++ 已保存的供应商配置来复用凭据，挂件不重新保存另一份 API Key。未提供公开余额接口的供应商仍可使用本机 token 和自定义费用估算。峰谷模块保留原版配置与显示，只为具有对应价目/时段的供应商使用，不把其他厂商价格套给 Codex。
+原版挂件的模型菜单另提供多供应商模板、余额或订阅窗口、探活、自定义 HTTP、用户单价与资源包额度。选择 Codex # 已保存的供应商配置来复用凭据，挂件不重新保存另一份 API Key。未提供公开余额接口的供应商仍可使用本机 token 和自定义费用估算。峰谷模块保留原版配置与显示，只为具有对应价目/时段的供应商使用，不把其他厂商价格套给 Codex。
 
 ## 实现与数据
 
 - 挂件界面：上游完整引擎 `assets/inject/upstream/whale-widget/full-widget.js`；适配产物由 `scripts/assemble-whale-runtime.mjs` 生成。`96-whale-compat.js` 提供词法宿主，`96-whale-widget.js` 管理开关与生命周期。
-- 持久开关：Agent 桌宠拓展（`bundled:agent-pet`）启用且配置的 `kind` 为 `whaleWidget`，默认关闭。余额配置是这个拓展配置里的 `codexAppWhaleBalance*`，随请求交给 Codex++ 查询。旧的 `agentPet`、`codexAppWhaleBalance*` 设置与 `codexAppWhaleWidgetEnabled` 只在迁移时读取。
+- 持久开关：Agent 桌宠拓展（`bundled:agent-pet`）启用且配置的 `kind` 为 `whaleWidget`，默认关闭。余额配置是这个拓展配置里的 `codexAppWhaleBalance*`，随请求交给 Codex # 查询。旧的 `agentPet`、`codexAppWhaleBalance*` 设置与 `codexAppWhaleWidgetEnabled` 只在迁移时读取。
 - 内部桥接：`/whale/balance`、`/whale/session`、`/whale/history` 和 `/whale/full`，未加入第三方拓展的路由白名单。
-- 余额账本：Codex++ 设置目录内的 `whale-balance.sqlite3`，按凭据指纹及币种隔离，金额以八位定点数累计。
+- 余额账本：Codex # 设置目录内的 `whale-balance.sqlite3`，按凭据指纹及币种隔离，金额以八位定点数累计。
 - 角色/泡泡图库、音频和挂件设置：本机 SQLite；交互位置及事件去重标记使用当前 Codex 界面的 localStorage，不上传服务器。
 - 凭据留在 Rust 后端；返回界面的余额数据不包含密钥、认证内容或供应商配置原文。
 
 ## 参考来源
 
-功能参考 [MeteorNOX/DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget)。本实现适配 Codex++ 的 Rust 后端与内置注入层，没有依赖 DSH 服务或另外启动 Electron 挂件进程。
+功能参考 [MeteorNOX/DeepSeek-Balance-Whale-Widget](https://github.com/MeteorNOX/DeepSeek-Balance-Whale-Widget)。本实现适配 Codex # 的 Rust 后端与内置注入层，没有依赖 DSH 服务或另外启动 Electron 挂件进程。
 
 完整界面引擎、默认角色、气泡、音效和动图来自固定版本 `fce34e3abd1fe8b616e287b9864305c7f0be81a0`。原始源码、素材以及上游 LICENSE / PROVENANCE 保存在 `assets/inject/upstream/whale-widget/`；美术、音频与动图不属于其 MIT 代码许可范围，原始声明随文件保留，不重新声明为本项目原创或 AGPL 素材。
 

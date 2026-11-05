@@ -25,7 +25,7 @@ const SHIM_FILE = path.join(DIR, 'page-shim.js');
 const DICTATION_FILE = path.join(DIR, 'page-dictation.js');
 
 /**
- * Codex++ launcher 写的听写凭据：helper 端口 + 能力令牌。
+ * Codex # launcher 写的听写凭据：helper 端口 + 能力令牌。
  * 文件名必须与 crates/codex-plus-core/src/launcher.rs 的 DICTATION_HELPER_RECEIPT 一致。
  *
  * launcher 把它写在状态目录（default_app_state_dir），而本脚本装在
@@ -80,7 +80,7 @@ function safeMime(type) {
 }
 
 /**
- * 把页面传来的音频交给 Codex++ 的 helper 转写（本地 SenseVoice 或用户配置的 ASR）。
+ * 把页面传来的音频交给 Codex # 的 helper 转写（本地 SenseVoice 或用户配置的 ASR）。
  *
  * 走 node:http 而不是全局 fetch：主进程可能挂着系统代理，loopback 请求不该被代理接管。
  */
@@ -88,7 +88,7 @@ function transcribe(payload) {
   return new Promise((resolve, reject) => {
     const receipt = readReceipt();
     if (!receipt) {
-      reject(new Error('Codex++ 语音服务未运行，请先启动 Codex++'));
+      reject(new Error('Codex # 语音服务未运行，请先启动 Codex #'));
       return;
     }
     let audio;

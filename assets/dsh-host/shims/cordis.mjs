@@ -1,4 +1,4 @@
-// Codex++ 兼容宿主提供的 @deepseek-ai/cordis 替身。
+// Codex # 兼容宿主提供的 @deepseek-ai/cordis 替身。
 // 工具插件通常只 `import type { Context }`；这里给运行时导入兜底，避免模块链接失败。
 // Service 子类插件按 Cordis 语义运行：宿主 `new Class(ctx, config)`，构造函数里 `super(ctx, name)` 把实例登记成服务
 // （同一个宿主里的其它插件 inject 后经 ctx[name] 拿到）；随后跑 `[Service.init]()`（没有就 `start()`），卸载时

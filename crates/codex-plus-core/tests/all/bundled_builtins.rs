@@ -261,7 +261,7 @@ fn old_status_bar_switches_migrate_once() {
     assert_eq!(script(&manager, PROXY_REQUEST_STATUS_KEY)["enabled"], false);
     manager.migrate_bundled_builtins(&BackendSettings::default()).unwrap();
     assert_eq!(script(&manager, USAGE_STATUSLINE_KEY)["enabled"], false, "迁移只做一次");
-    // 停用时不声明路由，Codex++ 不替它干活。
+    // 停用时不声明路由，Codex # 不替它干活。
     assert!(!manager.route_declared("/thread-usage-live"));
     manager.set_script_enabled(USAGE_STATUSLINE_KEY, true).unwrap();
     assert!(manager.route_declared("/thread-usage-live"));

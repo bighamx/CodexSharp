@@ -4,9 +4,9 @@ import "./flow-demo.css";
 type Stage = "idle" | "unrouted" | "waiting" | "generating" | "mixed" | "done" | "error";
 const stages: Array<{ id: Stage; label: string; description: string }> = [
   { id: "idle", label: "空闲", description: "没有进行中的请求。历史成功、失败记录不会在图上重新播放。" },
-  { id: "unrouted", label: "路由选择中", description: "尚未选定供应商，只显示 Codex 到 Codex++ 的去程。" },
-  { id: "waiting", label: "发送 / 等待", description: "拖尾光点从 Codex 出发，经过 Codex++，流向 ChatGPT Pro。" },
-  { id: "generating", label: "响应回流", description: "沿同一条完整路线反向流动：ChatGPT Pro → Codex++ → Codex。" },
+  { id: "unrouted", label: "路由选择中", description: "尚未选定供应商，只显示 Codex 到 Codex # 的去程。" },
+  { id: "waiting", label: "发送 / 等待", description: "拖尾光点从 Codex 出发，经过 Codex #，流向 ChatGPT Pro。" },
+  { id: "generating", label: "响应回流", description: "沿同一条完整路线反向流动：ChatGPT Pro → Codex # → Codex。" },
   { id: "mixed", label: "双向并发", description: "ChatGPT Pro 正在响应，另一条请求正在发往 jojocodemax；共用连线也保留各自方向。" },
   { id: "done", label: "完成", description: "请求成功后立即停止光流。成功结果留在对应请求行，不再留下游离绿点。" },
   { id: "error", label: "失败", description: "请求失败后立即停止光流。失败原因留在对应请求行，不再在其他链路播放红点。" },
@@ -58,14 +58,14 @@ export function FlowDemo() {
       <dl className="flow-demo-notes">
         <div><dt>看归属</dt><dd>每家供应商固定一种颜色，光流、供应商节点和请求行色点一致；同一家去回同色。</dd></div>
         <div><dt>看方向</dt><dd>亮头在前，淡尾在后；去程和回程不再只是同样的闪烁虚线。</dd></div>
-        <div><dt>看连续</dt><dd>整个路线共用时钟和速度，经过 Codex++ 节点时不重新起跑。</dd></div>
+        <div><dt>看连续</dt><dd>整个路线共用时钟和速度，经过 Codex # 节点时不重新起跑。</dd></div>
         <div><dt>看结束</dt><dd>完成、失败后立即停止；历史结果只在请求列表展示。</dd></div>
       </dl>
       <p className="flow-demo-footnote">状态切换最多约 1 秒同步到托盘。若系统开启“减弱动态效果”，保留活动线路、关闭移动光点。</p>
     </section>
     <section className="flow-demo-preview" aria-label="托盘模拟预览">
       <header><span>模拟数据 · 与应用共用组件</span><span>380 × 620</span></header>
-      <iframe ref={frame} src={initial.current} title="Codex++ 实时请求模拟托盘" onLoad={() => setLoaded(true)} />
+      <iframe ref={frame} src={initial.current} title="Codex # 实时请求模拟托盘" onLoad={() => setLoaded(true)} />
     </section>
   </main>;
 }

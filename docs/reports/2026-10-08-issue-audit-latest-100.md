@@ -180,7 +180,7 @@ OPEN 中 #2403、#2394 的针对性修复已发布，适合先请用户复测；
 | 38 | [#2363](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2363) | CLOSED | 已修待验证 | P1 | 换皮肤后对话及输入框消失 | 8baffa91 在 v1.5.0；新 1.6.0 遮挡或错位不自动归为旧 top-fade。 |
 | 39 | [#2362](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2362) | CLOSED | 已修待验证 | P1 | Windows 安装器不能覆盖管理器 | 8610d2f3 已在 v1.5.1；旧报告“尚未发布”已过期。 |
 | 40 | [#2360](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2360) | CLOSED | 已修待验证 | P1 | remote compaction 0 output items | 549551d3 在 v1.5.0；修复事件序列，后续复现需保留 SSE。 |
-| 41 | [#2359](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2359) | CLOSED | 已修待验证 | P2 | Codex++ 页面黑底黑字 | 43e6c55c 与 10ff2fe6 在 v1.5.1；浅深色切换复测即可。 |
+| 41 | [#2359](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2359) | CLOSED | 已修待验证 | P2 | Codex # 页面黑底黑字 | 43e6c55c 与 10ff2fe6 在 v1.5.1；浅深色切换复测即可。 |
 | 42 | [#2358](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2358) | CLOSED | 已修待验证 | P2 | gpt-6.1-sol 档位缺失 | 35ede662 在 v1.5.0；切换供应商重新生成 catalog。 |
 | 43 | [#2357](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2357) | CLOSED | 咨询或需求 | P2 | 中文界面依赖网络 | 作者确认开代理恢复；后来 Layer 补丁另已发布，不能由此否定离线缺陷。 |
 | 44 | [#2355](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2355) | CLOSED | 已修待验证 | P2 | 模型排序 | ea82bc74 在 v1.5.1 支持模型行拖拽。 |

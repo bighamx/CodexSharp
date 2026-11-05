@@ -4,7 +4,7 @@
    * dsh 的前端插件是懒 CJS 工厂（window.__ModuleLoader__.load({ id, factory })），factory(require) 返回
    * { inject, apply(ctx) }，apply 里用 ctx.slots.register(options, Component) 往 dsh Web 客户端的 React 插槽里放组件。
    * Codex 的页面也是 React（19），这里把 Codex 自己的 React / ReactDOM 交给插件的 require，再把 dsh 插槽一一对到
-   * Codex++ 的界面插槽：组件用 createRoot 渲染进插槽容器，随拓展实例卸载。对不上的插槽不显示，记一条失败说明。
+   * Codex # 的界面插槽：组件用 createRoot 渲染进插槽容器，随拓展实例卸载。对不上的插槽不显示，记一条失败说明。
    *
    * 配套拓展包把插件的 client.js 夹在两段胶水之间：前一段截住 __ModuleLoader__.load 并给 fetch 换成经后台转给插件
    * 宿主半边（ctx.connection.fetch 注册的路由）的版本，后一段调这里。设计见 docs/plans/2026-10-30-dsh-plugin-import-design.md。
@@ -61,7 +61,7 @@
   }
 
   /**
-   * dsh 插槽 → Codex++ 位置。kind：slot（界面插槽）、rowAction（会话行「更多」菜单的自绘项）、
+   * dsh 插槽 → Codex # 位置。kind：slot（界面插槽）、rowAction（会话行「更多」菜单的自绘项）、
    * message（助手消息下方）、page（整页，带图标栏入口）。
    */
   const codexPlusDshSlotMap = {
@@ -107,7 +107,7 @@
     "tool.view.cordis": { kind: "toolView" },
   };
 
-  /** dsh 快捷键绑定（{ code, modifiers }）→ Codex++ 的 "Mod+Shift+K" 写法；认不出时返回空串。 */
+  /** dsh 快捷键绑定（{ code, modifiers }）→ Codex # 的 "Mod+Shift+K" 写法；认不出时返回空串。 */
   function codexPlusDshShortcutKey(binding) {
     if (!binding || typeof binding.code !== "string" || binding.secondCode) return "";
     const names = { primary: "Mod", control: "Ctrl", alt: "Alt", shift: "Shift", meta: "Meta" };
@@ -142,13 +142,13 @@
   }
 
   /**
-   * 所有 dsh 前端插件的插槽登记（跨包共享）。对得上 Codex++ 位置的插槽直接渲染进去；对不上的作为「子插槽」，
+   * 所有 dsh 前端插件的插槽登记（跨包共享）。对得上 Codex # 位置的插槽直接渲染进去；对不上的作为「子插槽」，
    * 由别的 dsh 组件经 renderSlot / renderSlotChain 渲染（dsh 的复合组件就是这样拼起来的）；factory 经 renderFactorySlot。
    */
   const codexPlusDshSlotEntries = new Map();
   const codexPlusDshFactories = new Map();
   const codexPlusDshSlotListeners = new Set();
-  /** 被 renderSlot / renderSlotChain 请求过的插槽名：对不上 Codex++ 位置、也没人渲染的才算「不会显示」。 */
+  /** 被 renderSlot / renderSlotChain 请求过的插槽名：对不上 Codex # 位置、也没人渲染的才算「不会显示」。 */
   const codexPlusDshRequestedSlots = new Set();
   let codexPlusDshSlotRevision = 0;
 
@@ -365,8 +365,8 @@
       },
     };
 
-    // dsh 的快捷键命令 → Codex++ 快捷键：取默认绑定（macOS 优先按平台挑），按下时问命令的 resolve。
-    // 单键（加修饰键）的绑定交给 Codex++ 的快捷键；双键组合（secondCode：两个键同时按住）与固定序列的输入
+    // dsh 的快捷键命令 → Codex # 快捷键：取默认绑定（macOS 优先按平台挑），按下时问命令的 resolve。
+    // 单键（加修饰键）的绑定交给 Codex # 的快捷键；双键组合（secondCode：两个键同时按住）与固定序列的输入
     // （registerFixed / observeFixedInput，如 `g g`，插件自己按 stopSequenceMs 判断）由这里的键盘监听处理，同 dsh 的 installKeyboard。
     const mac = Boolean(codexPlusIsMacPlatform);
     const chordCommands = new Map();
@@ -467,7 +467,7 @@
           refreshCatalog();
         };
         if (normalized?.secondCode) {
-          // 双键组合：Codex++ 的快捷键只认一个键，由这里的键盘监听匹配。
+          // 双键组合：Codex # 的快捷键只认一个键，由这里的键盘监听匹配。
           const entry = { command, binding: normalized };
           chordCommands.set(id, entry);
           installKeyboard();
@@ -520,7 +520,7 @@
         const normalized = codexPlusDshNormalizeBinding(binding, mac);
         return { keys: codexPlusDshBindingKeys(normalized, mac), aria: normalized && !normalized.secondCode ? codexPlusDshShortcutKey(binding) : undefined };
       },
-      edit: async () => ({ ok: false, reason: "Codex++ 里快捷键在拓展里改" }),
+      edit: async () => ({ ok: false, reason: "Codex # 里快捷键在拓展里改" }),
       recording: async () => {},
       closeWindow: async () => {},
     };
@@ -565,7 +565,7 @@
       dismiss() {},
       popupFor: () => undefined,
     };
-    // dsh 主题（tokens）→ Codex++ 主题：token 名写成 CSS 变量；切换走 codexPlus.themes。
+    // dsh 主题（tokens）→ Codex # 主题：token 名写成 CSS 变量；切换走 codexPlus.themes。
     const themeService = {
       getTheme: () => ({ preference: "system", fontSize: 14, active: { id: codexPlusThemesService().current || "default", colorScheme: document.documentElement.classList.contains("dark") ? "dark" : "light", tokens: {} }, themes: [], revision: 0 }),
       exportInspectTokens: () => [],
@@ -582,7 +582,7 @@
     // dsh 的 / 与 @ 菜单在 Codex 里归 Codex 自己：输入触发源注册不进去，记一条说明但不挡插件加载。
     const inputTriggers = new Proxy({}, {
       get: (_target, key) => (key === "then" ? undefined : (...args) => {
-        if (key === "register" || key === "registerSource") fail(`输入触发源 ${args[0]?.trigger || ""}${args[0]?.name || ""} 用的是 Codex 自己的 / 或 @ 菜单，Codex++ 不接管，不会出现`);
+        if (key === "register" || key === "registerSource") fail(`输入触发源 ${args[0]?.trigger || ""}${args[0]?.name || ""} 用的是 Codex 自己的 / 或 @ 菜单，Codex # 不接管，不会出现`);
         return () => {};
       }),
     });
@@ -672,7 +672,7 @@
       useProjection: () => undefined,
       renderFactorySlot,
     });
-    // 本包登记的、对不上 Codex++ 位置的插槽：全部 apply 后过一会儿还没有任何组件渲染它，才记「不会显示」。
+    // 本包登记的、对不上 Codex # 位置的插槽：全部 apply 后过一会儿还没有任何组件渲染它，才记「不会显示」。
     const unmappedNames = new Set();
 
     let anonymous = 0;
@@ -699,7 +699,7 @@
       const props = (extra) => ({ ...standardProps(extra.sessionId ?? (codexPlusCurrentSessionId() || undefined)), t, ...face, ...extra });
       const label = typeof options.label === "function" ? options.label() : String(options.label || options.id || packageName);
       const id = `dsh-${name}-${options.id || options.key || ++anonymous}`;
-      // 先登记进跨包登记表：父组件的 renderSlot 能渲染它；对得上 Codex++ 位置的再挂到那里。
+      // 先登记进跨包登记表：父组件的 renderSlot 能渲染它；对得上 Codex # 位置的再挂到那里。
       const entry = {
         id,
         name,
@@ -792,7 +792,7 @@
     };
     const slots = {
       register,
-      // Codex++ 的插槽一开始就都在：立刻执行，回调返回的撤销函数随拓展卸载。
+      // Codex # 的插槽一开始就都在：立刻执行，回调返回的撤销函数随拓展卸载。
       inject(key, callback) {
         let result;
         try {
@@ -922,7 +922,7 @@
         for (const descriptor of contribution?.descriptors || []) addRemoteDescriptor(descriptor);
         return async () => {};
       },
-      // 宿主转发的事件：对上 Codex++ 拓展内核的同名事件（agent/status 等）。
+      // 宿主转发的事件：对上 Codex # 拓展内核的同名事件（agent/status 等）。
       $on: (event, listener) => ctx.on(String(event), listener),
     }, {
       get(target, key) {
@@ -1005,7 +1005,7 @@
     };
     const require = (name) => {
       if (name in builtinModules && builtinModules[name]) return builtinModules[name];
-      throw new Error(`dsh 前端插件 require 了 ${name}，Codex++ 只提供 React 与 ReactDOM`);
+      throw new Error(`dsh 前端插件 require 了 ${name}，Codex # 只提供 React 与 ReactDOM`);
     };
     // 先求出各模块的插件对象：要用 remote 的话先向宿主半边要一次 typert 描述，remote.<namespace> 才能被 inject。
     const loaded = [];
@@ -1048,7 +1048,7 @@
     }
     if (ctx.disposed) return;
     ready = true;
-    // 对不上 Codex++ 位置的插槽：给页面一点时间画出父组件，仍没人渲染才记一条说明。
+    // 对不上 Codex # 位置的插槽：给页面一点时间画出父组件，仍没人渲染才记一条说明。
     if (unmappedNames.size) {
       ctx.setTimeout(() => {
         const orphaned = [...unmappedNames].filter((name) => !codexPlusDshRequestedSlots.has(name));

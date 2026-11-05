@@ -109,7 +109,7 @@ describe("dsh 前端插件运行时", () => {
     assert.match(k.failures[0], /依赖 store/);
   });
 
-  it("shortcuts / commandUi / theme 桥接到 Codex++ 的快捷键、斜杠命令与主题；inputTriggers 只记说明", async () => {
+  it("shortcuts / commandUi / theme 桥接到 Codex # 的快捷键、斜杠命令与主题；inputTriggers 只记说明", async () => {
     const k = await runtime();
     const ran: string[] = [];
     await k.run(k.ctx, modules({ inject: ["shortcuts", "commandUi", "theme", "inputTriggers"], apply(ctx: any) {
@@ -217,7 +217,7 @@ describe("dsh 前端插件运行时", () => {
         }
       });
     } }), { packageName: "demo" });
-    assert.equal(k.calls.filter(([kind]) => kind === "shortcut").length, 0, "双键组合不走 Codex++ 的单键快捷键");
+    assert.equal(k.calls.filter(([kind]) => kind === "shortcut").length, 0, "双键组合不走 Codex # 的单键快捷键");
     // 先按住 J 再按 K（顺序无关）。
     k.key("keydown", "KeyJ");
     const chord = k.key("keydown", "KeyK");
@@ -241,7 +241,7 @@ describe("dsh 前端插件运行时", () => {
     assert.deepEqual(k.failures, []);
   });
 
-  it("新映射的插槽落到 Codex++ 的位置；双键组合不交给 Codex++ 的单键快捷键", async () => {
+  it("新映射的插槽落到 Codex # 的位置；双键组合不交给 Codex # 的单键快捷键", async () => {
     const k = await runtime();
     for (const [name, slot] of [
       ["conversation.approval.detail", "approval"],
@@ -262,7 +262,7 @@ describe("dsh 前端插件运行时", () => {
     assert.deepEqual(k.failures, []);
   });
 
-  it("对不上 Codex++ 位置的插槽作为子插槽：父组件 renderSlot / renderSlotChain 渲染，factory 经 renderFactorySlot", async () => {
+  it("对不上 Codex # 位置的插槽作为子插槽：父组件 renderSlot / renderSlotChain 渲染，factory 经 renderFactorySlot", async () => {
     const k = await runtime();
     let parentProps: any;
     await k.run(k.ctx, modules({ inject: ["slots"], apply(ctx: any) {

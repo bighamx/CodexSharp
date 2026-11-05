@@ -186,7 +186,7 @@ pub struct SkillEntry {
     pub update_available: bool,
     /// 已经启用到哪些 Agent（"codex" / "claude" / "grok"）：它们的 skills 目录里有这个 Skill。
     pub agents: Vec<String>,
-    /// Codex++ 的受控源目录里有它（安装或导入过）；只在某个 Agent 自己目录里的 Skill 为 false。
+    /// Codex # 的受控源目录里有它（安装或导入过）；只在某个 Agent 自己目录里的 Skill 为 false。
     pub managed: bool,
 }
 
@@ -636,7 +636,7 @@ impl SkillsManager {
                         self.backup_directory(id, &link)?;
                         Ok(())
                     }
-                    Ok(_) => anyhow::bail!("{} 是这个 Agent 自己的 Skill，不由 Codex++ 管理，未删除", link.display()),
+                    Ok(_) => anyhow::bail!("{} 是这个 Agent 自己的 Skill，不由 Codex # 管理，未删除", link.display()),
                     Err(_) => Ok(()),
                 };
             }
@@ -1074,7 +1074,7 @@ impl SkillsManager {
         skills
     }
 
-    /// 从外部 Skill 目录导入到 Codex++ 的受控源目录，并默认停用。来源记为 cc-switch。
+    /// 从外部 Skill 目录导入到 Codex # 的受控源目录，并默认停用。来源记为 cc-switch。
     pub fn import_from_directory(
         &self,
         id: &str,
@@ -1136,9 +1136,9 @@ impl SkillsManager {
         if repo_key == LOCAL_IMPORT_REPO_KEY {
             // Codex 的 skills 目录本来就会被扫描显示；从这里「导入」会把原目录挪进备份，反而让它从 Codex 消失。
             if let Ok(external) = external_dir.canonicalize() {
-                for (root, label) in [(self.linked_dir(), "Codex 的 skills 目录"), (self.source_dir.clone(), "Codex++ 的 Skills 受控目录")] {
+                for (root, label) in [(self.linked_dir(), "Codex 的 skills 目录"), (self.source_dir.clone(), "Codex # 的 Skills 受控目录")] {
                     if root.canonicalize().is_ok_and(|root| external.starts_with(root)) {
-                        anyhow::bail!("{} 已在{label}里，Codex++ 会直接识别，无需导入", external_dir.display());
+                        anyhow::bail!("{} 已在{label}里，Codex # 会直接识别，无需导入", external_dir.display());
                     }
                 }
             }
@@ -2644,7 +2644,7 @@ fn github_system_proxy(url: Option<&str>) -> Option<String> {
 
 async fn github_client() -> anyhow::Result<reqwest::Client> {
     tokio::task::spawn_blocking(|| {
-        let agent = format!("Codex++/{}", crate::version::VERSION);
+        let agent = format!("Codex #/{}", crate::version::VERSION);
         if !cfg!(target_os = "linux")
             && [
                 "HTTPS_PROXY",
@@ -3013,7 +3013,7 @@ async fn read_repo_zip_response_with_timeout(
     .context("仓库压缩包下载总时间超限")?
 }
 
-/// 复制回退时放进副本的标记：有它说明这份副本是 Codex++ 建的，停用时可以删。
+/// 复制回退时放进副本的标记：有它说明这份副本是 Codex # 建的，停用时可以删。
 const MANAGED_COPY_MARKER: &str = ".codex-plus-managed";
 
 #[cfg(test)]

@@ -21,7 +21,7 @@ test("预览窗口不抢焦点：创建时不聚焦，显示走不激活的置�
   const rust = read("../src-tauri/src/cu_pip.rs");
   assert.match(rust, /\.focused\(false\)/);
   assert.match(rust, /show_floating_without_activation/);
-  // 用 window.show() 会激活 Codex++，用户正在用的窗口失焦。
+  // 用 window.show() 会激活 Codex #，用户正在用的窗口失焦。
   assert.doesNotMatch(rust.slice(rust.indexOf("fn order_front"), rust.indexOf("#[cfg(not(target_os = \"macos\"))]", rust.indexOf("fn order_front"))), /window\.show\(\)/);
 });
 
@@ -36,9 +36,9 @@ test("预览组件加载后主动取目标，并能关闭与切到应用", () =>
   }
 });
 
-test("预览窗口标明 Codex++ Computer Use", () => {
-  assert.ok(read("./CuPipWindow.tsx").includes(">Codex++ Computer Use<"));
-  assert.match(read("../src-tauri/src/cu_pip.rs"), /\.title\("Codex\+\+ Computer Use"\)/);
+test("预览窗口标明 Codex # Computer Use", () => {
+  assert.ok(read("./CuPipWindow.tsx").includes(">Codex # Computer Use<"));
+  assert.match(read("../src-tauri/src/cu_pip.rs"), /\.title\("Codex # Computer Use"\)/);
 });
 
 test("预览窗口能拖动：标题栏是拖动区，权限里有 start-dragging，非前台时第一下点击也生效", () => {

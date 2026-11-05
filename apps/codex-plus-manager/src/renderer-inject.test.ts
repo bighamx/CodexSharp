@@ -919,7 +919,7 @@ describe("renderer injection header compatibility", () => {
     assert.doesNotMatch(renderer, /codexAppSessionShare|"\/session\/export"/);
   });
 
-  it("removes the legacy Codex++ top-bar entry", async () => {
+  it("removes the legacy Codex # top-bar entry", async () => {
     const renderer = await readFile(new URL("../../../assets/inject/renderer-inject.js", import.meta.url), "utf8");
 
     assert.doesNotMatch(renderer, /function installCodexPlusMenu\(\)/);
@@ -927,7 +927,7 @@ describe("renderer injection header compatibility", () => {
     assert.doesNotMatch(renderer, /codex-plus-trigger/);
   });
 
-  it("places Codex++ in the native sidebar and opens a main-content page", async () => {
+  it("places Codex # in the native sidebar and opens a main-content page", async () => {
     const renderer = await readFile(new URL("../../../assets/inject/renderer-inject.js", import.meta.url), "utf8");
 
     assert.match(renderer, /codexPlusSidebarNavId\s*=\s*"codex-plus-sidebar-nav"/);
@@ -957,7 +957,7 @@ describe("renderer injection header compatibility", () => {
     assert.match(renderer, /document\.querySelectorAll\(`#\$\{codexPlusMenuId\}/);
   });
 
-  it("mounts Codex++ and 拓展 entries into the new navigation rail", async () => {
+  it("mounts Codex # and 拓展 entries into the new navigation rail", async () => {
     const renderer = await readFile(new URL("../../../assets/inject/renderer-inject.js", import.meta.url), "utf8");
 
     assert.match(renderer, /codexPlusRailNavId\s*=\s*"codex-plus-rail-nav"/);
@@ -988,7 +988,7 @@ describe("renderer injection header compatibility", () => {
     assert.match(renderer, /const installed = document\.getElementById\(codexPlusSidebarNavId\)\s*\|\| document\.getElementById\(codexPlusRailNavId\);/);
   });
 
-  it("opens 拓展 as a standalone page instead of a Codex++ tab", async () => {
+  it("opens 拓展 as a standalone page instead of a Codex # tab", async () => {
     const renderer = await readFile(new URL("../../../assets/inject/renderer-inject.js", import.meta.url), "utf8");
 
     assert.match(renderer, /codexPlusExtensionsTab\s*=\s*"extensions"/);
@@ -1126,7 +1126,7 @@ describe("renderer injection header compatibility", () => {
     assert.doesNotMatch(renderer.slice(start, end), /data-codex-extensions-search|setSelectionRange/);
   });
 
-  it("does not install Codex++ UI in embedded browser documents", async () => {
+  it("does not install Codex # UI in embedded browser documents", async () => {
     const renderer = await readFile(new URL("../../../assets/inject/renderer-inject.js", import.meta.url), "utf8");
 
     assert.match(renderer, /window\.top\s*!==\s*window/);
@@ -1475,9 +1475,9 @@ ${segment(renderer, "  function codexPlusModalTab(", "  // ── 设置项清�
 ${segment(renderer, "  function refreshCodexPlusPageNav(", "  /**\n   * 脚本清单变化后同步左面板")}
 refreshCodexPlusPageNav();
 return { title: title.textContent, body: body.innerHTML };`)(activeTab) as { title: string; body: string };
-    // 拓展注册 / 撤销后统一刷新不带 tab：拓展页仍是拓展列表，不能换成 Codex++ 主页导航。
+    // 拓展注册 / 撤销后统一刷新不带 tab：拓展页仍是拓展列表，不能换成 Codex # 主页导航。
     assert.deepEqual(pageNav("extensions"), { title: "拓展", body: "items:extensions" });
-    assert.deepEqual(pageNav("home"), { title: "Codex++", body: "items:home" });
+    assert.deepEqual(pageNav("home"), { title: "Codex #", body: "items:home" });
     // 统一刷新确实是无参调用，这条默认值才有意义。
     assert.match(renderer, /for \(const refresh of \[\s*refreshCodexPlusPageNav,/);
   });
@@ -2182,7 +2182,7 @@ it("opens Stepwise configuration in the manager enhancement page", async () => {
   );
   await openManager();
   assert.deepEqual(requests, [{ route: "/manager/open-transient", payload: { page: "enhance", section: "stepwise" } }]);
-  assert.equal(state.settingsStatus, "已打开 Codex++");
+  assert.equal(state.settingsStatus, "已打开 Codex #");
   assert.equal(renders, 2);
 });
 
@@ -3252,7 +3252,7 @@ describe("renderer model reasoning efforts patch", () => {
   });
 });
 
-describe("Codex++ 设置页按设置项清单生成", () => {
+describe("Codex # 设置页按设置项清单生成", () => {
   type CatalogItem = {
     key: string; group: string; control: string; title: string; description: string; descriptionWhenEnhancementsOn?: string;
     surfaces: string[]; platforms?: string[]; codexInputs?: Array<{ id: string; label: string; hint?: string }>;

@@ -184,7 +184,7 @@ export function ComputerUsePreview() {
       <div className="cu-card-head">
         <div>
           <h2 id="cu-preview-title">{t("窗口预览")}</h2>
-          <p>{t("实时看 Codex 正在操作的目标窗口。画面由 Codex++ 自己抓取，和官方窗口镜像同源，只是不经官方通道。")}</p>
+          <p>{t("实时看 Codex 正在操作的目标窗口。画面由 Codex # 自己抓取，和官方窗口镜像同源，只是不经官方通道。")}</p>
         </div>
         {permitted ? (
           <button className="mg-button" type="button" disabled={locked} onClick={() => void loadWindows()}>
@@ -256,7 +256,7 @@ export function ComputerUsePreview() {
       {!error && notice && <p className="cu-hint">{notice}</p>}
       {!error && hint && <p className="cu-hint">{hint}</p>}
       <p className="cu-note">
-        {t("第一次使用会在 系统设置 → 隐私与安全性 → 屏幕录制 里请求授权，授权后需重启 Codex++ 才生效。")}
+        {t("第一次使用会在 系统设置 → 隐私与安全性 → 屏幕录制 里请求授权，授权后需重启 Codex # 才生效。")}
       </p>
     </section>
   );

@@ -116,7 +116,7 @@ export function AgentDashboard({
 
   const heroStatus: DashboardStatus = enhanceOnly ? { tone: "direct", text: t("供应商由其他工具管理") } : status ?? {
     tone: access,
-    text: access === "gateway" ? (model ? tf("经 Codex++ 网关 · {0}", [model]) : t("经 Codex++ 网关"))
+    text: access === "gateway" ? (model ? tf("经 Codex # 网关 · {0}", [model]) : t("经 Codex # 网关"))
       : access === "drift" ? (view?.drift?.by ? tf("配置被 {0} 改掉了，没有经过网关", [view.drift.by]) : t("配置被别的工具改掉了，没有经过网关"))
         : access === "direct" ? t("未接入网关 · 用它自己的设置")
           : t("读取中…"),

@@ -2,7 +2,7 @@
 
 ## 现象
 
-用户截图：Codex 会话经 Codex++ 本地代理（`http://127.0.0.1:57321/v1/responses`）发请求时返回
+用户截图：Codex 会话经 Codex # 本地代理（`http://127.0.0.1:57321/v1/responses`）发请求时返回
 
 ```
 unexpected status 413 Payload Too Large:
@@ -27,7 +27,7 @@ unexpected status 413 Payload Too Large:
 
   同时请求日志显示该会话 `inputTokens = 684,700`、缓存命中 99.98%。按此比例，
   1M tokens 的请求体约 50 MB，32 MiB 默认值在正常长会话里必然先撞上。
-- 结论：不是请求异常膨胀，而是 **Codex++ 自己支持的「按模型配置大上下文窗口」
+- 结论：不是请求异常膨胀，而是 **Codex # 自己支持的「按模型配置大上下文窗口」
   与 helper 的 32 MiB 默认硬上限互相矛盾**。另外旧错误提示只提环境变量，
   GUI 用户（Finder/LaunchServices 启动）实际上无法设置。
 
@@ -38,12 +38,12 @@ unexpected status 413 Payload Too Large:
 2. **新增设置项 `helperMaxRequestBodyMib`**（默认 128，范围 32~512）：
    - 管理器「代理设置 → 本地协议代理 → 请求体上限（MiB）」可视化修改；
    - 保存后立即对运行中的 helper 生效（`save_settings` 调用
-     `launcher::set_http_body_limit_bytes`），不必重启 Codex++/Codex；
+     `launcher::set_http_body_limit_bytes`），不必重启 Codex #/Codex；
    - 启动流程在 helper 绑定端口前从设置读取并应用；管理器进程启动时也会应用；
    - `CODEX_PLUS_MAX_HTTP_BODY_BYTES`（字节）仍优先，兼容既有用法。
 3. **设置落盘安全**：`settings.json` 读写、`/settings/set` 部分更新白名单、
    管理器保存前都夹取到 32~512 MiB；旧配置没有该字段时补默认 128。
-4. **413 提示**改为「请在 Codex++『代理设置』调大『请求体上限』，或设置环境变量」，
+4. **413 提示**改为「请在 Codex #『代理设置』调大『请求体上限』，或设置环境变量」，
    直接指到可操作入口。
 
 内存权衡：helper 会整段缓冲请求体后再解析/转发，128 MiB 上限对应单次请求约
@@ -85,7 +85,7 @@ unexpected status 413 Payload Too Large:
 | 场景 | 结果 |
 | --- | --- |
 | 40 MiB 实际请求体（旧上限下必 413） | `HTTP/1.1 404 Not Found`（未知路径），**请求体已被完整接收** |
-| 声明 `Content-Length: 128MiB + 1` | `HTTP/1.1 413 Payload Too Large`，提示「超过 128 MiB（134217728 字节）上限：请在 Codex++『代理设置』调大『请求体上限』…」 |
+| 声明 `Content-Length: 128MiB + 1` | `HTTP/1.1 413 Payload Too Large`，提示「超过 128 MiB（134217728 字节）上限：请在 Codex #『代理设置』调大『请求体上限』…」 |
 | 声明 `Content-Length: 512MiB + 1` | `HTTP/1.1 413 Payload Too Large`（上限仍生效） |
 
 用户原会话（请求体约 33.5 MB）重试即可继续，无需再设环境变量；重启后注入桥已重新连上

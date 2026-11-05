@@ -482,7 +482,7 @@ impl Store {
             .to_string();
         self.with_state(|state| {
             if !state.config.enabled {
-                bail!("请先在 Codex++ 中开启 agent 协作");
+                bail!("请先在 Codex # 中开启 agent 协作");
             }
             let agent = state
                 .config
@@ -1002,7 +1002,7 @@ fn expire_abandoned_tasks(owners_dir: &Path, state: &mut State) {
                     "failed"
                 }
                 .to_string();
-                task.error = "排队期间提交此任务的执行进程（Codex++ 或 MCP）已退出或失联，任务未启动，没有执行任何操作；可以重新提交。".to_string();
+                task.error = "排队期间提交此任务的执行进程（Codex # 或 MCP）已退出或失联，任务未启动，没有执行任何操作；可以重新提交。".to_string();
                 task.progress = QUEUE_ABANDONED_PROGRESS.to_string();
                 task.updated_at_ms = timestamp;
                 continue;

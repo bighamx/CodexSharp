@@ -1,4 +1,4 @@
-# Codex++ Computer Use：原生直通方案
+# Codex # Computer Use：原生直通方案
 
 - 日期：2026-10-23
 - 取代：[2026-10-23-codexpp-computer-use-bridge-design.md](./2026-10-23-codexpp-computer-use-bridge-design.md) 的 §2.5 路线（`cua_repl` + 薄适配层）
@@ -9,7 +9,7 @@
 
 ## 0. 一句话结论
 
-现在这套是**二阶模拟**：`Codex++ → cua-repl(JS code-mode) → @oai/sky → SkyComputerUseService`，
+现在这套是**二阶模拟**：`Codex # → cua-repl(JS code-mode) → @oai/sky → SkyComputerUseService`，
 然后在 Rust 里用 `build_sky_call` / `reshape_tool_result` / `decorate_state`
 把这 10 个离散工具重新造了一遍。
 
@@ -283,7 +283,7 @@ apps/codex-plus-manager/src/ComputerUsePage.tsx       新增「已授权应用�
 scripts/cu-parity.mjs                                 新增：golden A/B 对照脚本（见 §7.2）
 ```
 
-不改：`Cargo.toml`（无新依赖）、`Info.plist`（TCC 身份沿用 Codex++ 主二进制）。
+不改：`Cargo.toml`（无新依赖）、`Info.plist`（TCC 身份沿用 Codex # 主二进制）。
 
 > 注：TCC 授权（辅助功能 / 屏幕录制）仍然绑在 `SkyComputerUseService` 自己的 bundle id 上，
 > 由 ChatGPT.app 那套装好时完成，本次改动不涉及。

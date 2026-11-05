@@ -19,7 +19,7 @@ pub struct RuntimeHealth {
     pub local_server: ServiceState,
     pub debugger: ServiceState,
     pub protocol_conversion_enabled: Option<bool>,
-    /// Codex 在运行，但不是经 Codex++ 启动的（Dock / Finder 等外部启动，没带调试端口），
+    /// Codex 在运行，但不是经 Codex # 启动的（Dock / Finder 等外部启动，没带调试端口），
     /// 增强脚本没有挂载。前端据此提示「重启并挂载」。目前只有 macOS 能精确识别。
     pub codex_unattached: bool,
 }

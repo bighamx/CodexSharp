@@ -97,7 +97,7 @@ test("启动 Codex 一眼可见：Codex 页面顶栏最右侧一个主按钮，�
   assert.match(button, /disabled=\{state\.busy \|\| unavailable\}/);
   assert.match(button, /<span className=\{`codex-launch \$\{className\}`\.trim\(\)\} data-running=\{state\.running\} data-unavailable=\{unavailable\} title=\{hint\}>/);
   assert.match(button, /variant="default"/);
-  // 顶栏：只在 Codex 的页面里、排在页面操作挂载点之后。Codex++ 不只服务 Codex，
+  // 顶栏：只在 Codex 的页面里、排在页面操作挂载点之后。Codex # 不只服务 Codex，
   // 网关、全局管理、工具类页面和 Claude Code / Grok 的页面都不放。
   assert.match(entry, /const onCodexPage = \(routeTool\(route\) === "codex" && \(route !== "userScripts" \|\| extensionHost === "codex"\)\) \|\| \(route === "overview" && activeTool === "codex"\);/);
   assert.match(
@@ -231,10 +231,10 @@ test("「Codex 连接」页顶部是连接方式（经网关 / 直连）：没�
   const hint = functionSource("LegacyRelayGatewayHint");
   assert.match(hint, /t\("建议改用新版网关"\)/);
   assert.match(hint, /form\.activeRelayId === CODEX_GATEWAY_RELAY_ID/);
-  assert.match(hint, /t\("Codex 当前经 Codex\+\+ 网关（新版）"\)/);
+  assert.match(hint, /t\("Codex 当前经 Codex # 网关（新版）"\)/);
   assert.match(hint, /t\("Codex 已从网关切回直连"\)/);
-  // 一行：标题写现在怎么连（经 Codex++ 网关 / 直连 · 供应商名），右侧切换 + 三点菜单；断开并还原在菜单里。
-  assert.match(hint, /\? t\("经 Codex\+\+ 网关"\)/);
+  // 一行：标题写现在怎么连（经 Codex # 网关 / 直连 · 供应商名），右侧切换 + 三点菜单；断开并还原在菜单里。
+  assert.match(hint, /\? t\("经 Codex # 网关"\)/);
   assert.match(hint, /tf\("直连 · \{0\}", \[direct\.name \|\| t\("未命名供应商"\)\]\)/);
   assert.match(hint, /\{viaGateway \? <MenuItem danger onClick=\{onDisconnect\}>\{t\("断开并还原"\)\}<\/MenuItem> : null\}/);
   // 列表里托管的网关供应商单独标出，只能「使用」，不能编辑、删除。
@@ -350,38 +350,26 @@ test("代理设置按归属拆开：本地服务与请求避震移到网关设�
   assert.match(functionSource("App"), /<SharedServiceSettings[\s\S]*?form=\{settingsForm\}/);
 });
 
-test("首页：状态、精选推荐、其他赞助商、常用入口；广告只在首页，首页是侧栏第一项和启动落脚页", () => {
+test("首页：状态、拓扑图、常用入口；赞助商推荐位已移除，广告不再拉取", () => {
   const app = functionSource("App");
-  assert.match(app, /\{route === "home" \? \(\n\s*<HomeScreen\n\s*ads=\{ads\}/);
+  // 首页是侧栏第一项、启动落脚页；旧的「推荐内容」路由跳到它。
+  assert.match(app, /\{route === "home" \? \(\n\s*<HomeScreen\n/);
   assert.equal((text.match(/<HomeScreen\b/g) ?? []).length, 1);
   assert.doesNotMatch(text, /SponsorBoard|FloatingSponsor/);
   assert.doesNotMatch(functionSource("OverviewScreen"), /featuredAds|AdGrid/);
-  // 侧栏主模式第一项；旧「推荐内容」路由跳到首页，设置模式里不再有这一项。
   assert.match(functionSource("AppSidebar"), /const general: SideEntry\[\] = \[\n\s*\{ key: "home", route: "home", label: t\("首页"\), icon: House, match: \["home", "recommendations"\] \},/);
   assert.match(app, /target === "recommendations" \? "home" : target/);
-  assert.match(app, /if \(next === "home"\) await refreshAds\(true\);/);
-  assert.doesNotMatch(text.slice(text.indexOf("const settingsModeRoutes"), text.indexOf("const customizeRoutes")), /"recommendations"/);
   const home = functionSource("HomeScreen");
-  // 首页不能全是广告：先是状态，再是精选推荐和其他赞助商，最后常用入口。
-  const order = ['title={t("状态")}', 'title={t("精选推荐")}', 'title={t("更多赞助商")}', 'title={t("常用")}'].map((needle) => home.indexOf(needle));
+  // 自上而下：状态 → 拓扑图（取代原来的推荐位）→ 常用入口。
+  const order = ['title={t("状态")}', "<HubTopologyCard", 'title={t("常用")}'].map((needle) => home.indexOf(needle));
   assert.ok(order.every((index, position) => index > 0 && (position === 0 || index > order[position - 1])), String(order));
-  // 只管增强时不显示网关一行，入口也按使用模式过滤。
-  assert.match(home, /\{enhanceOnly \? null : \(/);
-  assert.match(home, /shortcuts\.filter\(\(item\) => routeVisible\(focus, item\.route\)\)/);
-  // 推荐：置顶位不管几个都上横幅、一行均分宽度，不挪去别处；推荐池的赞助商不能上横幅；其他赞助商全部列出不折叠；同一家去重。卡片上不再单独标「推广」，赞助性质由这一节标题旁的说明交代。
-  assert.match(home, /const heroes = topAds;/);
-  assert.match(home, /const rest = pool\.filter\(\(ad\) => ad\.type === "sponsor"\);/);
-  assert.match(home, /gridTemplateColumns: `repeat\(\$\{heroes\.length\}, minmax\(0, 1fr\)\)`/);
-  assert.match(home, /\{rest\.map\(\(ad\) => \(/);
-  assert.doesNotMatch(home, /showAllAds|rest\.slice\(0, 3\)/);
-  assert.match(home, /!topIdentities\.has\(adIdentity\(ad\)\)/);
-  assert.match(home, /\.filter\(\(ad\) => ad\.type === "sponsor"\)/);
-  assert.doesNotMatch(home, /t\("推广"\)/);
-  assert.match(home, /aside=\{<span>\{t\("赞助商推荐：支持 Codex\+\+ 的服务"\)\}<\/span>\}/);
-  // 精选卡片不用 button：旧版 WebKit 里 button 做网格项会被大图撑宽、整页错位。
-  assert.match(home, /<div\n\s*className="home-hero"/);
-  assert.doesNotMatch(home, /<button[^>]*className="home-hero"/);
-  assert.match(functionSource("featuredAds"), /filter\(\(ad\) => !isExpiredAd\(ad\)\)/);
+  // 推荐位彻底移除：不再吃 ads、没有精选/更多赞助商区块，进首页也不再拉广告源。
+  assert.doesNotMatch(home, /ads=\{ads\}|精选推荐|更多赞助商|actions\.refreshAds/);
+  assert.doesNotMatch(app, /if \(next === "home"\) await refreshAds\(true\);/);
+  // 首页的拓扑卡用旧版宽松尺寸（roomy），总览仍走 compact。
+  assert.match(home, /<HubTopologyCard[\s\S]*?roomy/);
+  assert.match(home, /codex=\{\{ running: codexRunning, providerName: tools\.find/);
+  assert.match(readSource("./HubOverview.tsx"), /className=\{roomy \? "hub-topology-roomy" : "hub-topology-compact"\}/);
 });
 
 test("Codex 在「经网关」和「直连」之间一键切换：切到网关沿用上次接入设置，切回直连先预览还原", () => {
@@ -425,7 +413,7 @@ test("直连供应商和网关供应商池打通：每行标出是否已在池�
   assert.doesNotMatch(screen, /\{poolBanner\}/);
   // 接管期间直连供应商整块隐藏，只留「被网关接管」一行说明，没有使用 / 编辑 / 删除。
   const takenOver = screen.slice(screen.indexOf("{normalized.relayProfilesEnabled && takenOverByGateway ? ("), screen.indexOf("{normalized.relayProfilesEnabled && !takenOverByGateway ? ("));
-  assert.match(takenOver, /title=\{t\("Codex 正由 Codex\+\+ 网关接管"\)\}/);
+  assert.match(takenOver, /title=\{t\("Codex 正由 Codex # 网关接管"\)\}/);
   assert.doesNotMatch(takenOver, /directProfiles\.map|onSwitchProfile|onEdit|removeRelayProfile/);
   assert.match(functionSource("SortableRelayProfileCard"), /\{gatewayManaged \|\| !poolLink \? null : <PoolLinkControl link=\{poolLink\} profileId=\{profile\.id\} \/>\}/);
 });

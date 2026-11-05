@@ -86,7 +86,7 @@
 - 交付前清理历史构建：`node scripts/prune-local-builds.mjs --apply`（移入废纸篓，可恢复；relaunch 脚本会自动执行）
 
 **不要再新建 `dist/local-build-<任务名>-<时间戳>` 目录，也不要按任务改名或改 bundle id。**
-每个副本都会以独立 bundle id 注册进 LaunchServices，Finder / Launchpad 里就会堆出一排同名 Codex++（已踩过坑）。
+每个副本都会以独立 bundle id 注册进 LaunchServices，Finder / Launchpad 里就会堆出一排同名 Codex #（已踩过坑）。
 
 `dist/local-build/Codex++.app` 丢失时，从 `/Applications/Codex++.app` 复制一份，补 `LSEnvironment`
 （`CODEX_PLUS_STATE_DIR=<仓库>/dist/local-build/state`、`CODEX_PLUS_MANAGER_GUARD_PORT=63122`、

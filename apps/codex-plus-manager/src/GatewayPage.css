@@ -1243,7 +1243,7 @@
   font-size: 11px;
 }
 
-/* 模型选择器的条目：图标 · 名字 · 「经 Codex++」 · 说明 · 收藏 · 勾 */
+/* 模型选择器的条目：图标 · 名字 · 「经 Codex #」 · 说明 · 收藏 · 勾 */
 .gw-model-popover {
   min-height: 0;
 }
@@ -2354,7 +2354,7 @@ span.gw-avatar[data-size] {
   fill: currentColor;
 }
 
-/* Agent 自带的模型：直连厂商、不经 Codex++，和池里的模型一眼区分开。 */
+/* Agent 自带的模型：直连厂商、不经 Codex #，和池里的模型一眼区分开。 */
 .gw-portal .gw-mp-direct {
   flex: none;
   max-width: 50%;

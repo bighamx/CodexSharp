@@ -19,7 +19,7 @@
 
 ## 1. #2154 → 修 #2148（唯一一条显式链接的）
 
-**#2148**：Windows 升 1.3.0 后点"重启 Codex++"报 `此应用不支持指定的合约或未安装该应用。 (0x80270254)`。
+**#2148**：Windows 升 1.3.0 后点"重启 Codex #"报 `此应用不支持指定的合约或未安装该应用。 (0x80270254)`。
 
 **PR #2154**（Story19240，+91/-1，2 文件）：根因是 `packaged_app_user_model_id`（[app_paths.rs:488](crates/codex-plus-core/src/app_paths.rs:488)）把 AUMID 应用段硬编码成 `App`，而 ChatGPT Desktop `1.2026.190.0` 更新后 manifest 里的 `<Application Id>` 已不是 `App`。改成从包内 `AppxManifest.xml` 读第一个 `<Application>` 的 `Id`，读不到再回退旧值。
 

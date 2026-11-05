@@ -1,4 +1,4 @@
-// 由 Codex++ 生成配置；只使用 Claude Code 官方 Mods API。
+// 由 Codex # 生成配置；只使用 Claude Code 官方 Mods API。
 const CONFIG = /*CODEXPP_CONFIG*/{};
 const EXTENSIONS = CONFIG.extensions || [];
 const PLUGIN_NAME = 'codexpp-extension-host';

@@ -136,7 +136,7 @@ fn write_goose(env: &AgentEnv, wiring: &Wiring, set: &mut FileSet) -> anyhow::Re
         ("name", json!(PROVIDER_ID)),
         ("engine", json!("openai")),
         ("display_name", json!(PROVIDER_NAME)),
-        ("description", json!("Codex++ 本地网关")),
+        ("description", json!("Codex # 本地网关")),
         ("api_key_env", json!("")),
         ("base_url", json!(wiring.v1())),
         (
@@ -177,7 +177,7 @@ pub const GOOSE: AgentSpec = AgentSpec {
     detect: |env| goose_dir(env).exists() || env.has_binary("goose"),
     config_path: goose_path,
     write: write_goose,
-    hint: "Goose 启动时加载供应商，接入后重启 Goose；在它的模型设置里可换 Codex++ 下的模型",
+    hint: "Goose 启动时加载供应商，接入后重启 Goose；在它的模型设置里可换 Codex # 下的模型",
 };
 
 // ---------------------------------------------------------------- DeepSeek Harness (dsh)
@@ -186,7 +186,7 @@ pub const GOOSE: AgentSpec = AgentSpec {
 const DSH_KEY_ENV: &str = "CODEXPLUS_GATEWAY_KEY";
 const DSH_BEGIN: &str = "# >>> codex-plus-gateway";
 const DSH_BEGIN_LINE: &str =
-    "# >>> codex-plus-gateway：由 Codex++ 网关写入，断开网关时自动移除，请不要手改";
+    "# >>> codex-plus-gateway：由 Codex # 网关写入，断开网关时自动移除，请不要手改";
 const DSH_END: &str = "# <<< codex-plus-gateway";
 const DSH_HEAD: &str = "# dsh 的全局补丁层，叠加在每个 profile 的补丁层之上\n";
 
@@ -226,7 +226,7 @@ fn dsh_profiles(dir: &Path) -> Vec<PathBuf> {
 
 /// dsh 的补丁列表是顶层 YAML 数组，`YamlDoc` 只认顶层键，所以全局补丁层按整份文件写：
 /// 用户原有内容不动，末尾维护一段带首尾标记的块，里面两条补丁——
-/// `llm-pi-ai`（自定义供应商，Codex++ 一条路由，用户已有的路由一并带上）与
+/// `llm-pi-ai`（自定义供应商，Codex # 一条路由，用户已有的路由一并带上）与
 /// `agent-default-model`（新会话起始的模型）。Key 写进 `$DSH_HOME/.env`（命令行读）和
 /// dsh 自己的密钥库 `.credentials.yaml`（桌面版只读它）。
 fn write_dsh(env: &AgentEnv, wiring: &Wiring, set: &mut FileSet) -> anyhow::Result<()> {
@@ -356,7 +356,7 @@ fn split_marked(text: &str, path: &Path) -> anyhow::Result<(String, Option<Strin
     }
     if inside {
         bail!(
-            "{} 里 Codex++ 写入的块缺少结束标记，为免改坏没有改动它",
+            "{} 里 Codex # 写入的块缺少结束标记，为免改坏没有改动它",
             path.display()
         );
     }
@@ -492,7 +492,7 @@ pub const REASONIX: AgentSpec = AgentSpec {
     detect: |env| reasonix_dir(env).exists() || env.has_binary("reasonix"),
     config_path: reasonix_path,
     write: write_reasonix,
-    hint: "在 Reasonix 里选 Codex++ 下的模型；接入后重启 Studio 或 reasonix",
+    hint: "在 Reasonix 里选 Codex # 下的模型；接入后重启 Studio 或 reasonix",
 };
 
 pub const DSH: AgentSpec = AgentSpec {
@@ -503,7 +503,7 @@ pub const DSH: AgentSpec = AgentSpec {
     detect: |env| dsh_dir(env).exists() || env.has_binary("dsh"),
     config_path: dsh_path,
     write: write_dsh,
-    hint: "在 dsh 的模型列表里选 Codex++ 下的模型；新会话生效",
+    hint: "在 dsh 的模型列表里选 Codex # 下的模型；新会话生效",
 };
 
 // ---------------------------------------------------------------- Hermes Agent
@@ -562,7 +562,7 @@ pub const HERMES: AgentSpec = AgentSpec {
     detect: |env| hermes_root(env).exists() || env.has_binary("hermes"),
     config_path: hermes_path,
     write: write_hermes,
-    hint: "用 hermes model 或会话里的模型选择器换 Codex++ 下的模型；接入后重开 hermes",
+    hint: "用 hermes model 或会话里的模型选择器换 Codex # 下的模型；接入后重开 hermes",
 };
 
 // ---------------------------------------------------------------- Mister Morph
@@ -602,7 +602,7 @@ pub const MISTER_MORPH: AgentSpec = AgentSpec {
     detect: |env| morph_path(env).exists() || env.home_path(".morph").exists(),
     config_path: morph_path,
     write: write_morph,
-    hint: "Mister Morph 只用一个模型，换模型请在 Codex++ 里改；接入后重开 morph",
+    hint: "Mister Morph 只用一个模型，换模型请在 Codex # 里改；接入后重开 morph",
 };
 
 // ---------------------------------------------------------------- jcode
@@ -651,7 +651,7 @@ pub const JCODE: AgentSpec = AgentSpec {
     detect: |env| jcode_dir(env).exists() || env.has_binary("jcode"),
     config_path: jcode_path,
     write: write_jcode,
-    hint: "在 jcode 里用 /model 选 Codex++ 下的模型；接入后重启 jcode",
+    hint: "在 jcode 里用 /model 选 Codex # 下的模型；接入后重启 jcode",
 };
 
 // ---------------------------------------------------------------- Empryo
@@ -672,7 +672,7 @@ fn empryo_path(env: &AgentEnv) -> PathBuf {
     empryo_dir(env).join("config.json")
 }
 
-/// `providers` 数组里一条 Codex++，`defaultModel` 选中它。自定义供应商的 Key 只能按 `envVar`
+/// `providers` 数组里一条 Codex #，`defaultModel` 选中它。自定义供应商的 Key 只能按 `envVar`
 /// 取：环境变量没有时 Empryo 会去同目录的 `secrets.json` 按变量名找，网关 token 就写在那里。
 fn write_empryo(env: &AgentEnv, wiring: &Wiring, set: &mut FileSet) -> anyhow::Result<()> {
     let dir = empryo_dir(env);
@@ -719,7 +719,7 @@ pub const EMPRYO: AgentSpec = AgentSpec {
     },
     config_path: empryo_path,
     write: write_empryo,
-    hint: "在 Empryo 的模型选择里选 Codex++ 下的模型；接入后重启 empryo",
+    hint: "在 Empryo 的模型选择里选 Codex # 下的模型；接入后重启 empryo",
 };
 
 // ---------------------------------------------------------------- MiniMax Code
@@ -768,7 +768,7 @@ pub const MINIMAX_CODE: AgentSpec = AgentSpec {
     detect: |env| minimax_path(env).parent().is_some_and(Path::exists) || env.has_binary("mcode"),
     config_path: minimax_path,
     write: write_minimax,
-    hint: "在 mcode 里用 /model 选 Codex++ 下的模型；接入后重启 mcode",
+    hint: "在 mcode 里用 /model 选 Codex # 下的模型；接入后重启 mcode",
 };
 
 // ---------------------------------------------------------------- Droid (Factory)
@@ -852,7 +852,7 @@ pub const DROID: AgentSpec = AgentSpec {
     detect: |env| droid_path(env).parent().is_some_and(Path::exists) || env.has_binary("droid"),
     config_path: droid_path,
     write: write_droid,
-    hint: "在 droid 里用 /model 的自定义模型里选 Codex++ 下的模型；新会话生效",
+    hint: "在 droid 里用 /model 的自定义模型里选 Codex # 下的模型；新会话生效",
 };
 
 // ---------------------------------------------------------------- Cline (CLI)
@@ -994,7 +994,7 @@ pub const QODER: AgentSpec = AgentSpec {
     detect: |env| qoder_path(env).is_file() || env.has_binary("qodercli"),
     config_path: qoder_path,
     write: |env, wiring, set| write_qoder_at(&qoder_path(env), wiring, set),
-    hint: "在 qodercli 里用 /model 选 Codex++ 下的模型（套餐需支持自带 Key）；接入后重开 qodercli",
+    hint: "在 qodercli 里用 /model 选 Codex # 下的模型（套餐需支持自带 Key）；接入后重开 qodercli",
 };
 
 pub const QODER_CN: AgentSpec = AgentSpec {
@@ -1005,7 +1005,7 @@ pub const QODER_CN: AgentSpec = AgentSpec {
     detect: |env| qoder_cn_path(env).is_file() || env.has_binary("qoderclicn"),
     config_path: qoder_cn_path,
     write: |env, wiring, set| write_qoder_at(&qoder_cn_path(env), wiring, set),
-    hint: "在 qoderclicn 里用 /model 选 Codex++ 下的模型（套餐需支持自带 Key）；接入后重开 qoderclicn",
+    hint: "在 qoderclicn 里用 /model 选 Codex # 下的模型（套餐需支持自带 Key）；接入后重开 qoderclicn",
 };
 
 // ---------------------------------------------------------------- Grok App
@@ -1088,7 +1088,7 @@ pub const GROK_APP: AgentSpec = AgentSpec {
     detect: |env| grok_app_dir(env).exists(),
     config_path: grok_app_path,
     write: write_grok_app,
-    hint: "在 Grok App 的设置 › 供应商里对 Codex++ 点「使用」，再在对话里选模型",
+    hint: "在 Grok App 的设置 › 供应商里对 Codex # 点「使用」，再在对话里选模型",
 };
 
 // ---------------------------------------------------------------- ZCode
@@ -1111,7 +1111,7 @@ fn zcode_path(env: &AgentEnv) -> PathBuf {
 }
 
 /// 3.14 起供应商在 `provider_config.json`（规则）；旧版的 `config.json` 存在时也写一份。
-/// 模型在 ZCode 自己的选择器里按任务选，这里只负责让 Codex++ 的模型出现在选择器里。
+/// 模型在 ZCode 自己的选择器里按任务选，这里只负责让 Codex # 的模型出现在选择器里。
 fn write_zcode(env: &AgentEnv, wiring: &Wiring, set: &mut FileSet) -> anyhow::Result<()> {
     let dir = zcode_dir(env).join("v2");
     let ids: Vec<&str> = wiring.model_ids().collect();
@@ -1195,7 +1195,7 @@ pub const ZCODE: AgentSpec = AgentSpec {
     detect: |env| zcode_dir(env).exists(),
     config_path: zcode_path,
     write: write_zcode,
-    hint: "在 ZCode 的模型选择器里选 Codex++ 下的模型；接入后重启 ZCode",
+    hint: "在 ZCode 的模型选择器里选 Codex # 下的模型；接入后重启 ZCode",
 };
 
 // ---------------------------------------------------------------- WorkBuddy / WorkBuddy AI / CodeBuddy
@@ -1321,7 +1321,7 @@ pub(super) fn restore_buddy_models(
     Ok(Some(text))
 }
 
-/// 把 Codex++ 的模型放进 `models.json`：它可以是裸数组，也可以是 `{"models":[…],"availableModels":[…]}`。
+/// 把 Codex # 的模型放进 `models.json`：它可以是裸数组，也可以是 `{"models":[…],"availableModels":[…]}`。
 /// 裸数组用 Raw 存档，对象用 JSON 存档；断开时都按模型归属恢复。
 fn write_buddy_models(path: &Path, wiring: &Wiring, set: &mut FileSet) -> anyhow::Result<()> {
     let ours: Vec<Value> = wiring
@@ -1348,7 +1348,7 @@ fn write_buddy_models(path: &Path, wiring: &Wiring, set: &mut FileSet) -> anyhow
     let models = array_entry(root, "models");
     models.retain(|entry| !buddy_model_is_ours(entry));
     models.extend(ours);
-    // 有「显示哪些模型」的白名单时，把 Codex++ 的加进去
+    // 有「显示哪些模型」的白名单时，把 Codex # 的加进去
     if let Some(available) = root
         .get_mut("availableModels")
         .and_then(Value::as_array_mut)
@@ -1380,7 +1380,7 @@ pub const WORKBUDDY: AgentSpec = AgentSpec {
     detect: |env| workbuddy_path(env).parent().is_some_and(Path::exists),
     config_path: workbuddy_path,
     write: |env, wiring, set| write_buddy_models(&workbuddy_path(env), wiring, set),
-    hint: "在 WorkBuddy 的模型选择器里选 Codex++ 的模型；接入后重启 WorkBuddy",
+    hint: "在 WorkBuddy 的模型选择器里选 Codex # 的模型；接入后重启 WorkBuddy",
 };
 
 pub const WORKBUDDY_AI: AgentSpec = AgentSpec {
@@ -1391,7 +1391,7 @@ pub const WORKBUDDY_AI: AgentSpec = AgentSpec {
     detect: |env| env.home_path(".workbuddy-ai").exists(),
     config_path: workbuddy_ai_path,
     write: |env, wiring, set| write_buddy_models(&workbuddy_ai_path(env), wiring, set),
-    hint: "在 WorkBuddy AI 的模型选择器里选 Codex++ 的模型；接入后重启 WorkBuddy AI",
+    hint: "在 WorkBuddy AI 的模型选择器里选 Codex # 的模型；接入后重启 WorkBuddy AI",
 };
 
 fn codebuddy_dir(env: &AgentEnv) -> PathBuf {
@@ -1419,7 +1419,7 @@ pub const CODEBUDDY: AgentSpec = AgentSpec {
     detect: |env| codebuddy_dir(env).exists() || env.has_binary("codebuddy"),
     config_path: codebuddy_path,
     write: write_codebuddy,
-    hint: "在 CodeBuddy 里用 /model 选 Codex++ 的模型；新会话生效",
+    hint: "在 CodeBuddy 里用 /model 选 Codex # 的模型；新会话生效",
 };
 
 // ---------------------------------------------------------------- AtomCode
@@ -1561,7 +1561,7 @@ pub const SNOW: AgentSpec = AgentSpec {
     detect: |env| snow_dir(env).exists() || env.has_binary("snow"),
     config_path: snow_path,
     write: write_snow,
-    hint: "已切到 Codex++ 配置档，接入后重开 snow；Snow App 可用「同步 Snow CLI API 配置」导入",
+    hint: "已切到 Codex # 配置档，接入后重开 snow；Snow App 可用「同步 Snow CLI API 配置」导入",
 };
 
 // ---------------------------------------------------------------- Ante
@@ -1614,7 +1614,7 @@ pub const ANTE: AgentSpec = AgentSpec {
     detect: |env| ante_dir(env).exists() || env.has_binary("ante"),
     config_path: ante_path,
     write: write_ante,
-    hint: "在 Ante 的模型选择器里选 Codex++ 下的模型；接入后重启 ante",
+    hint: "在 Ante 的模型选择器里选 Codex # 下的模型；接入后重启 ante",
 };
 
 // ---------------------------------------------------------------- 工具：JSON

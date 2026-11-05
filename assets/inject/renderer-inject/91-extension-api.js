@@ -1,7 +1,7 @@
   /**
    * 对外接口层：window.codexPlus
    *
-   * 第三方用户脚本不认识 Codex++ 内部的闭包函数，只能通过这个对象调用能力。
+   * 第三方用户脚本不认识 Codex # 内部的闭包函数，只能通过这个对象调用能力。
    * 设计要点：
    *
    *   1. 只挂一个全局名。之前 42 个 window.__codexPlus* 里绝大多数是补丁哨兵，
@@ -9,7 +9,7 @@
    *   2. 注册表持久、DOM 瞬态。每个 register* 只把数据写进注册中心，渲染由消费方
    *      负责。第三方不需要关心宿主何时重建（overlay 重开、会话行重建）。
    *   3. 失败隔离。第三方回调一律经 runCodexPlusExtensionCallback 包一层，抛错
-   *      记进该脚本的状态通道，不会让 Codex++ 自己的 UI 白屏。
+   *      记进该脚本的状态通道，不会让 Codex # 自己的 UI 白屏。
    *
    * 这个分片必须在 renderer-inject 内部的所有 UI 消费方之前执行，因为它只做定义、
    * 不读 DOM；实际挂载发生在 99-tail 之前，那时所有依赖函数都已可用。
@@ -57,14 +57,14 @@
     "/proxy-status",
     // 只读：当前会话最近的 token 事件（读 rollout 尾部，可秒级轮询），与内置用量状态栏同源。
     "/thread-usage-live",
-    // 只读：Codex++ 版本与连接状态。
+    // 只读：Codex # 版本与连接状态。
     "/backend/status",
     // 只读：设置的公开子集（当前供应商的名称、模式、模型、上下文窗口），不含地址、Key 与配置内容。
     "/settings/public",
     // 只读：模型目录（模型列表与每模型元数据，含上下文窗口），去掉了来源地址与本机路径。
     "/model-catalog/public",
     // Agent 桌宠（官方拓展包）的数据服务：图片 / 音效下载、大肥鱼的素材、挂件数据、本机用量。
-    // 只有启用中的拓展在清单里声明了才干活；供应商 Key 只在 Codex++ 里用。
+    // 只有启用中的拓展在清单里声明了才干活；供应商 Key 只在 Codex # 里用。
     "/agent-pet/catalog",
     "/agent-pet/image",
     "/agent-pet/sound",
@@ -272,7 +272,7 @@
   /**
    * 注册一个整页视图，并自动配一个图标栏入口。
    *
-   * 内置的三个页面（Codex++ / 拓展 / 推荐内容）都是「rail 入口 + 整页」的形态，
+   * 内置的三个页面（Codex # / 拓展 / 推荐内容）都是「rail 入口 + 整页」的形态，
    * 第三方页面沿用同一种形态，用户才不会在弹窗里找入口。抽成独立函数是因为
    * codexPlus.registerPage 与插件内核的 ctx.registerPage 共用这一套逻辑。
    */
@@ -334,8 +334,8 @@
       },
 
       /**
-       * 在拓展实例里运行 dsh 前端插件（由 Codex++ 生成的 dsh 配套拓展包调用）：modules 是截住的
-       * __ModuleLoader__.load 参数，dsh 插槽映射到 Codex++ 的插槽，见 96-dsh-client.js。
+       * 在拓展实例里运行 dsh 前端插件（由 Codex # 生成的 dsh 配套拓展包调用）：modules 是截住的
+       * __ModuleLoader__.load 参数，dsh 插槽映射到 Codex # 的插槽，见 96-dsh-client.js。
        */
       dshClient(ctx, modules, options) {
         return codexPlusRunDshClient(ctx, modules, options);
@@ -466,13 +466,13 @@
       },
 
       /**
-       * 在 Codex++ 菜单的「主页」面板里加一行。
+       * 在 Codex # 菜单的「主页」面板里加一行。
        *
        * 两种形态，按 definition 里给的字段决定：
        *   - 开关：给 `onChange(next)`，可选 `toggleValue()` 提供当前值
        *   - 按钮：给 `onActivate({ close })`
        *
-       * 这些是 Codex++ 自己的设置面板，改动会立刻反映到当前打开的菜单上；
+       * 这些是 Codex # 自己的设置面板，改动会立刻反映到当前打开的菜单上；
        * 菜单重新打开时会从 `toggleValue()` 重新读一次状态。
        */
       registerMenuItem(definition, options = {}) {
@@ -482,7 +482,7 @@
       /**
        * 注册一个整页视图。
        *
-       * 同时自动配一个图标栏入口——内置的三个页面（Codex++ / 拓展 / 推荐内容）
+       * 同时自动配一个图标栏入口——内置的三个页面（Codex # / 拓展 / 推荐内容）
        * 都是「rail 入口 + 整页」的形态，第三方页面沿用同一种形态，用户才不会
        * 在弹窗里找入口。`options.navLabel` / `options.icon` 控制入口外观。
        *

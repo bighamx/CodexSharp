@@ -649,7 +649,7 @@ pub fn run() {
                                 serde_json::json!({ "message": error.to_string() }),
                             );
                         }
-                        // 常驻本地代理只在 Codex++ 退出时停止；Codex 会话结束
+                        // 常驻本地代理只在 Codex # 退出时停止；Codex 会话结束
                         // 不会关它（见 core::resident_helper）。
                         gateway_commands::restore_for_exit();
                         codex_plus_core::resident_helper::stop_resident_helper();
@@ -746,7 +746,7 @@ fn install_tray<R: tauri::Runtime>(app: &tauri::App<R>) -> tauri::Result<()> {
 
     let mut tray_builder = TrayIconBuilder::with_id(TRAY_ID)
         .menu(&tray_menu)
-        .tooltip("Codex++")
+        .tooltip("Codex #")
         .on_menu_event(|app, event| match event.id.as_ref() {
             TRAY_MENU_SHOW => {
                 show_main_window(app);
@@ -934,7 +934,7 @@ fn build_main_window<R: tauri::Runtime>(
         MAIN_WINDOW_LABEL,
         tauri::WebviewUrl::App(url.into()),
     )
-    .title("Codex++")
+    .title("Codex #")
     .visible(visible)
     .focused(visible)
     .inner_size(1180.0, 820.0)
@@ -1061,7 +1061,7 @@ fn update_tray_labels<R: tauri::Runtime>(
     }
 }
 
-/// 托盘快捷面板的「打开 Codex++」。
+/// 托盘快捷面板的「打开 Codex #」。
 pub(crate) fn show_main_window_from<R: tauri::Runtime>(app_handle: &tauri::AppHandle<R>) {
     show_main_window(app_handle);
 }

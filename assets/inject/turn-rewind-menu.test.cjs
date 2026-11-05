@@ -89,7 +89,7 @@ class Element {
   settings.turnRewind = true; context.syncCodexPlusTurnRewind(); assert.equal(observes, 0);
   context.codexPlusBackendSettingsLoaded = true; context.syncCodexPlusTurnRewind();
   const button = menu.children[1];
-  assert.equal(button.textContent, '回退到本轮之前 · Codex++'); assert.equal(button.getAttribute('aria-disabled'), 'false');
+  assert.equal(button.textContent, '回退到本轮之前 · Codex #'); assert.equal(button.getAttribute('aria-disabled'), 'false');
   assert.equal(button.previousElementSibling, branch); assert.equal(menu.children[2], other);
   context.refreshTurnRewindMenus(); assert.equal(menu.children.length, 3); assert.equal(moduleLoads, 0);
   const activations = []; api.run = async (...args) => {

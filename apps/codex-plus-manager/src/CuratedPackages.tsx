@@ -114,7 +114,7 @@ export function CuratedPackagesSection({
       const result = await request<{ hooksAdded?: boolean; hooksError?: string | null }>("install", { token: target.token, enable, replace: target.conflict !== null });
       const parts = [enable ? t("拓展已安装并启用。") : t("拓展已安装，尚未启用，可在「本地拓展」里启用。")];
       if (result.hooksError) parts.push(tf("Codex 钩子配置未能同步：{0}", [result.hooksError]));
-      else if (result.hooksAdded) parts.push(t("Codex 配置里新增了「Codex++ 拓展钩子」，请在 Codex 的 Hooks 设置里信任一次，新开对话生效。"));
+      else if (result.hooksAdded) parts.push(t("Codex 配置里新增了「Codex # 拓展钩子」，请在 Codex 的 Hooks 设置里信任一次，新开对话生效。"));
       setNotice(`${target.name} ${target.tag ?? target.sha.slice(0, 7)}：${parts.join("")}`);
       await onInstalled();
     } catch (failure) {
@@ -187,7 +187,7 @@ export function CuratedPackagesSection({
   return (
     <>
       {blockedInstalled.length ? (
-        <CxBanner icon={<ShieldAlert />} title={t("已安装的拓展被下架")} tone="warn" detail={tf("这些已安装的拓展已被 Codex++ 下架，建议在「本地拓展」里停用：{0}", [blockedInstalled.map((item) => `${item.id}（${item.repo}）`).join("、")])} />
+        <CxBanner icon={<ShieldAlert />} title={t("已安装的拓展被下架")} tone="warn" detail={tf("这些已安装的拓展已被 Codex # 下架，建议在「本地拓展」里停用：{0}", [blockedInstalled.map((item) => `${item.id}（${item.repo}）`).join("、")])} />
       ) : null}
       {error ? <div className="community-ext-notice is-error">{error}</div> : null}
       {notice ? <div className="community-ext-notice">{notice}</div> : null}

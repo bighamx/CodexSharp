@@ -1302,7 +1302,7 @@ mod tests {
     #[test]
     fn outbound_rejects_sensitive_files_inside_workspace() {
         let workspace = tempfile::tempdir().unwrap();
-        for name in [".codex", ".ssh", ".aws", "Codex++", ".docker"] {
+        for name in [".codex", ".ssh", ".aws", "Codex #", ".docker"] {
             let directory = workspace.path().join(name);
             std::fs::create_dir(&directory).unwrap();
             std::fs::write(directory.join("result.txt"), b"private").unwrap();

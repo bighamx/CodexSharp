@@ -402,7 +402,7 @@
   const codexPlusSidebarNavId = "codex-plus-sidebar-nav";
   const codexPlusPageClass = "codex-plus-page-overlay";
   // 新版 Codex 在最左侧多出一条导航图标栏（navigation rail）。
-  // 三个入口分别挂进去：Codex++ 主页、「拓展」（原用户脚本）和「推荐内容」。
+  // 三个入口分别挂进去：Codex # 主页、「拓展」（原用户脚本）和「推荐内容」。
   // 三者各自是一个独立页面，不再作为弹窗里的二级 tab。
   const codexPlusRailNavId = "codex-plus-rail-nav";
   const codexPlusRailExtensionsId = "codex-plus-rail-extensions";
@@ -491,7 +491,7 @@
    * 生命周期约定（很重要）：
    *   注册表持久，DOM 瞬态。
    *
-   * Codex++ 的 UI 宿主会被反复重建（overlay 每次打开都清空重建、会话行按钮在
+   * Codex # 的 UI 宿主会被反复重建（overlay 每次打开都清空重建、会话行按钮在
    * 版本号变化时整组重建），所以任何消费方都不能缓存 DOM 引用，必须每次从注册
    * 表读数据全量重建。反过来说，第三方脚本不需要关心 DOM 何时被销毁。
    *
@@ -523,7 +523,7 @@
   /**
    * 必须被扫描调度忽略的选择器。
    *
-   * 这些节点由 Codex++ 自己（或拓展）插入到 Codex 的容器里，而容器本身是
+   * 这些节点由 Codex # 自己（或拓展）插入到 Codex 的容器里，而容器本身是
    * scan-relevant 的。如果不排除，就会形成「写入 → 观察到自己的写入 → 200ms
    * 后再 scan → 再写入」的自喂循环：空闲时也每秒全量扫描五次，macOS 上足以
    * 吃满一个核（issue #1960）。
@@ -1079,7 +1079,7 @@
       .codex-plus-plugin-empty { padding: 40px 16px; text-align: center; color: var(--codex-plus-text-secondary); }
       @media (max-width: 600px) { .codex-plus-plugin-card { flex-direction: column; gap: 10px; } .codex-plus-plugin-install { align-self: flex-end; } }
       /*
-       * 新版导航图标栏里的 Codex++ / 拓展 / 推荐内容入口：原生按钮只放图标，
+       * 新版导航图标栏里的 Codex # / 拓展 / 推荐内容入口：原生按钮只放图标，
        * 这里对齐它的尺寸。
        *
        * 用 [data-codex-plus-rail] 而不是逐个列 id——早先按 id 写，加第三个入口时
@@ -1950,7 +1950,7 @@
       .codex-plus-form-message[data-status="failed"], .codex-plus-backend-label[data-status="failed"] { color: var(--codex-plus-danger); }
       .codex-plus-backend-label[data-status="degraded"] { color: var(--codex-plus-warning); }
       .codex-plus-form-message[data-status="loading"], .codex-plus-model-compat-warning { color: var(--codex-plus-warning); }
-      /* Codex++ 设置主页：对齐原生设置页，保持其它页面与弹窗的布局独立。 */
+      /* Codex # 设置主页：对齐原生设置页，保持其它页面与弹窗的布局独立。 */
       .${codexPlusPageClass} .codex-plus-modal-content[data-codex-plus-active-tab="home"] {
         background: var(--codex-plus-settings-page-bg, var(--codex-plus-bg-primary)) !important;
       }
@@ -3917,7 +3917,7 @@
     return "Codex 首页会根据项目文件和已连接应用生成「下一步做什么」的建议，会在后台持续调用模型、消耗 token。中转模式下 Codex 设置页隐藏了这个开关，可以在这里关闭。";
   }
 
-  /** 增强面板里的一行：直接读写 Codex 自己的设置，不经过 Codex++ 后端。 */
+  /** 增强面板里的一行：直接读写 Codex 自己的设置，不经过 Codex # 后端。 */
   function renderCodexAmbientSuggestionsRow() {
     const state = codexAmbientSuggestionsState;
     const pending = state.status === "idle" || state.status === "loading" || state.status === "saving";
@@ -4077,7 +4077,7 @@
   }
   // 服务等级由 Codex 原生控件决定；此兼容入口仅负责供应商适配。
   function applyCodexServiceTierRequestOverride(method, params, threadIdHint = "") {
-    // 所有发往 app-server 的请求都经过这里：先做 Codex++ 自己的改写，再交给拓展的 codex/request 中间件。
+    // 所有发往 app-server 的请求都经过这里：先做 Codex # 自己的改写，再交给拓展的 codex/request 中间件。
     // typeof 守卫：测试会单独执行本分片，那时拓展内核不在作用域里。
     const patched = applyCodexRemoteSessionProviderOverride(method, params);
     return typeof codexPlusApplyExtensionRequestMiddleware === "function"
@@ -4586,7 +4586,7 @@
       });
       if (starts.size > 256) starts.delete(starts.keys().next().value);
     };
-    // 已由 Codex++ 创建/恢复的会话直接发送。正常消息不再额外读取配置或线程状态。
+    // 已由 Codex # 创建/恢复的会话直接发送。正常消息不再额外读取配置或线程状态。
     if (known?.signature === signature && !known.needsRecovery) {
       try {
         const response = await sendRequest(method, params, options);
@@ -5062,7 +5062,7 @@
         new Promise((_, reject) => {
           timeoutId = setTimeout(() => {
             sendCodexPlusDiagnostic("app_server_preparation_read_timeout", { path, timeoutMs });
-            reject(new Error(`Codex++ preparation read timed out: ${path}`));
+            reject(new Error(`Codex # preparation read timed out: ${path}`));
           }, timeoutMs);
         }),
       ]);
@@ -5375,7 +5375,7 @@
   }
 
   /**
-   * 供应商相关的公开事件，比较前后两份设置里 Codex++ 下发的 activeRelayProfilePublic / modelCatalogFingerprint：
+   * 供应商相关的公开事件，比较前后两份设置里 Codex # 下发的 activeRelayProfilePublic / modelCatalogFingerprint：
    *   - `relayProfile/switched`：({ previous, profile })，当前供应商换了
    *   - `modelCatalog/changed`：({ profile })，决定模型目录的字段变了（模型列表、每模型窗口 / 压缩 / 元数据、换供应商……），
    *     新目录用 /model-catalog/public 取
@@ -5398,7 +5398,7 @@
 
   /**
    * 在 Codex 页面里改了一项设置后发公开事件 `settings/changed`，参数 `{ key, value, persisted }`：
-   * key 是改动的设置字段（存在 Codex++ 后端的用后端字段名，如 codexAppCapacityAutoRetry；只存页面本地的用页面键名）；
+   * key 是改动的设置字段（存在 Codex # 后端的用后端字段名，如 codexAppCapacityAutoRetry；只存页面本地的用页面键名）；
    * 先按新值发一次 persisted: false（这时读设置已是新值），写进后端后再发一次 persisted: true。
    * 跟着设置走的内置拓展订阅它，内核不再逐个点名功能。
    */
@@ -5578,7 +5578,7 @@
     if (codexPlusBackendStatus.version) {
       codexPlusVersion = codexPlusBackendStatus.version;
       document.querySelectorAll("[data-codex-plus-version]").forEach((node) => {
-        node.textContent = `Codex++ ${codexPlusVersion}`;
+        node.textContent = `Codex # ${codexPlusVersion}`;
       });
     }
     const labelFallback = status === "ok" ? "后端已连接" : status === "degraded" ? "桥接降级，自动修复中" : status === "checking" ? "正在检查后端…" : "未连接";
@@ -5901,7 +5901,7 @@
     `;
   }
 
-  /** 来源标签：内置 / 官方（随 Codex++ 发布的拓展包）/ 市场 / 用户。 */
+  /** 来源标签：内置 / 官方（随 Codex # 发布的拓展包）/ 市场 / 用户。 */
   function codexPlusScriptSourceLabel(script) {
     if (script?.source === "builtin") return "内置";
     if (script?.source === "bundled") return "官方";
@@ -5989,7 +5989,7 @@
     await loadUserScripts();
   }
 
-  /** 左面板的导航项。Codex++ 页面切分组，「拓展」页面列脚本。 */
+  /** 左面板的导航项。Codex # 页面切分组，「拓展」页面列脚本。 */
   function renderCodexPlusPageNavItems(tab) {
     if (tab === codexPlusExtensionsTab) return renderCodexPlusExtensionsNav();
     return [
@@ -6040,19 +6040,19 @@
   function codexPlusPageTitle(tab) {
     if (tab === codexPlusExtensionsTab) return "拓展";
     if (tab === codexPlusSponsorTab) return "推荐内容";
-    return "Codex++";
+    return "Codex #";
   }
 
   /**
    * 左面板内容随当前分组刷新（切 tab 后调用）。
    * 不传 tab 时按页面当前分组重画：拓展注册 / 撤销后的统一刷新（codexPlusRefreshExtensionHostsNow）不带参数，
-   * 落到 home 会把「拓展」页的左面板换成 Codex++ 主页的导航，启停一个拓展就回不到列表。
+   * 落到 home 会把「拓展」页的左面板换成 Codex # 主页的导航，启停一个拓展就回不到列表。
    */
   function refreshCodexPlusPageNav(tab = codexPlusModalTab(document.querySelector(".codex-plus-modal-content")?.dataset.codexPlusActiveTab)) {
     const body = document.querySelector("[data-codex-plus-page-nav-body]");
     if (!body) return;
     const title = document.querySelector(".codex-plus-page-nav-title");
-    if (title) title.textContent = tab === codexPlusExtensionsTab ? "拓展" : "Codex++";
+    if (title) title.textContent = tab === codexPlusExtensionsTab ? "拓展" : "Codex #";
     body.innerHTML = renderCodexPlusPageNavItems(tab);
   }
 
@@ -6653,7 +6653,7 @@
   /**
    * 规范化页面/tab 名。
    *
-   * 用户脚本从 Codex++ 弹窗里拆出来成了独立的「拓展」页面，
+   * 用户脚本从 Codex # 弹窗里拆出来成了独立的「拓展」页面，
    * 这里把旧名 userScripts 也映射过去，避免存量调用点失效。
    */
   function codexPlusModalTab(tab) {
@@ -6921,12 +6921,12 @@
       const state = failed
         ? `
                 <div class="codex-plus-row" data-codex-plus-settings-catalog-state="failed" role="alert">
-                  <div><div class="codex-plus-row-title">设置项读取失败</div><div class="codex-plus-row-description">无法从 Codex++ 后端读取设置项清单${message ? `：${escapeHtml(message)}` : ""}。确认后端已连接后重试。</div></div>
+                  <div><div class="codex-plus-row-title">设置项读取失败</div><div class="codex-plus-row-description">无法从 Codex # 后端读取设置项清单${message ? `：${escapeHtml(message)}` : ""}。确认后端已连接后重试。</div></div>
                   <button type="button" class="codex-plus-action-button" data-codex-plus-settings-catalog-retry="true">重试</button>
                 </div>`
         : `
                 <div class="codex-plus-row" data-codex-plus-settings-catalog-state="loading" role="status">
-                  <div><div class="codex-plus-row-title">正在读取设置项…</div><div class="codex-plus-row-description">设置项清单由 Codex++ 后端提供，读取完成后显示。</div></div>
+                  <div><div class="codex-plus-row-title">正在读取设置项…</div><div class="codex-plus-row-description">设置项清单由 Codex # 后端提供，读取完成后显示。</div></div>
                 </div>`;
       return renderCodexPlusSettingsSection("设置", renderCodexPlusBackendStatusRow() + state);
     }
@@ -6980,9 +6980,9 @@
     applyCodexPlusZoom(overlay);
     // 下拉箭头与勾选图标使用已安装的 Lucide ChevronDown / Check（ISC）路径。
     overlay.innerHTML = `
-      <div class="codex-plus-modal-content" role="dialog" aria-modal="true" aria-label="Codex++">
+      <div class="codex-plus-modal-content" role="dialog" aria-modal="true" aria-label="Codex #">
         <div class="codex-plus-modal-header">
-          <div class="codex-plus-modal-title"><span class="codex-plus-backend-indicator" data-codex-backend-indicator="true" data-status="checking"></span><span data-codex-plus-version="true">Codex++ ${codexPlusVersion}</span></div>
+          <div class="codex-plus-modal-title"><span class="codex-plus-backend-indicator" data-codex-backend-indicator="true" data-status="checking"></span><span data-codex-plus-version="true">Codex # ${codexPlusVersion}</span></div>
           ${pageMode ? "" : `<button type="button" class="codex-plus-modal-close" aria-label="关闭">×</button>`}
         </div>
         <div class="codex-plus-modal-body">
@@ -7004,7 +7004,7 @@
                   <button type="button" class="codex-plus-action-button" data-codex-open-devtools="true">打开 DevTools</button>
                 </div>
                 <div class="codex-plus-row">
-                  <div><div class="codex-plus-row-title">关于 Codex++</div><div class="codex-plus-about">Codex++ 是通过外部 launcher 注入的增强菜单，不修改 Codex App 原始安装文件。<br>Build: <span data-codex-plus-build="true">${codexPlusBuild}</span><br>GitHub: <a href="https://github.com/BigPizzaV3/CodexPlusPlus" target="_blank" rel="noreferrer">https://github.com/BigPizzaV3/CodexPlusPlus</a><br>Discord: <a href="https://discord.gg/y96kX7A76v" target="_blank" rel="noreferrer">https://discord.gg/y96kX7A76v</a><br>Telegram: <a href="https://t.me/CodexPlusPlus" target="_blank" rel="noreferrer">https://t.me/CodexPlusPlus</a></div></div>
+                  <div><div class="codex-plus-row-title">关于 Codex #</div><div class="codex-plus-about">Codex # 是通过外部 launcher 注入的增强菜单，不修改 Codex App 原始安装文件。<br>Build: <span data-codex-plus-build="true">${codexPlusBuild}</span><br>GitHub: <a href="https://github.com/BigPizzaV3/CodexPlusPlus" target="_blank" rel="noreferrer">https://github.com/BigPizzaV3/CodexPlusPlus</a><br>Discord: <a href="https://discord.gg/y96kX7A76v" target="_blank" rel="noreferrer">https://discord.gg/y96kX7A76v</a><br>Telegram: <a href="https://t.me/CodexPlusPlus" target="_blank" rel="noreferrer">https://t.me/CodexPlusPlus</a></div></div>
                 </div>
                 <div class="codex-plus-row">
                   <div><div class="codex-plus-row-title">Discord 社区</div><div class="codex-plus-row-description">加入 Discord 获取更新消息、反馈问题或交流使用体验。</div></div>
@@ -7037,7 +7037,7 @@
           <div class="codex-plus-panel" data-codex-plus-panel="sponsor" hidden>
             <div class="codex-plus-discovery codex-plus-sponsor-page">
               <div class="codex-plus-discovery-header">
-                <div><h1 class="codex-plus-discovery-title">推荐内容</h1><p class="codex-plus-discovery-description codex-plus-sponsor-text">以下推荐来自支持 Codex++ 继续维护的合作方。</p></div>
+                <div><h1 class="codex-plus-discovery-title">推荐内容</h1><p class="codex-plus-discovery-description codex-plus-sponsor-text">以下推荐来自支持 Codex # 继续维护的合作方。</p></div>
               </div>
               <h2 class="codex-plus-discovery-section-title">合作伙伴</h2>
               <div class="codex-plus-ad-remote">${renderCodexPlusAds()}</div>
@@ -7257,7 +7257,7 @@
     if (!codexPlusAdsLoaded) fetchCodexPlusAds();
     selectCodexPlusTab(initialTab);
     // 必须在 selectCodexPlusTab 之后：激活态要靠 data-codex-plus-active-tab
-    // 判断当前是 Codex++ 还是「拓展」，提前调用会永远落到 home 上。
+    // 判断当前是 Codex # 还是「拓展」，提前调用会永远落到 home 上。
     if (pageMode) setCodexPlusSidebarNavActive(true, codexPlusActiveEntry() || "home");
     renderCodexPlusMenu();
     refreshCodexPlusBackendToggles();
@@ -7423,9 +7423,9 @@
       button.removeAttribute("aria-current");
       button.removeAttribute("disabled");
       button.removeAttribute("aria-disabled");
-      button.setAttribute("aria-label", "Codex++");
+      button.setAttribute("aria-label", "Codex #");
       button.textContent = "";
-      button.innerHTML = `<span class="codex-plus-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13"/></svg></span><span class="truncate">Codex++</span><span class="codex-plus-sidebar-nav-status" data-status="${codexPlusBackendStatus.status || "checking"}" aria-hidden="true"></span>`;
+      button.innerHTML = `<span class="codex-plus-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13"/></svg></span><span class="truncate">Codex #</span><span class="codex-plus-sidebar-nav-status" data-status="${codexPlusBackendStatus.status || "checking"}" aria-hidden="true"></span>`;
       button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -7485,7 +7485,7 @@
   /**
    * 入口按钮能否沿用。
    *
-   * 同页重复注入（Codex++ 重启 / 升级而 Codex 没重启）时，上一次注入建的入口按钮还在，
+   * 同页重复注入（Codex # 重启 / 升级而 Codex 没重启）时，上一次注入建的入口按钮还在，
    * 按钮上绑的是旧闭包：点「拓展」打开的仍是旧版页面，里面的开关也走旧逻辑。
    * 按钮记下建它的注入代次；最新一代遇到别代的按钮就重建。旧代即便还在跑也不重建，
    * 免得两代来回抢同一个 id。
@@ -7667,7 +7667,7 @@
   }
 
   /**
-   * 把 Codex++ / 拓展两个入口挂到新版图标栏。
+   * 把 Codex # / 拓展两个入口挂到新版图标栏。
    *
    * Codex 的 rail 渲染晚于注入，所以这里每次 scan 都会被调用；靠 id 判存避免重复插入。
    */
@@ -7679,7 +7679,7 @@
     // 那只是暂时状态，不能因此判定"没有 rail"而回退旧模式，否则入口会整个消失。
     const template = codexPlusRailTemplateButton(rail);
 
-    // 旧逻辑把"点原生导航就关掉 Codex++ 页面"的监听挂在侧边栏的 navigation 上，
+    // 旧逻辑把"点原生导航就关掉 Codex # 页面"的监听挂在侧边栏的 navigation 上，
     // 但 rail 模式下那个函数会提前 return，监听压根装不上，所以这里补一份。
     if (rail.dataset.codexPlusRailNavigationListener !== "true") {
       rail.dataset.codexPlusRailNavigationListener = "true";
@@ -7703,7 +7703,7 @@
     };
 
     const specs = [
-      { id: codexPlusRailNavId, label: "Codex++", iconMarkup: icons.home, withStatus: true, onActivate: openCodexPlusPage },
+      { id: codexPlusRailNavId, label: "Codex #", iconMarkup: icons.home, withStatus: true, onActivate: openCodexPlusPage },
       { id: codexPlusRailExtensionsId, label: "拓展", iconMarkup: icons.extensions, withStatus: false, onActivate: openCodexPlusExtensions },
       { id: codexPlusRailSponsorId, label: "推荐内容", iconMarkup: icons.sponsor, withStatus: false, onActivate: openCodexPlusSponsor },
     ];
@@ -7720,7 +7720,7 @@
         wrapper = createCodexPlusRailButton({ ...spec, template });
         if (!wrapper) return;
       }
-      // 顺序：Codex++ 在前，「拓展」在后；紧跟在 primary 区锚点后面。
+      // 顺序：Codex # 在前，「拓展」在后；紧跟在 primary 区锚点后面。
       if (cursor?.nextSibling) {
         host.insertBefore(wrapper, cursor.nextSibling);
       } else if (cursor) {
@@ -8382,19 +8382,19 @@
   }
 
   function displayNameForPluginMarketplaceName(name, fallback) {
-    if (name === "openai-bundled") return "OpenAI插件1(Codex++)";
-    if (name === "openai-curated") return "OpenAI插件2(Codex++)";
-    if (name === "openai-primary-runtime") return "OpenAI插件3(Codex++)";
-    if (name === "openai-api-curated") return "OpenAI插件4(Codex++)";
+    if (name === "openai-bundled") return "OpenAI插件1(Codex #)";
+    if (name === "openai-curated") return "OpenAI插件2(Codex #)";
+    if (name === "openai-primary-runtime") return "OpenAI插件3(Codex #)";
+    if (name === "openai-api-curated") return "OpenAI插件4(Codex #)";
     // 兼容原生返回的既有旧配置名称；这里不会注入、缓存或注册插件市场。
-    if (name === "codex-plus-curated" || name === "openai-curated-remote") return "OpenAI插件5(Codex++)";
+    if (name === "codex-plus-curated" || name === "openai-curated-remote") return "OpenAI插件5(Codex #)";
     return fallback;
   }
 
   function patchPluginMarketplaceObject(marketplace) {
     if (!marketplace || typeof marketplace !== "object" || marketplace.__codexPlusMarketplaceUnlockPatched) return false;
     // 上游已经给了显示名就用上游的（issue #692：此前无条件用上面的中文编号覆盖，
-    // 用户看到的是「OpenAI插件1(Codex++)」而不是市场真实名字）。
+    // 用户看到的是「OpenAI插件1(Codex #)」而不是市场真实名字）。
     // 编号映射只在市场上游确实没给显示名时兜底；去重仍走 restorePluginMarketplaceName，
     // 与显示名无关，所以不会因此退回重复条目。
     const upstreamDisplayName = marketplace.displayName || marketplace.title || marketplace.label || "";
@@ -12410,7 +12410,7 @@
   const codexPlusModelPickerNativeLabelClass = "codex-plus-model-group-native-label";
   /** 我们自己插入的模型标签类名。 */
   const codexPlusModelPickerOwnLabelClass = "codex-plus-model-group-own-label";
-  /** 在 Codex++ 里收藏过的模型，行尾的星标。 */
+  /** 在 Codex # 里收藏过的模型，行尾的星标。 */
   const codexPlusModelPickerFavoriteClass = "codex-plus-model-group-favorite";
   /** 行上的分组标记属性。 */
   const codexPlusModelPickerGroupAttr = "data-codex-plus-model-group";
@@ -12467,7 +12467,7 @@
           modelCount: (count) => `${count} 个模型`,
           groupAria: (name, count, current, isDefault) => `${name}${isDefault ? "（默认供应商）" : ""}，${count} 个模型${current ? "，当前使用" : ""}`,
           groupTitle: (name, count) => `${name} · ${count}`,
-          favorite: "已收藏（在 Codex++ 里收藏的模型）",
+          favorite: "已收藏（在 Codex # 里收藏的模型）",
         }
       : {
           defaultBadge: "Default",
@@ -12479,7 +12479,7 @@
           modelCount: (count) => `${count} models`,
           groupAria: (name, count, current, isDefault) => `${name}${isDefault ? " (default provider)" : ""}, ${count} models${current ? ", currently selected" : ""}`,
           groupTitle: (name, count) => `${name} · ${count}`,
-          favorite: "Favorite (starred in Codex++)",
+          favorite: "Favorite (starred in Codex #)",
         };
   }
 
@@ -12791,7 +12791,7 @@
       const groupId =
         typeof entry.codex_plus_group_id === "string" ? entry.codex_plus_group_id.trim() : "";
       if (!provider || !groupId) return;
-      // 在 Codex++ 里收藏过的模型（网关写的 `codex_plus_favorite`）：行尾画星标。
+      // 在 Codex # 里收藏过的模型（网关写的 `codex_plus_favorite`）：行尾画星标。
       const value = { provider, groupId, favorite: entry.codex_plus_favorite === true };
       // 原文键：网关关掉「模型名后带供应商」时，同名的几份只差末尾看不见的零宽字符，
       // 宽松归一化会把它们抹掉，必须先按原文比对。
@@ -13890,7 +13890,7 @@
   /**
    * 侧栏重建时过滤已删会话（#2671）。
    *
-   * 根因：本地删除走 Codex++ 后端直接删库/删文件，Codex 自己的会话列表缓存并不知道；
+   * 根因：本地删除走 Codex # 后端直接删库/删文件，Codex 自己的会话列表缓存并不知道；
    * 以前靠 refresh-recent-conversations-for-host 让 Codex 重读列表，新版 Codex 已没有
    * 这个请求，于是折叠再展开项目分组时，Codex 按缓存把这条会话重新渲染出来。
    * 样式表只能按行属性匹配，这里再用与删除按钮同一套 sessionRefFromRow 解析行身份
@@ -14252,7 +14252,7 @@
    *
    *   本分片补上的就是这一段：横幅还在、原生又不再自动重试时，替用户点按钮。
    *   节奏默认与手动点击一致——上一轮失败后立刻重试（0 秒间隔，内部有 1 秒地板值
-   *   防热循环），间隔和次数上限都可以在 Codex++ 设置里改。
+   *   防热循环），间隔和次数上限都可以在 Codex # 设置里改。
    *
    *   原生那 4 档阶梯（10/30/120/300 秒）不是我们复刻的对象，也不等待：倒计时显示
    *   「10 秒后重试」时本功能同样在下一秒就把按钮点掉，等于把原生那 4 次也压成 0 秒。
@@ -15437,7 +15437,7 @@
   });
 
   function turnRewindAvailability(branch) {
-    if (!codexPlusTurnRewindEnabled()) return { reason: "请先在 Codex++ 设置中开启轮次回退。" };
+    if (!codexPlusTurnRewindEnabled()) return { reason: "请先在 Codex # 设置中开启轮次回退。" };
     const details = {};
     const target = turnRewindContextFromNode(branch, details);
     if (!target) {
@@ -15445,7 +15445,7 @@
         ? "消息结构超出当前支持的安全识别范围，未执行回退。"
         : details.identityCount !== 1
         ? "无法唯一识别此消息的聊天和轮次，未执行回退。请重新打开此聊天后重试。"
-        : "无法获取此聊天的原生回退接口，未执行回退。请确认通过最新 Codex++ 测试版启动客户端。";
+        : "无法获取此聊天的原生回退接口，未执行回退。请确认通过最新 Codex # 测试版启动客户端。";
       return { reason, details };
     }
     codexPlusTurnRewind.registerManager(target.threadId, target.manager);
@@ -15468,7 +15468,7 @@
         button.className = `${branch.className || ""} codex-plus-turn-rewind-item`;
         button.setAttribute("data-codex-plus-ext", turnRewindMenuMark);
         button.setAttribute("role", "menuitem");
-        button.textContent = "回退到本轮之前 · Codex++";
+        button.textContent = "回退到本轮之前 · Codex #";
         button.style.cssText = "width:100%;text-align:start;cursor:pointer;";
         button.addEventListener("click", async (event) => {
           event.preventDefault();
@@ -16363,7 +16363,7 @@
     return `<span class="codex-session-action-glyph">${glyph}</span>`;
   }
 
-  /** 拓展行操作的回调参数。归档页的行未必读得到会话 id，resolve() 必要时问 Codex++ 按标题找。 */
+  /** 拓展行操作的回调参数。归档页的行未必读得到会话 id，resolve() 必要时问 Codex # 按标题找。 */
   function sessionRowActionContext(row, extra = {}) {
     const archived = extra.archived === true;
     const ref = archived ? archivedRefFromRow(row) : sessionRefFromRow(row);
@@ -17127,7 +17127,7 @@
   /**
    * 对外接口层：window.codexPlus
    *
-   * 第三方用户脚本不认识 Codex++ 内部的闭包函数，只能通过这个对象调用能力。
+   * 第三方用户脚本不认识 Codex # 内部的闭包函数，只能通过这个对象调用能力。
    * 设计要点：
    *
    *   1. 只挂一个全局名。之前 42 个 window.__codexPlus* 里绝大多数是补丁哨兵，
@@ -17135,7 +17135,7 @@
    *   2. 注册表持久、DOM 瞬态。每个 register* 只把数据写进注册中心，渲染由消费方
    *      负责。第三方不需要关心宿主何时重建（overlay 重开、会话行重建）。
    *   3. 失败隔离。第三方回调一律经 runCodexPlusExtensionCallback 包一层，抛错
-   *      记进该脚本的状态通道，不会让 Codex++ 自己的 UI 白屏。
+   *      记进该脚本的状态通道，不会让 Codex # 自己的 UI 白屏。
    *
    * 这个分片必须在 renderer-inject 内部的所有 UI 消费方之前执行，因为它只做定义、
    * 不读 DOM；实际挂载发生在 99-tail 之前，那时所有依赖函数都已可用。
@@ -17183,14 +17183,14 @@
     "/proxy-status",
     // 只读：当前会话最近的 token 事件（读 rollout 尾部，可秒级轮询），与内置用量状态栏同源。
     "/thread-usage-live",
-    // 只读：Codex++ 版本与连接状态。
+    // 只读：Codex # 版本与连接状态。
     "/backend/status",
     // 只读：设置的公开子集（当前供应商的名称、模式、模型、上下文窗口），不含地址、Key 与配置内容。
     "/settings/public",
     // 只读：模型目录（模型列表与每模型元数据，含上下文窗口），去掉了来源地址与本机路径。
     "/model-catalog/public",
     // Agent 桌宠（官方拓展包）的数据服务：图片 / 音效下载、大肥鱼的素材、挂件数据、本机用量。
-    // 只有启用中的拓展在清单里声明了才干活；供应商 Key 只在 Codex++ 里用。
+    // 只有启用中的拓展在清单里声明了才干活；供应商 Key 只在 Codex # 里用。
     "/agent-pet/catalog",
     "/agent-pet/image",
     "/agent-pet/sound",
@@ -17398,7 +17398,7 @@
   /**
    * 注册一个整页视图，并自动配一个图标栏入口。
    *
-   * 内置的三个页面（Codex++ / 拓展 / 推荐内容）都是「rail 入口 + 整页」的形态，
+   * 内置的三个页面（Codex # / 拓展 / 推荐内容）都是「rail 入口 + 整页」的形态，
    * 第三方页面沿用同一种形态，用户才不会在弹窗里找入口。抽成独立函数是因为
    * codexPlus.registerPage 与插件内核的 ctx.registerPage 共用这一套逻辑。
    */
@@ -17460,8 +17460,8 @@
       },
 
       /**
-       * 在拓展实例里运行 dsh 前端插件（由 Codex++ 生成的 dsh 配套拓展包调用）：modules 是截住的
-       * __ModuleLoader__.load 参数，dsh 插槽映射到 Codex++ 的插槽，见 96-dsh-client.js。
+       * 在拓展实例里运行 dsh 前端插件（由 Codex # 生成的 dsh 配套拓展包调用）：modules 是截住的
+       * __ModuleLoader__.load 参数，dsh 插槽映射到 Codex # 的插槽，见 96-dsh-client.js。
        */
       dshClient(ctx, modules, options) {
         return codexPlusRunDshClient(ctx, modules, options);
@@ -17592,13 +17592,13 @@
       },
 
       /**
-       * 在 Codex++ 菜单的「主页」面板里加一行。
+       * 在 Codex # 菜单的「主页」面板里加一行。
        *
        * 两种形态，按 definition 里给的字段决定：
        *   - 开关：给 `onChange(next)`，可选 `toggleValue()` 提供当前值
        *   - 按钮：给 `onActivate({ close })`
        *
-       * 这些是 Codex++ 自己的设置面板，改动会立刻反映到当前打开的菜单上；
+       * 这些是 Codex # 自己的设置面板，改动会立刻反映到当前打开的菜单上；
        * 菜单重新打开时会从 `toggleValue()` 重新读一次状态。
        */
       registerMenuItem(definition, options = {}) {
@@ -17608,7 +17608,7 @@
       /**
        * 注册一个整页视图。
        *
-       * 同时自动配一个图标栏入口——内置的三个页面（Codex++ / 拓展 / 推荐内容）
+       * 同时自动配一个图标栏入口——内置的三个页面（Codex # / 拓展 / 推荐内容）
        * 都是「rail 入口 + 整页」的形态，第三方页面沿用同一种形态，用户才不会
        * 在弹窗里找入口。`options.navLabel` / `options.icon` 控制入口外观。
        *
@@ -17671,7 +17671,7 @@
   /**
    * 拓展间服务。名字是一个扁平命名空间：ctx.provide(name, value) 提供，声明了 inject 的拓展
    * 在依赖齐全时才应用；提供者卸载或被替换时，依赖方先卸载、回到挂起，提供者回来后自动
-   * 重新应用。内置服务（如 sessionQuery）由 Codex++ 提供，归属为 "builtin"。
+   * 重新应用。内置服务（如 sessionQuery）由 Codex # 提供，归属为 "builtin"。
    */
   const codexPlusServices = new Map();
   let codexPlusServiceSeq = 0;
@@ -17733,7 +17733,7 @@
     };
   }
 
-  /** 内置的只读会话查询服务：方法名与参数对齐会话查询接口，经桥接转到 Codex++。 */
+  /** 内置的只读会话查询服务：方法名与参数对齐会话查询接口，经桥接转到 Codex #。 */
   function codexPlusSessionQueryService() {
     const invoke = (method, params) => {
       const bridge = window.__codexSessionDeleteBridge;
@@ -17894,7 +17894,7 @@
     return { type: "message", role, content: [{ type: role === "assistant" ? "output_text" : "input_text", text: String(entry?.text ?? "") }] };
   }
 
-  /** 按方法名调用会话写入；params 形状见 codexPlusSessionsService。也给 Codex++ 进程经 CDP 调（后台、工具）。 */
+  /** 按方法名调用会话写入；params 形状见 codexPlusSessionsService。也给 Codex # 进程经 CDP 调（后台、工具）。 */
   async function codexPlusSessionsCall(name, params = {}) {
     const method = codexPlusSessionMethods[name];
     if (!method) throw new Error(`会话服务没有方法 ${name}`);
@@ -18263,7 +18263,7 @@
   }
 
   /**
-   * Codex++ 后台经 CDP 发给拓展的公开事件（只认 codexpp/ 前缀），例如会话索引修复结束的
+   * Codex # 后台经 CDP 发给拓展的公开事件（只认 codexpp/ 前缀），例如会话索引修复结束的
    * `codexpp/session-index-repaired`。拓展用 ctx.on 订阅。
    */
   window.__codexPlusEmitHostEvent = (event, payload) => {
@@ -18623,9 +18623,9 @@
     // 生效配置（清单 config 默认值叠加用户在管理器 / 对话里设置的值）。改配置会热重载拓展，这里是只读快照。
     let config = Object.freeze({ ...(manifest?.config && typeof manifest.config === "object" ? manifest.config : {}) });
     const configHandlers = new Set();
-    // 常驻后台：call 调方法（首次调用时 Codex++ 启动后台进程），on 订阅后台 emit 的事件（长轮询，
+    // 常驻后台：call 调方法（首次调用时 Codex # 启动后台进程），on 订阅后台 emit 的事件（长轮询，
     // 随实例卸载停止；on 本身不启动后台）。走内部桥接路由，不经拓展路由白名单，key 固定为本脚本。
-    // 用过后台的实例卸载时通知 Codex++ 停掉它；带实例标识，热重载时不会误停新实例拉起的后台。
+    // 用过后台的实例卸载时通知 Codex # 停掉它；带实例标识，热重载时不会误停新实例拉起的后台。
     const backendHandlers = new Map();
     const backendInstance = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
     let backendPolling = false;
@@ -18674,7 +18674,7 @@
         backendPolling = false;
       }
     };
-    // 调模型：经 Codex++ 协议代理用当前供应商（不跑拓展网关中间件）。
+    // 调模型：经 Codex # 协议代理用当前供应商（不跑拓展网关中间件）。
     const llm = Object.freeze({
       complete(options) {
         const payload = typeof options === "string" ? { input: options } : options ?? {};
@@ -18930,7 +18930,7 @@
         return track(() => window.clearInterval(timer));
       },
       /**
-       * 跟着 Codex++ 的页面扫描跑：Codex 的界面变了（会话切换、侧栏重建、输入框重建……）时调用 handler，
+       * 跟着 Codex # 的页面扫描跑：Codex 的界面变了（会话切换、侧栏重建、输入框重建……）时调用 handler，
        * 按帧合并、页面隐藏时不跑。phase：deferred（默认，完整扫描）或 light（每次变化都跑的轻量扫描，handler 要便宜）。
        * handler 插进页面的节点必须带 data-codex-plus-ext 属性，否则会触发自喂扫描循环。返回的撤销函数带 run()：立即跑一次。
        */
@@ -19204,7 +19204,7 @@
         if (typeof config.model === "string" && config.model && config.model !== seed.model) {
           result.model = config.model;
         } else if (typeof config.provider === "string" && config.provider && config.provider !== provider && base) {
-          // 只换了供应商：沿用 Codex++ 的「供应商/模型」写法拼回去。
+          // 只换了供应商：沿用 Codex # 的「供应商/模型」写法拼回去。
           result.model = `${config.provider}/${base}`;
         }
         if (typeof config.reasoningEffort === "string" && config.reasoningEffort !== seed.reasoningEffort) {
@@ -19379,7 +19379,7 @@
         Promise.resolve().then(() => plan(controller.signal)),
         new Promise((resolve) => {
           timer = setTimeout(() => {
-            controller.abort(new Error("Codex++ 拓展中间件超时"));
+            controller.abort(new Error("Codex # 拓展中间件超时"));
             resolve(null);
           }, codexPlusRpcMiddlewareTimeoutMs);
         }),
@@ -22628,7 +22628,7 @@
     scheduleDeferredScan();
   }
   /**
-   * 内置拓展：Codex++ 自带的功能也挂在拓展内核上，和第三方拓展走同一套生命周期
+   * 内置拓展：Codex # 自带的功能也挂在拓展内核上，和第三方拓展走同一套生命周期
    * （没有特权功能：自带的也能单独停用、被别的拓展顶替）。
    *
    *   - 每个内置功能是一个拓展实例（scriptKey = builtin:<id>）：实例在时功能可用，卸载时功能撤下；
@@ -22636,7 +22636,7 @@
    *   - 第三方拓展包在 codexpp.json 里声明 `replaces: ["<id>"]`，它启用时对应的内置拓展让位；
    *   - 功能自己的设置开关（如「Agent 桌宠」）照旧生效：内置拓展是外面一层，两者都开功能才出现。
    *
-   * 停用 / 顶替状态由 Codex++ 随用户脚本注入包下发（window.__codexPlusBuiltinExtensionState），
+   * 停用 / 顶替状态由 Codex # 随用户脚本注入包下发（window.__codexPlusBuiltinExtensionState），
    * 热重载时更新。功能的开关检查在注入早期（本分片执行前）、以及只抽单个分片的测试里也会被调用，所以只记
    * 「停用的」：globalThis.__codexPlusBuiltinInactive 里没有的 id 都算启用，功能侧写成
    * `!globalThis.__codexPlusBuiltinInactive?.has("<id>")`。实例卸载时加进集合，装上时移出。
@@ -22658,7 +22658,7 @@
    */
   function codexPlusBuiltinExtensionCatalog() {
     return [
-      // Agent 桌宠（含大肥鱼）、用量状态栏、请求状态条已改成随 Codex++ 发布的官方拓展包（bundled:agent-pet、
+      // Agent 桌宠（含大肥鱼）、用量状态栏、请求状态条已改成随 Codex # 发布的官方拓展包（bundled:agent-pet、
       // bundled:usage-statusline、bundled:proxy-request-status），不再是内置拓展。
       { id: "dictation", name: "语音听写", apply: codexPlusDictationExtension },
       { id: "turn-rewind", name: "轮次回退", apply: codexPlusTurnRewindExtension },
@@ -22915,7 +22915,7 @@
   }
 
   /**
-   * 对话宽度：完整扫描、窗口缩放时对齐对话区宽度；Codex++ 设置变了（管理器里改、心跳同步过来）且开关有变化时立即重算。
+   * 对话宽度：完整扫描、窗口缩放时对齐对话区宽度；Codex # 设置变了（管理器里改、心跳同步过来）且开关有变化时立即重算。
    */
   function codexPlusConversationViewExtension(ctx) {
     ctx.onScan(refreshConversationView);
@@ -22977,7 +22977,7 @@
         const node = document.createElement("div");
         node.id = "codex-plus-instance-identity";
         node.setAttribute("role", "status");
-        node.setAttribute("aria-label", `当前 Codex++ 多开身份：${label}`);
+        node.setAttribute("aria-label", `当前 Codex # 多开身份：${label}`);
         node.style.cssText = [
           "position:fixed",
           "top:8px",
@@ -22999,7 +22999,7 @@
           "letter-spacing:.02em",
           "opacity:.86",
         ].join(";");
-        node.textContent = `Codex++ 多开 · ${label}`;
+        node.textContent = `Codex # 多开 · ${label}`;
         container.appendChild(node);
       },
     });
@@ -23095,7 +23095,7 @@
    * dsh 的前端插件是懒 CJS 工厂（window.__ModuleLoader__.load({ id, factory })），factory(require) 返回
    * { inject, apply(ctx) }，apply 里用 ctx.slots.register(options, Component) 往 dsh Web 客户端的 React 插槽里放组件。
    * Codex 的页面也是 React（19），这里把 Codex 自己的 React / ReactDOM 交给插件的 require，再把 dsh 插槽一一对到
-   * Codex++ 的界面插槽：组件用 createRoot 渲染进插槽容器，随拓展实例卸载。对不上的插槽不显示，记一条失败说明。
+   * Codex # 的界面插槽：组件用 createRoot 渲染进插槽容器，随拓展实例卸载。对不上的插槽不显示，记一条失败说明。
    *
    * 配套拓展包把插件的 client.js 夹在两段胶水之间：前一段截住 __ModuleLoader__.load 并给 fetch 换成经后台转给插件
    * 宿主半边（ctx.connection.fetch 注册的路由）的版本，后一段调这里。设计见 docs/plans/2026-10-30-dsh-plugin-import-design.md。
@@ -23152,7 +23152,7 @@
   }
 
   /**
-   * dsh 插槽 → Codex++ 位置。kind：slot（界面插槽）、rowAction（会话行「更多」菜单的自绘项）、
+   * dsh 插槽 → Codex # 位置。kind：slot（界面插槽）、rowAction（会话行「更多」菜单的自绘项）、
    * message（助手消息下方）、page（整页，带图标栏入口）。
    */
   const codexPlusDshSlotMap = {
@@ -23198,7 +23198,7 @@
     "tool.view.cordis": { kind: "toolView" },
   };
 
-  /** dsh 快捷键绑定（{ code, modifiers }）→ Codex++ 的 "Mod+Shift+K" 写法；认不出时返回空串。 */
+  /** dsh 快捷键绑定（{ code, modifiers }）→ Codex # 的 "Mod+Shift+K" 写法；认不出时返回空串。 */
   function codexPlusDshShortcutKey(binding) {
     if (!binding || typeof binding.code !== "string" || binding.secondCode) return "";
     const names = { primary: "Mod", control: "Ctrl", alt: "Alt", shift: "Shift", meta: "Meta" };
@@ -23233,13 +23233,13 @@
   }
 
   /**
-   * 所有 dsh 前端插件的插槽登记（跨包共享）。对得上 Codex++ 位置的插槽直接渲染进去；对不上的作为「子插槽」，
+   * 所有 dsh 前端插件的插槽登记（跨包共享）。对得上 Codex # 位置的插槽直接渲染进去；对不上的作为「子插槽」，
    * 由别的 dsh 组件经 renderSlot / renderSlotChain 渲染（dsh 的复合组件就是这样拼起来的）；factory 经 renderFactorySlot。
    */
   const codexPlusDshSlotEntries = new Map();
   const codexPlusDshFactories = new Map();
   const codexPlusDshSlotListeners = new Set();
-  /** 被 renderSlot / renderSlotChain 请求过的插槽名：对不上 Codex++ 位置、也没人渲染的才算「不会显示」。 */
+  /** 被 renderSlot / renderSlotChain 请求过的插槽名：对不上 Codex # 位置、也没人渲染的才算「不会显示」。 */
   const codexPlusDshRequestedSlots = new Set();
   let codexPlusDshSlotRevision = 0;
 
@@ -23456,8 +23456,8 @@
       },
     };
 
-    // dsh 的快捷键命令 → Codex++ 快捷键：取默认绑定（macOS 优先按平台挑），按下时问命令的 resolve。
-    // 单键（加修饰键）的绑定交给 Codex++ 的快捷键；双键组合（secondCode：两个键同时按住）与固定序列的输入
+    // dsh 的快捷键命令 → Codex # 快捷键：取默认绑定（macOS 优先按平台挑），按下时问命令的 resolve。
+    // 单键（加修饰键）的绑定交给 Codex # 的快捷键；双键组合（secondCode：两个键同时按住）与固定序列的输入
     // （registerFixed / observeFixedInput，如 `g g`，插件自己按 stopSequenceMs 判断）由这里的键盘监听处理，同 dsh 的 installKeyboard。
     const mac = Boolean(codexPlusIsMacPlatform);
     const chordCommands = new Map();
@@ -23558,7 +23558,7 @@
           refreshCatalog();
         };
         if (normalized?.secondCode) {
-          // 双键组合：Codex++ 的快捷键只认一个键，由这里的键盘监听匹配。
+          // 双键组合：Codex # 的快捷键只认一个键，由这里的键盘监听匹配。
           const entry = { command, binding: normalized };
           chordCommands.set(id, entry);
           installKeyboard();
@@ -23611,7 +23611,7 @@
         const normalized = codexPlusDshNormalizeBinding(binding, mac);
         return { keys: codexPlusDshBindingKeys(normalized, mac), aria: normalized && !normalized.secondCode ? codexPlusDshShortcutKey(binding) : undefined };
       },
-      edit: async () => ({ ok: false, reason: "Codex++ 里快捷键在拓展里改" }),
+      edit: async () => ({ ok: false, reason: "Codex # 里快捷键在拓展里改" }),
       recording: async () => {},
       closeWindow: async () => {},
     };
@@ -23656,7 +23656,7 @@
       dismiss() {},
       popupFor: () => undefined,
     };
-    // dsh 主题（tokens）→ Codex++ 主题：token 名写成 CSS 变量；切换走 codexPlus.themes。
+    // dsh 主题（tokens）→ Codex # 主题：token 名写成 CSS 变量；切换走 codexPlus.themes。
     const themeService = {
       getTheme: () => ({ preference: "system", fontSize: 14, active: { id: codexPlusThemesService().current || "default", colorScheme: document.documentElement.classList.contains("dark") ? "dark" : "light", tokens: {} }, themes: [], revision: 0 }),
       exportInspectTokens: () => [],
@@ -23673,7 +23673,7 @@
     // dsh 的 / 与 @ 菜单在 Codex 里归 Codex 自己：输入触发源注册不进去，记一条说明但不挡插件加载。
     const inputTriggers = new Proxy({}, {
       get: (_target, key) => (key === "then" ? undefined : (...args) => {
-        if (key === "register" || key === "registerSource") fail(`输入触发源 ${args[0]?.trigger || ""}${args[0]?.name || ""} 用的是 Codex 自己的 / 或 @ 菜单，Codex++ 不接管，不会出现`);
+        if (key === "register" || key === "registerSource") fail(`输入触发源 ${args[0]?.trigger || ""}${args[0]?.name || ""} 用的是 Codex 自己的 / 或 @ 菜单，Codex # 不接管，不会出现`);
         return () => {};
       }),
     });
@@ -23763,7 +23763,7 @@
       useProjection: () => undefined,
       renderFactorySlot,
     });
-    // 本包登记的、对不上 Codex++ 位置的插槽：全部 apply 后过一会儿还没有任何组件渲染它，才记「不会显示」。
+    // 本包登记的、对不上 Codex # 位置的插槽：全部 apply 后过一会儿还没有任何组件渲染它，才记「不会显示」。
     const unmappedNames = new Set();
 
     let anonymous = 0;
@@ -23790,7 +23790,7 @@
       const props = (extra) => ({ ...standardProps(extra.sessionId ?? (codexPlusCurrentSessionId() || undefined)), t, ...face, ...extra });
       const label = typeof options.label === "function" ? options.label() : String(options.label || options.id || packageName);
       const id = `dsh-${name}-${options.id || options.key || ++anonymous}`;
-      // 先登记进跨包登记表：父组件的 renderSlot 能渲染它；对得上 Codex++ 位置的再挂到那里。
+      // 先登记进跨包登记表：父组件的 renderSlot 能渲染它；对得上 Codex # 位置的再挂到那里。
       const entry = {
         id,
         name,
@@ -23883,7 +23883,7 @@
     };
     const slots = {
       register,
-      // Codex++ 的插槽一开始就都在：立刻执行，回调返回的撤销函数随拓展卸载。
+      // Codex # 的插槽一开始就都在：立刻执行，回调返回的撤销函数随拓展卸载。
       inject(key, callback) {
         let result;
         try {
@@ -24013,7 +24013,7 @@
         for (const descriptor of contribution?.descriptors || []) addRemoteDescriptor(descriptor);
         return async () => {};
       },
-      // 宿主转发的事件：对上 Codex++ 拓展内核的同名事件（agent/status 等）。
+      // 宿主转发的事件：对上 Codex # 拓展内核的同名事件（agent/status 等）。
       $on: (event, listener) => ctx.on(String(event), listener),
     }, {
       get(target, key) {
@@ -24096,7 +24096,7 @@
     };
     const require = (name) => {
       if (name in builtinModules && builtinModules[name]) return builtinModules[name];
-      throw new Error(`dsh 前端插件 require 了 ${name}，Codex++ 只提供 React 与 ReactDOM`);
+      throw new Error(`dsh 前端插件 require 了 ${name}，Codex # 只提供 React 与 ReactDOM`);
     };
     // 先求出各模块的插件对象：要用 remote 的话先向宿主半边要一次 typert 描述，remote.<namespace> 才能被 inject。
     const loaded = [];
@@ -24139,7 +24139,7 @@
     }
     if (ctx.disposed) return;
     ready = true;
-    // 对不上 Codex++ 位置的插槽：给页面一点时间画出父组件，仍没人渲染才记一条说明。
+    // 对不上 Codex # 位置的插槽：给页面一点时间画出父组件，仍没人渲染才记一条说明。
     if (unmappedNames.size) {
       ctx.setTimeout(() => {
         const orphaned = [...unmappedNames].filter((name) => !codexPlusDshRequestedSlots.has(name));
@@ -24163,7 +24163,7 @@
   window.__codexSessionDeleteDeferredPending = false;
 
   /**
-   * 这个节点是不是 Codex++ 自己（或拓展）的 UI。
+   * 这个节点是不是 Codex # 自己（或拓展）的 UI。
    *
    * 内置选择器写在这里；拓展通过注册中心登记的选择器走 isCodexPlusExtensionNode，
    * 那边已把选择器合并成一个串并在 Set 变化时重建缓存，所以这里每次调用只多一次

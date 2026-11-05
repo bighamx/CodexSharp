@@ -81,8 +81,8 @@ export function errorText(error: unknown): string {
 
 function engineWarning(engine: Entry["engine"]): string {
   return typeof engine === "number"
-    ? tf("需要拓展 API v{0}，请先更新 Codex++", [engine])
-    : tf("需要 Codex++ {0}，当前版本不兼容", [engine]);
+    ? tf("需要拓展 API v{0}，请先更新 Codex #", [engine])
+    : tf("需要 Codex # {0}，当前版本不兼容", [engine]);
 }
 
 /** 按风险从高到低列出声明的能力；空数组表示只是页面脚本以外什么也没有。 */
@@ -166,7 +166,7 @@ export function CommunityExtensionsPanel({
     if (sort === "updated") sorted.sort((a, b) => b.pushedAt.localeCompare(a.pushedAt));
     else if (sort === "name") sorted.sort((a, b) => a.name.localeCompare(b.name));
     else sorted.sort((a, b) => b.stars - a.stars);
-    // 需要更新 Codex++ 的排到最后。
+    // 需要更新 Codex # 的排到最后。
     return sorted.sort((a, b) => Number(b.compatible) - Number(a.compatible));
   }, [listing, search, sort]);
 
@@ -207,7 +207,7 @@ export function CommunityExtensionsPanel({
       const result = await request<{ hooksAdded?: boolean; hooksError?: string | null }>("install", { token: target.token, enable, replace: target.conflict !== null });
       const parts = [enable ? t("拓展已安装并启用。") : t("拓展已安装，尚未启用，可在「本地拓展」里启用。")];
       if (result.hooksError) parts.push(tf("Codex 钩子配置未能同步：{0}", [result.hooksError]));
-      else if (result.hooksAdded) parts.push(t("Codex 配置里新增了「Codex++ 拓展钩子」，请在 Codex 的 Hooks 设置里信任一次，新开对话生效。"));
+      else if (result.hooksAdded) parts.push(t("Codex 配置里新增了「Codex # 拓展钩子」，请在 Codex 的 Hooks 设置里信任一次，新开对话生效。"));
       setNotice(`${target.name} ${target.tag ?? target.sha.slice(0, 7)}：${parts.join("")}`);
       await onInstalled();
       await load(false);
@@ -235,7 +235,7 @@ export function CommunityExtensionsPanel({
             <CxBadge title={t("GitHub 星数")}><Star size={11} />{entry.stars}</CxBadge>
             {riskBadges(entry.permissions).map((badge) => <CxBadge key={badge} title={t("安装前会列出它要的全部权限")}>{badge}</CxBadge>)}
             {entry.warnings?.length ? <CxBadge title={entry.warnings.join("\n")} tone="danger">{t("可疑")}</CxBadge> : null}
-            {!entry.compatible ? <CxBadge title={facts} tone="warn">{t("需要更新 Codex++")}</CxBadge> : null}
+            {!entry.compatible ? <CxBadge title={facts} tone="warn">{t("需要更新 Codex #")}</CxBadge> : null}
           </>
         }
         description={entry.description}
@@ -298,7 +298,7 @@ export function CommunityExtensionsPanel({
       <CxBanner
         detail={<span title={t("这里列出 GitHub 上打了 codexpp-extension 标签的拓展包仓库。作者可以在新版本里加入任意代码，只安装你信任的作者的拓展。安装时锁定到作者发布的版本，并在安装前列出它要的权限。")}>{t("只安装你信任的作者的拓展；安装前会列出它要的权限。")}</span>}
         icon={<ShieldAlert />}
-        title={t("社区拓展未经 Codex++ 审核")}
+        title={t("社区拓展未经 Codex # 审核")}
         tone="warn"
       >
         <Switch label={t("显示社区拓展")} on={enabled} onToggle={() => void setEnabled(!enabled)} />
@@ -363,11 +363,11 @@ export function InstallDialog({ prepared, onCancel, onInstall }: { prepared: Pre
         </div>
         <div className="confirm-modal-body">
           {prepared.channel === "official" ? (
-            <p className="community-ext-dialog-trusted">{t("Codex++ 官方拓展，安装的是审核过的版本。")}</p>
+            <p className="community-ext-dialog-trusted">{t("Codex # 官方拓展，安装的是审核过的版本。")}</p>
           ) : prepared.channel === "curated" ? (
-            <p className="community-ext-dialog-trusted">{t("经 Codex++ 审核的精选拓展，安装的是审核过的那一版；作者之后的改动要再审核才会更新。")}</p>
+            <p className="community-ext-dialog-trusted">{t("经 Codex # 审核的精选拓展，安装的是审核过的那一版；作者之后的改动要再审核才会更新。")}</p>
           ) : (
-            <p className="community-ext-dialog-warning">{t("未经 Codex++ 审核，作者可以在新版本里加入任意代码。只安装你信任的作者的拓展。")}</p>
+            <p className="community-ext-dialog-warning">{t("未经 Codex # 审核，作者可以在新版本里加入任意代码。只安装你信任的作者的拓展。")}</p>
           )}
           <div className="community-ext-dialog-version">
             <code>{prepared.repo}</code>

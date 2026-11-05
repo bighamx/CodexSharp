@@ -1,4 +1,4 @@
-//! Codex++ 托管的本机 stdio MCP 条目：在 Codex `config.toml` 的 `[mcp_servers.<id>]` 下
+//! Codex # 托管的本机 stdio MCP 条目：在 Codex `config.toml` 的 `[mcp_servers.<id>]` 下
 //! 只管理自己那一条，不读取或改写认证文件。
 //!
 //! 每个托管服务由一份 [`ManagedMcp`] 描述（条目 id、启动参数首项、锁与备份文件名、文案）。

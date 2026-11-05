@@ -43,7 +43,7 @@ pub const BROWSER_SERVER_ID: &str = "codex-plus-browser";
 /// 只用于识别并移除旧版本留下的条目，不再写入。
 pub const CODEX_SERVER_ID: &str = "codex_plus_cu";
 const CODEX_NOT_INSTALLABLE: &str =
-    "Codex 自带 Computer Use，不接入 Codex++ 的：同时存在会出现两套电脑控制工具";
+    "Codex 自带 Computer Use，不接入 Codex # 的：同时存在会出现两套电脑控制工具";
 /// 非 macOS 平台的明确提示：运行时只随 macOS 版 ChatGPT.app 提供，别的平台不是「没装」而是「不支持」。
 pub const UNSUPPORTED_PLATFORM: &str =
     "Computer Use 接入目前只支持 macOS，暂不支持 Windows：它依赖 macOS 版 ChatGPT.app 自带的 Computer Use 服务";
@@ -430,7 +430,7 @@ impl RuntimeLocation {
 
     /// 写进客户端配置的条目。
     ///
-    /// 指向 Codex++ 自己的二进制而不是 `cua-repl`：中间需要一层 MCP 代理处理
+    /// 指向 Codex # 自己的二进制而不是 `cua-repl`：中间需要一层 MCP 代理处理
     /// `elicitation`（Claude Code 的 MCP 客户端不声明这个能力，直连会在接管 app 的
     /// 瞬间断掉）。代理内部仍原样拉起 `cua-repl`，工具面与执行器都没有变化。
     fn server_entry(&self) -> Value {
@@ -680,7 +680,7 @@ pub(crate) fn claude_code_config_path() -> PathBuf {
         .join(".claude.json")
 }
 
-/// Claude Desktop 的配置路径可能有多个：官方版用 `Claude/`，Codex++ 的增强版副本用
+/// Claude Desktop 的配置路径可能有多个：官方版用 `Claude/`，Codex # 的增强版副本用
 /// `Claude-3p/`，两者互不读取。存在几个就写几个，避免「官方装了、用户实际跑副本」时
 /// 接入看起来成功却没生效。
 fn claude_desktop_config_paths() -> Vec<PathBuf> {
@@ -1216,7 +1216,7 @@ fn status_at(
             Ok(Some(entry)) if codex_entry_looks_like_ours(&entry) => (
                 true,
                 "registered",
-                "Codex 配置里残留 Codex++ 的 Computer Use 条目，会与 Codex 自带的重复，建议移除".to_string(),
+                "Codex 配置里残留 Codex # 的 Computer Use 条目，会与 Codex 自带的重复，建议移除".to_string(),
             ),
             Ok(Some(_)) => (
                 false,
@@ -2066,7 +2066,7 @@ fn looks_like_ours(entry: &Value, runtime: &RuntimeLocation) -> bool {
 }
 
 /// 同一份配置可能在 debug / release / 安装位置之间被复用：只认「是不是
-/// Codex++ 自己的二进制」，而不是某一条绝对路径，否则换个构建就会被判成他人条目。
+/// Codex # 自己的二进制」，而不是某一条绝对路径，否则换个构建就会被判成他人条目。
 /// bundle 里叫 CodexPlusPlus，cargo 产物叫 codex-plus-plus，两种都认。
 fn is_codex_plus_binary(command: &str) -> bool {
     std::path::Path::new(command)
@@ -2093,8 +2093,8 @@ fn read_codex_entry(path: &Path, server_id: &str) -> anyhow::Result<Option<toml_
         .cloned())
 }
 
-/// Codex 配置里的 `codex_plus_cu` 是不是 Codex++ 写入的残留：早期直连 cua-repl 的写法
-/// （`node …/cua-repl.mjs`），或指向 Codex++ 自己的代理。
+/// Codex 配置里的 `codex_plus_cu` 是不是 Codex # 写入的残留：早期直连 cua-repl 的写法
+/// （`node …/cua-repl.mjs`），或指向 Codex # 自己的代理。
 ///
 /// 不依赖 `RuntimeLocation`：ChatGPT.app 升级或卸载后路径都会变，残留仍要能认出来并移除。
 fn codex_entry_looks_like_ours(entry: &toml_edit::Item) -> bool {
@@ -2378,7 +2378,7 @@ mod tests {
     fn codex_leftovers_are_recognized_and_removed() {
         let temp = TempDir::new().unwrap();
         let path = temp.path().join("config.toml");
-        // 两种残留：早期直连 cua-repl，以及指向 Codex++ 代理的写法。
+        // 两种残留：早期直连 cua-repl，以及指向 Codex # 代理的写法。
         for (command, arg) in [
             (
                 "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node",

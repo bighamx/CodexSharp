@@ -439,7 +439,7 @@ pub async fn handle_bridge_request(
                 .to_string();
             ctx.runtime.delete_user_script(key).await
         }
-        // Codex++ 内部用：「拓展」详情页里拓展自己的设置面板保存配置。只写这一个拓展清单里声明过的配置项，
+        // Codex # 内部用：「拓展」详情页里拓展自己的设置面板保存配置。只写这一个拓展清单里声明过的配置项，
         // 不进拓展路由白名单（拓展经 ctx.registerSettingsPanel 拿到的 saveConfig 只能存它自己的）。
         "/user-scripts/set-config" => {
             let key = payload.get("key").and_then(Value::as_str).unwrap_or_default().trim().to_string();
@@ -453,7 +453,7 @@ pub async fn handle_bridge_request(
                 }
             }
         }
-        // Codex++ 内部用：「拓展」详情页「细节」页签读拓展的 README。只读，不进拓展路由白名单。
+        // Codex # 内部用：「拓展」详情页「细节」页签读拓展的 README。只读，不进拓展路由白名单。
         "/user-scripts/readme" => {
             let key = payload.get("key").and_then(Value::as_str).unwrap_or_default().trim().to_string();
             if key.is_empty() {
@@ -472,7 +472,7 @@ pub async fn handle_bridge_request(
         // 系统鼠标位置：拓展写「桌宠跟随鼠标」这类功能用（页面里拿不到窗口外的鼠标）。只读。
         "/system/cursor-position" => crate::launcher::cursor_position()
             .map(|(x, y)| json!({ "status": "ok", "x": x, "y": y })),
-        // Codex++ 内部用：拓展要改写发往 app-server 的请求时补开客户端捕获。不进拓展路由白名单。
+        // Codex # 内部用：拓展要改写发往 app-server 的请求时补开客户端捕获。不进拓展路由白名单。
         "/extensions/request-capture" => ctx.runtime.request_app_server_client_capture().await,
         // 拓展常驻后台：页面侧 ctx.backend 用。进程由处理桥接的这个进程托管，与具体运行时无关。
         "/extensions/backend/call" => crate::extension_backend::route_call(&payload).await,
@@ -578,7 +578,7 @@ pub async fn handle_bridge_request(
             }
         },
         // 大肥鱼（Agent 桌宠拓展）的数据路由：拓展白名单里开放，但只有启用中的拓展在清单里声明了它才干活。
-        // 本机用量统计与余额查询都在 Codex++ 里做，供应商的 Key 不交给页面。
+        // 本机用量统计与余额查询都在 Codex # 里做，供应商的 Key 不交给页面。
         "/whale/media" if ctx.settings.extension_route_declared(path) => Ok(crate::assets::whale_media()),
         "/whale/media" => Ok(json!({"status":"disabled"})),
         "/whale/history" => match ctx.settings.get_settings().await {
@@ -638,7 +638,7 @@ pub async fn handle_bridge_request(
             Err(_) => Ok(json!({"status": "unavailable", "message": "无法读取挂件设置"})),
         },
         // Agent 桌宠拓展的数据路由（图库、图片、音效、导入自定义音效）：参数来自拓展配置，按原来的设置规则校验；
-        // 下载走 Codex++ 的地址校验（只 https、拦截本机地址）与缓存。只有启用中的拓展声明了它才干活。
+        // 下载走 Codex # 的地址校验（只 https、拦截本机地址）与缓存。只有启用中的拓展声明了它才干活。
         "/agent-pet/catalog" | "/agent-pet/image" | "/agent-pet/sound" | "/agent-pet/import-sound" => {
             if ctx.settings.extension_route_declared(path) {
                 Ok(crate::agent_pet::route(path, &payload, &ctx.settings.agent_pet_cache_dir(), &ctx.settings.agent_pet_custom_dir())

@@ -1,4 +1,4 @@
-# Codex++ 拓展体系设计
+# Codex # 拓展体系设计
 
 日期：2026-10-30
 状态：P0~P3 已实施（P1、P3 部分），P4 与持续项为规划
@@ -8,10 +8,10 @@
 
 ## 命名
 
-- **拓展**：Codex++ 自己注入 Codex 页面的能力，包括单文件脚本拓展与带 `codexpp.json` 的拓展包，
+- **拓展**：Codex # 自己注入 Codex 页面的能力，包括单文件脚本拓展与带 `codexpp.json` 的拓展包，
   接口是 `codexPlus.extension(ctx => …)`（早期名 `codexPlus.plugin` 保留为别名）。
-- **插件**：只指 Codex 自带的插件（skills / MCP / apps 包），Codex++「插件市场」安装的就是这种。
-- **dsh 插件**：dsh 自己的插件，导入后按层落到 Codex++，见 `2026-10-30-dsh-plugin-import-design.md`。
+- **插件**：只指 Codex 自带的插件（skills / MCP / apps 包），Codex #「插件市场」安装的就是这种。
+- **dsh 插件**：dsh 自己的插件，导入后按层落到 Codex #，见 `2026-10-30-dsh-plugin-import-design.md`。
 
 ## 一、目标
 
@@ -29,15 +29,15 @@
 ## 二、约束：我们不拥有内核
 
 Codex 的 agent 循环在 Rust app-server 里，渲染进程是闭源打包的 Electron 页面。我们做不到「内核也是拓展」，
-只能在 Codex++ 能控制的层面上提供拓展挂载点。好在这些层面已经覆盖了参照对象的大部分能力缝：
+只能在 Codex # 能控制的层面上提供拓展挂载点。好在这些层面已经覆盖了参照对象的大部分能力缝：
 
-| 层 | Codex++ 现状 | 对应能力缝 |
+| 层 | Codex # 现状 | 对应能力缝 |
 | --- | --- | --- |
 | ① 界面层（CDP 注入 renderer） | `window.codexPlus` 已有 rowAction / navEntry / menuItem / page 四种注册 | UI slot |
 | ② 协议层（renderer 内拦截 app-server JSON-RPC） | 插件市场已接管 `plugin/*`（`62-plugin-market-adapter.js`） | 会话 / 轮次事件、slash 命令 |
 | ③ 模型网络层（本地网关、协议代理） | 路由、Key 轮换、本地压缩（`gateway/`、`protocol_proxy/`） | 请求改写、流改写、压缩、重试 |
 | ④ Codex 原生 hooks | 仅在切换配置时保留 hooks 定义 | SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop |
-| ⑤ Codex 原生插件 / MCP / skills | 插件市场能安装 `.codex-plugin` 包 | 工具注册（由 Codex++ 聚合 MCP 暴露） |
+| ⑤ Codex 原生插件 / MCP / skills | 插件市场能安装 `.codex-plugin` 包 | 工具注册（由 Codex # 聚合 MCP 暴露） |
 
 明确不做：替换 agent 循环、替换会话存储（Codex 自己写 rollout）、把执行环境整体迁到远端。
 
@@ -120,7 +120,7 @@ codexPlus.extension((ctx) => {
 | --- | --- | --- |
 | **P0** ✅ | 内核（ctx / effect / 事件 / waterfall / 自动清理）；`codexpp.json` 包加载、版本校验、路由权限；管理页显示包信息 | 一个拓展包能注册页面、热重载不刷新页面、越权路由被拒 |
 | **P1** ✅（部分） | 已做：会话事件 `codex/*`、`codex/request` 请求中间件、输入区按钮插槽、斜杠命令、`ctx.storage`、清单 `config` 配置项与管理器自动生成的设置表单、对话造拓展的页面查看与截图、消息操作按钮与消息装饰插槽、右侧面板插槽。`codex/request` 依赖 app-server 客户端类捕获，该捕获在新版 Codex 上失效，另案修复 | 拓展订阅轮次结束、往输入区加按钮 |
-| **P2** ✅ | Codex hooks：拓展声明 `hooks`，Codex++ 只写固定分发条目（用户信任一次），`--codex-plus-hook` 每次起一个 Node 跑完命中的钩子并按协议合并。模型工具：拓展声明 `tools`，由 `codex_plus_extensions` MCP 对外提供 | 拓展可阻塞危险命令、给提示词补上下文 |
+| **P2** ✅ | Codex hooks：拓展声明 `hooks`，Codex # 只写固定分发条目（用户信任一次），`--codex-plus-hook` 每次起一个 Node 跑完命中的钩子并按协议合并。模型工具：拓展声明 `tools`，由 `codex_plus_extensions` MCP 对外提供 | 拓展可阻塞危险命令、给提示词补上下文 |
 | **P3** ✅ | 网关请求中间件 `gateway.request`：本地代理解析请求体后按顺序改写；网关响应流中间件 `gateway.response`：`(context, next) => 异步可迭代对象` 包住整条事件流，常驻 Node 工作进程逐事件一问一答，出错超时原样放行 | 拓展可往系统提示词追加段落 |
 | **后台** ✅ | 常驻后台 `backend.script`：启动器首次调用时用 Node 拉起，行式 JSON 收发；页面 `ctx.backend.call / on`（事件长轮询）。实例卸载时按实例标识停止，调用前核对脚本 / 配置 / 启用状态，过期重起 | 页面能读写本地文件、后台推事件到页面 |
 | **对齐补完** ✅ | `engines.codexpp` 支持 semver 范围；会话查询加 `project` / `observeSession` / `readEventsSince` 与全量搜索缓存；工具管道 `toolPipeline`（preExecute 改参数 / 拦截、execute 代为执行、postExecute 改写结果）；网关失败重试 `gateway.error`；后台服务 `backend.provides` + `provide` / `service()`，页面 / 后台 / 工具 / 钩子跨进程调用；配置项支持 text / array / object / min-max / 多语言说明。`codex/request` 改挂 createRequest；新版 Codex 的请求改在页面与宿主进程之间的 capnweb RPC 帧上拦截（`91-extension-rpc.js`），并补上 `agent/pre-step`（改写 / 拒绝本轮用户输入）与 `agent/request`（改模型、推理强度） | — |
@@ -133,7 +133,7 @@ codexPlus.extension((ctx) => {
 | **内置拓展只剩 apply**（2026-11-01） | 公开 `ctx.onScan(handler, { phase })`（扫描步骤登记在拓展名下，卸下即撤）与公开事件 `settings/changed`（页面里改设置后先按新值、写进后端后各发一次）。原来只靠包装层 sync / scan / settings 钩子的 15 个内置拓展（语音听写、轮次回退、容量重试、会话分享、模型分组、梦皮、插件市场解锁、会话删除、Markdown 导出、会话 ID 角标、滚动位置恢复、消息导航条、微信会话同步、下一步建议、回答大纲）改成各自一个 `apply(ctx)`，包装层不再有私有钩子；扫描循环不再点名已删会话过滤、对话宽度、滚动位置恢复，`setCodexPlusSetting` / `refreshCodexPlusBackendToggles` 不再点名任何功能；模型分组的轮询不再自启。随后：`registerRowAction` 加 `placement: "inline"`（行上常驻图标按钮）、`surfaces: ["archived"]`（归档页行）、`className` / `onMount`，内置拓展的注册项可用 0~999 排序；会话删除、Markdown 导出改为注册会话行操作，内核只是按注册项画按钮组的宿主；用量状态栏、请求状态条的轮询、听写快捷键、消息导航条的启动轮询改由内置拓展装上时开始。功能侧仍读停用集合判断自己装着没有（行为与闭包内标记等价）；Rust 侧驱动的 11 项只登记（启动期补丁刻意不开放） | 第三方拓展用同样的接口能写出这些内置功能 |
 | **网关环节可关**（2026-11-01） | `gateway.replaces` 再开放 7 个内置环节：本地代理两种模式都经过的 `builtin:auto-retry`（请求避震）、`builtin:foreign-reasoning`（别家加密推理处理）、`builtin:unlisted-model-mapping`（目录外模型映射），网关模式的 `builtin:key-cooldown`、`builtin:key-breaker`、`builtin:local-rate-limit`、`builtin:title-model`。关掉冷却 / 熔断后在冷却的 Key 照常当候选（排在可用的后面），由拓展在 route 段筛。仍不开放：协议转换、凭据与鉴权头、官方登录 / ChatGPT 后端整理、请求日志与用量（关掉后请求发不出或计费对不上） | 拓展能整体接管网关的调度与重试 |
 | **管理器面板**（2026-11-01） | 清单 `manager: { page, title }`：管理器「本地拓展」行菜单「打开面板」，页面放进沙箱 iframe（允许脚本和表单交互，CSP 限制外部资源与表单外发；iframe 自导航仍须信任作者），经 postMessage 的 `window.codexPlusManager` 只能读写本拓展配置、调本拓展常驻后台、取本拓展 assets、弹提示、跟随主题。只声明 `manager` 的包也合法；对话造拓展的写入工具认 `manager` | 拓展能在管理器里有自己的界面，且碰不到管理器的其它能力 |
-| **补齐剩余差距** ✅（2026-11-01） | ① Rust 侧生效的 10 个内置拓展（原生 Fast、原生输入预测、模型白名单解锁、强制中文、背景图、第三方推理折叠、Work 视图、原生浏览器兼容、历史轮次补全、桌宠跟随鼠标）都能被 `replaces` 顶替：`builtin_takeover` 把被顶替的设置项按「关」处理，启动、注入、桥接、本地代理、启动器驱动读到的都是处理后的设置；只有独立模式的官方额度解锁不能顶替（那时拓展不加载）。顶替用的新接口：清单 `preload`（新文档脚本，Codex 自己的脚本之前执行，可要求启动后重载一次）、`launch`（`args` 追加启动参数，`before` / `after` 在启动前 / 退出后跑 Node 脚本）、公开事件 `codexpp/session-index-repaired`、只读路由 `/system/cursor-position`。② `gateway.replaces` 再开放 4 个环节：`builtin:request-conversion`（请求方向的协议转换）、`builtin:auth-headers`（鉴权头；Key 只交给声明它的拓展的 upstream 中间件）、`builtin:official-shaping`（官方登录 / ChatGPT 后端整理）、`builtin:request-log`（请求日志与用量）。仍由 Codex++ 做的只剩响应方向的协议转换与官方 OAuth 凭据。③ 管理器的页面也可由拓展贡献：`manager.nav` 进侧栏与 ⌘K、`manager.replaces` 顶替 23 个内置页面（「万物皆拓展」「内置拓展」「设置」除外，被顶替页上方可切回）、`manager.data` 声明可读的只读数据（请求流、请求日志、用量、本机会话），面板多了 `data` / `navigate` | 第三方拓展能写出所有内置功能的等价物 |
+| **补齐剩余差距** ✅（2026-11-01） | ① Rust 侧生效的 10 个内置拓展（原生 Fast、原生输入预测、模型白名单解锁、强制中文、背景图、第三方推理折叠、Work 视图、原生浏览器兼容、历史轮次补全、桌宠跟随鼠标）都能被 `replaces` 顶替：`builtin_takeover` 把被顶替的设置项按「关」处理，启动、注入、桥接、本地代理、启动器驱动读到的都是处理后的设置；只有独立模式的官方额度解锁不能顶替（那时拓展不加载）。顶替用的新接口：清单 `preload`（新文档脚本，Codex 自己的脚本之前执行，可要求启动后重载一次）、`launch`（`args` 追加启动参数，`before` / `after` 在启动前 / 退出后跑 Node 脚本）、公开事件 `codexpp/session-index-repaired`、只读路由 `/system/cursor-position`。② `gateway.replaces` 再开放 4 个环节：`builtin:request-conversion`（请求方向的协议转换）、`builtin:auth-headers`（鉴权头；Key 只交给声明它的拓展的 upstream 中间件）、`builtin:official-shaping`（官方登录 / ChatGPT 后端整理）、`builtin:request-log`（请求日志与用量）。仍由 Codex # 做的只剩响应方向的协议转换与官方 OAuth 凭据。③ 管理器的页面也可由拓展贡献：`manager.nav` 进侧栏与 ⌘K、`manager.replaces` 顶替 23 个内置页面（「万物皆拓展」「内置拓展」「设置」除外，被顶替页上方可切回）、`manager.data` 声明可读的只读数据（请求流、请求日志、用量、本机会话），面板多了 `data` / `navigate` | 第三方拓展能写出所有内置功能的等价物 |
 | **对齐 dsh** ✅（2026-11-01） | 拓展内核：可选依赖（`inject` 对象写法 `required: false`）、实例级 `ready` / `dispose`、异步 effect、清单 `instances` 多实例；网关：`stage: upstream` 排在内置环节之后、`order`、`replaces` 关掉内置环节、供应商 `override`；内置拓展：扫描步骤与全局监听归拓展所有，`codexpp.usage` / `codexpp.proxyStatus` 数据服务。dsh 插件侧的覆盖见 `2026-10-30-dsh-plugin-import-design.md` 第 9~11 节 | — |
 
 ## 六、对话造拓展
@@ -142,10 +142,10 @@ codexPlus.extension((ctx) => {
 
 - **为什么走 MCP**：Codex 的沙箱通常不能写工作区以外的目录，也连不上本机调试端口。MCP 服务由 Codex 拉起、
   在沙箱外运行，写入还会经过 Codex 的工具审批。
-- **服务**：`codex_plus_extensions`，即 Codex++ 主程序 `--codex-plus-extension-mcp --state-dir <状态目录>`
+- **服务**：`codex_plus_extensions`，即 Codex # 主程序 `--codex-plus-extension-mcp --state-dir <状态目录>`
   （`crates/codex-plus-core/src/extension_creator.rs`）。工具：guide / list / read / write / set_enabled / reload，
   没有删除。
-- **接入**：与协作 MCP 共用 `crates/codex-plus-core/src/managed_mcp.rs`：先写 Codex++ 托管上下文（切换供应商不丢），
+- **接入**：与协作 MCP 共用 `crates/codex-plus-core/src/managed_mcp.rs`：先写 Codex # 托管上下文（切换供应商不丢），
   再原子写 Codex live 配置，冲突不覆盖、失败只回滚本条。管理器「拓展」页的「对话造拓展」一栏触发。
 - **热重载安全**：重载前读一次页面运行状态，有不支持页内重载的旧脚本就不自动执行（否则会整页刷新、打断对话），
   交给用户在管理器手动点。重载后等 0.8 秒再读一次状态，捕捉拓展异步阶段报的错。
@@ -154,7 +154,7 @@ codexPlus.extension((ctx) => {
 
 ## 七、风险
 
-- **Codex 升级**：DOM 与协议随版本变。拓展只依赖我们承诺的 slot / 事件契约，由 Codex++ 适配层吸收变化，
+- **Codex 升级**：DOM 与协议随版本变。拓展只依赖我们承诺的 slot / 事件契约，由 Codex # 适配层吸收变化，
   契约测试守住。
 - **安全**：拓展与 Codex 页面同权，P3 起还会跑子进程。不做沙箱（参照对象同样不做），靠权限声明、
   管理页展示与市场审核。

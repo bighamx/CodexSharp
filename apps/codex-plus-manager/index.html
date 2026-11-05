@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codex++</title>
+    <title>Codex #</title>
     <script>
       // 启动兜底（#2753）：前端包在模块求值阶段就出错（例如旧版系统 WebKit 不认识某个语法 / API）时，
       // React 根本没机会渲染，窗口只剩深色底像黑屏。这里用普通脚本（不依赖模块和打包产物）接住错误，
@@ -20,7 +20,7 @@
           box.style.cssText = "box-sizing:border-box;min-height:100vh;padding:32px;background:#111318;color:#e8e9ed;font:14px/1.6 -apple-system,BlinkMacSystemFont,sans-serif";
           var title = document.createElement("h1");
           title.style.cssText = "margin:0 0 8px;font-size:18px";
-          title.textContent = "Codex++ 界面加载失败 / Codex++ failed to load";
+          title.textContent = "Codex # 界面加载失败 / Codex # failed to load";
           var hint = document.createElement("p");
           hint.style.cssText = "margin:0 0 12px;color:#a9adb8";
           hint.textContent = "可以先重新加载；如果仍然失败，请把 macOS 更新到最新版本，并把下面的错误信息附到 GitHub issue 里。 / Try reloading. If it keeps failing, update macOS and attach the error below to a GitHub issue.";

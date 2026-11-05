@@ -8,7 +8,7 @@
 
 ## 开启
 
-Agent 桌宠是随 Codex++ 一起发布的官方拓展包（「万物皆拓展 → 本地拓展」里的「Agent 桌宠」，来源 `bundled`，
+Agent 桌宠是随 Codex # 一起发布的官方拓展包（「万物皆拓展 → 本地拓展」里的「Agent 桌宠」，来源 `bundled`，
 脚本 key `bundled:agent-pet`），可以停用、不能删除。打开管理器「Agent 桌宠」页，打开开关即可（开关就是这个拓展的启停），
 默认关闭。目前只支持 Codex，其他 Agent 之后再补。「启用本地拓展」整体开关关着时桌宠也不显示。
 
@@ -94,4 +94,4 @@ Agent 桌宠是随 Codex++ 一起发布的官方拓展包（「万物皆拓展 �
 - 页面侧只用公开拓展接口（overlay 插槽、`ctx.config` / `onConfigUpdate`、`ctx.asset`、`ctx.call`、`ctx.on("codex/…")`、
   `codexPlus.currentSession()`）；两种桌宠都按配置的 `kind` 判断，选中另一种时不挂载。
 - 大肥鱼的数据：路由 `/whale/media`（内嵌素材）、`/whale/full`（挂件设置、图库、余额与用量，请求里带拓展配置的余额设置）、
-  `/whale/history`、`/whale/session`（本机 Codex 用量）。供应商 Key 只在 Codex++ 里用，不交给页面。
+  `/whale/history`、`/whale/session`（本机 Codex 用量）。供应商 Key 只在 Codex # 里用，不交给页面。

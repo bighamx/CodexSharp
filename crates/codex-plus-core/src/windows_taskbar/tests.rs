@@ -131,7 +131,7 @@ fn both_taskbar_apis_preserve_native_icons_and_unrelated_properties() {
                 ),
                 (
                     PKEY_AppUserModel_RelaunchDisplayNameResource,
-                    "Codex++".to_string(),
+                    "Codex #".to_string(),
                 ),
                 (
                     PKEY_AppUserModel_RelaunchCommand,

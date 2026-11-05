@@ -119,7 +119,7 @@ fn injection_script_preserves_legacy_native_marketplace_display_names() {
     let script = assets::injection_script(57321);
 
     assert!(script.contains(r#"name === "codex-plus-curated" || name === "openai-curated-remote""#));
-    assert!(script.contains("OpenAI插件5(Codex++)"));
+    assert!(script.contains("OpenAI插件5(Codex #)"));
 }
 
 #[test]
@@ -2443,7 +2443,7 @@ fn injection_script_keeps_bundled_marketplace_name_for_default_filter() {
     assert!(
         !script.contains("if (name === \"openai-bundled\") return \"codex-plus-openai-bundled\"")
     );
-    assert!(script.contains("if (name === \"openai-bundled\") return \"OpenAI插件1(Codex++)\""));
+    assert!(script.contains("if (name === \"openai-bundled\") return \"OpenAI插件1(Codex #)\""));
 }
 
 #[test]
@@ -2505,22 +2505,22 @@ fn injection_script_expands_api_key_plugin_marketplace_requests() {
         "next.remoteMarketplaceName = restorePluginMarketplaceName(next.remoteMarketplaceName)"
     ));
     assert!(!script.contains("marketplace.name = alias"));
-    assert!(script.contains("if (name === \"openai-curated\") return \"OpenAI插件2(Codex++)\""));
+    assert!(script.contains("if (name === \"openai-curated\") return \"OpenAI插件2(Codex #)\""));
     assert!(
-        script.contains("if (name === \"openai-primary-runtime\") return \"OpenAI插件3(Codex++)\"")
+        script.contains("if (name === \"openai-primary-runtime\") return \"OpenAI插件3(Codex #)\"")
     );
     assert!(script.contains("restored === \"openai-api-curated\""));
     assert!(script.contains("restored === \"openai-curated-remote\""));
     // 既有原生配置的显示名兼容同时认新旧名称，不再注入或注册本地插件包。
     assert!(script.contains(
-        "if (name === \"codex-plus-curated\" || name === \"openai-curated-remote\") return \"OpenAI插件5(Codex++)\""
+        "if (name === \"codex-plus-curated\" || name === \"openai-curated-remote\") return \"OpenAI插件5(Codex #)\""
     ));
     assert!(script.contains(
         "if (name === \"codex-plus-openai-curated-remote\") return \"openai-curated-remote\""
     ));
-    assert!(script.contains("OpenAI插件1(Codex++)"));
-    assert!(script.contains("OpenAI插件2(Codex++)"));
-    assert!(script.contains("OpenAI插件3(Codex++)"));
+    assert!(script.contains("OpenAI插件1(Codex #)"));
+    assert!(script.contains("OpenAI插件2(Codex #)"));
+    assert!(script.contains("OpenAI插件3(Codex #)"));
     assert!(script.contains("method === \"install-plugin\""));
     assert!(script.contains("plugin_marketplace_response_expanded"));
     assert!(script.contains("plugin_build_flavor_filter_bypassed"));
@@ -5066,7 +5066,7 @@ fn pick_injectable_codex_page_target_ignores_embedded_browser_page_named_codex()
         target(
             "browser-pr",
             "page",
-            "Fix Codex++ menu anchoring · Pull Request",
+            "Fix Codex # menu anchoring · Pull Request",
             "https://github.com/BigPizzaV3/CodexPlusPlus/pull/1743",
             Some("ws://browser-pr"),
         ),
@@ -5091,7 +5091,7 @@ fn pick_injectable_codex_page_target_ignores_standalone_manager() {
         target(
             "manager",
             "page",
-            "Codex++ 管理工具",
+            "Codex # 管理工具",
             "http://127.0.0.1:1420/",
             Some("ws://manager"),
         ),
@@ -5115,7 +5115,7 @@ fn pick_injectable_codex_page_target_rejects_embedded_browser_only_page() {
     let targets = vec![target(
         "browser-pr",
         "page",
-        "Fix Codex++ menu anchoring · Pull Request",
+        "Fix Codex # menu anchoring · Pull Request",
         "https://github.com/BigPizzaV3/CodexPlusPlus/pull/1743",
         Some("ws://browser-pr"),
     )];

@@ -31,7 +31,7 @@
       }
       if (!root.__codexPlusNativeThreadGoalReloadWarned) {
         root.__codexPlusNativeThreadGoalReloadWarned = true;
-        root.console?.warn?.("[Codex++] 会话目标组件已更新，请刷新或重新打开此窗口。");
+        root.console?.warn?.("[Codex #] 会话目标组件已更新，请刷新或重新打开此窗口。");
       }
     }
     return;
@@ -47,7 +47,7 @@
   const genericForwardMessage = "会话所在窗口暂不可用，请稍后重试设置目标";
   const forwardMessages = new Map([
     ["goal-invalid-request", "会话目标请求无效，请重新设置目标"],
-    ["goal-enhancements-disabled", "Codex++ 增强已关闭"],
+    ["goal-enhancements-disabled", "Codex # 增强已关闭"],
     ["goal-runtime-reload-required", "会话目标组件已更新，请刷新或重新打开此窗口后重试"],
     ...["goal-probe-failed", "goal-owner-unavailable", "goal-native-getter-ambiguous",
       "goal-owner-changed", "goal-request-id-conflict", "goal-request-limit", "goal-forward-failed"]
@@ -144,7 +144,7 @@
       }
       if (!discovery.warned) {
         discovery.warned = true;
-        root.console?.warn?.("[Codex++] Native thread goal getter is ambiguous.");
+        root.console?.warn?.("[Codex #] Native thread goal getter is ambiguous.");
       }
       throw runtimeError("goal-native-getter-ambiguous");
     }

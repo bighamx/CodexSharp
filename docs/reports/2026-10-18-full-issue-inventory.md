@@ -11,7 +11,7 @@
 | [#2590](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2590) | [Bug]: 模型上下文无法正确设置 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2590#issuecomment-6245625938) |
 | [#2589](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2589) | [Bug]: 0.10.0闪退 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2589#issuecomment-6245626497) |
 | [#2587](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2587) | [Bug]: codex++接管后gpt图标异常 | 重复关闭 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2587#issuecomment-6245627126) |
-| [#2585](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2585) | [Bug]: 用户脚本在 MutationObserver 回调内自改 innerText，导致 Codex++ 启动黑屏且渲染进程 100% CPU | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2585#issuecomment-6232400453) |
+| [#2585](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2585) | [Bug]: 用户脚本在 MutationObserver 回调内自改 innerText，导致 Codex # 启动黑屏且渲染进程 100% CPU | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2585#issuecomment-6232400453) |
 | [#2584](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2584) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2584#issuecomment-6231017347) |
 | [#2583](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2583) | [Bug]: 问题：MCP 服务器启动命令中的 Codex 版本路径未随应用更新。 | 可修复或兼容改进 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2583#issuecomment-6232410887) |
 | [#2582](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2582) | [Bug]: ChatgptWork无法使用 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2582#issuecomment-6245706625) |
@@ -19,7 +19,7 @@
 | [#2579](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2579) | [Bug]: 增量添加模型后，同一个聚合供应商在模型选择器中被拆成两个同名分组 | 已有修复或功能后关闭 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2579#issuecomment-6245671669) |
 | [#2577](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2577) | [Bug]: 插件市场无法解锁 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2577#issuecomment-6231017836) |
 | [#2576](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2576) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2576#issuecomment-6231012797) |
-| [#2574](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2574) | [Bug]: Codex++ 1.9.0 在 Codex App 自动更新后无法启动/重启，恢复后 service tier dispatcher 补丁仍失败 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2574#issuecomment-6245704141) |
+| [#2574](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2574) | [Bug]: Codex # 1.9.0 在 Codex App 自动更新后无法启动/重启，恢复后 service tier dispatcher 补丁仍失败 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2574#issuecomment-6245704141) |
 | [#2573](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2573) | [Bug]: 在Windows上自动接管CodeX启动时的反复接管 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2573#issuecomment-6231011897) |
 | [#2572](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2572) | [Feature]: 希望可添加"启动时自动最小化"项目 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2572#issuecomment-6218679419) |
 | [#2567](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2567) | [Bug]: 用量状态栏长期无数据——主库选中 0 行的历史库后 /thread-usage-live 稳定失败 | 已有修复或功能后关闭 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2567#issuecomment-6245672370) |
@@ -32,7 +32,7 @@
 | [#2555](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2555) | [Bug]: 更新后点击启动codex报错 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2555#issuecomment-6211066821) |
 | [#2554](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2554) | [Bug]: 第三方上游声明了 use_responses_lite 的目录被无条件关闭；model_metadata 逃生通道无文档、无界面入口 | 可修复或兼容改进 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2554#issuecomment-6208673286) |
 | [#2552](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2552) | [Question]: 为什么我在用ccsw后无法让code++切换供应商？ | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2552#issuecomment-6218187584) |
-| [#2551](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2551) | Codex++ 增加「强制刷新 UI 配置」按钮，修复 Statsig 开关获取失败导致中文界面无法启用的问题 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2551#issuecomment-6195064826) |
+| [#2551](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2551) | Codex # 增加「强制刷新 UI 配置」按钮，修复 Statsig 开关获取失败导致中文界面无法启用的问题 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2551#issuecomment-6195064826) |
 | [#2549](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2549) | [Bug]: 1.9版本思考等级注入bug 无反应 | 可修复或兼容改进 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2549#issuecomment-6196469534) |
 | [#2548](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2548) | [Bug]: Windows MSIX 版 Claude — windows_msix_source() 与 source_app() 判定不一致，启动注入分支不可达 | 已有修复或功能后关闭 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2548#issuecomment-6245680633) |
 | [#2544](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2544) | [Bug]: .codex-session-delete\backups出现2.78gb大型json文件 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2544#issuecomment-6245683967) |
@@ -46,7 +46,7 @@
 | [#2530](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2530) | [Question]: 为什么没有最新的最左边最小的那一排侧边栏 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2530#issuecomment-6218680425) |
 | [#2529](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2529) | [Bug]: 配置无法加载无法进入codex | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2529#issuecomment-6245698199) |
 | [#2528](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2528) | [Feature]: Skill 管理支持分组（分组折叠 / 批量启停 / 按来源自动分组） | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2528#issuecomment-6186426481) |
-| [#2525](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2525) | [Bug]: Windows Codex Beta 版本无法通过 Codex++ 多开启动 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2525#issuecomment-6245698850) |
+| [#2525](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2525) | [Bug]: Windows Codex Beta 版本无法通过 Codex # 多开启动 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2525#issuecomment-6245698850) |
 | [#2524](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2524) | [Question]: skill范围 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2524#issuecomment-6186427347) |
 | [#2523](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2523) | [Feature]: | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2523#issuecomment-6245685058) |
 | [#2521](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2521) | [Question]: | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2521#issuecomment-6245684520) |
@@ -57,7 +57,7 @@
 | [#2506](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2506) | [Question]: 我想要使用Gamini的官方api服务，非中转站，有什么办法吗？ | 可修复或兼容改进 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2506#issuecomment-6218683191) |
 | [#2501](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2501) | [Bug]: 小运存笔记本电脑cloud无法使用汉化 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2501#issuecomment-6245688637) |
 | [#2500](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2500) | [Bug]:配置写入失败，启动codex之后，没有启用当前配置 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2500#issuecomment-6186438806) |
-| [#2499](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2499) | [Bug]: Windows 下通过 Codex++ 启动后，Codex 任务栏显示白色通用图标 | 可修复缺陷 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2499#issuecomment-6245703629) |
+| [#2499](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2499) | [Bug]: Windows 下通过 Codex # 启动后，Codex 任务栏显示白色通用图标 | 可修复缺陷 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2499#issuecomment-6245703629) |
 | [#2498](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2498) | 都支持 claude 汉化了，什么时候支持供应商配置 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2498#issuecomment-6218684244) |
 | [#2496](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2496) | [Bug]: 无法自动升级 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2496#issuecomment-6211068282) |
 | [#2494](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2494) | [Question]: 现在启动codex++必须手动启动codex了吗 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2494#issuecomment-6218193192) |
@@ -91,7 +91,7 @@
 | [#2444](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2444) | [Bug]: 会话请求，codex运行一会就会停止运行 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2444#issuecomment-6218690835) |
 | [#2442](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2442) | [Bug]: 最新版本在无代理情况下无汉化，以及插件市场在使用openai账号登录时无内容，以及在无代理时codex整体界面显示与有代理不一致 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2442#issuecomment-6218686562) |
 | [#2439](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2439) | [Bug]: 升级最新版后，deepseek v4.1 接口报错，其他模型不报错。 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2439#issuecomment-6080541858) |
-| [#2438](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2438) | [Bug]: Codex++ 1.7.0 在 Windows 开机后首次启动、网络未通过代理时，UI 回退英文；代理连通后重新启动才显示中文。启动命令没有语言参数，疑似 locale 初始化失败后没有重试。 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2438#issuecomment-6195053101) |
+| [#2438](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2438) | [Bug]: Codex # 1.7.0 在 Windows 开机后首次启动、网络未通过代理时，UI 回退英文；代理连通后重新启动才显示中文。启动命令没有语言参数，疑似 locale 初始化失败后没有重试。 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2438#issuecomment-6195053101) |
 | [#2436](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2436) | [Bug]: 沙盒一直报错 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2436#issuecomment-6098531039) |
 | [#2432](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2432) | [Bug]: 会话删除问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2432#issuecomment-6208721218) |
 | [#2429](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2429) | [Bug]: 皮肤问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2429#issuecomment-6211471399) |
@@ -105,7 +105,7 @@
 | [#2412](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2412) | [Bug]: 10月7、8日版本更新导致无法登录codex | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2412#issuecomment-6051533336) |
 | [#2409](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2409) | [Bug]: Mac上codex界面显示错误 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2409#issuecomment-6186463887) |
 | [#2408](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2408) | [Bug]: 更新后界面出现了问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2408#issuecomment-6051588395) |
-| [#2407](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2407) | [Bug]: 经 Codex++ 启动 Codex 26.1002.x 后报「无法加载工作空间设置」无法发送，不经 Codex++ 则正常 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2407#issuecomment-6186464961) |
+| [#2407](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2407) | [Bug]: 经 Codex # 启动 Codex 26.1002.x 后报「无法加载工作空间设置」无法发送，不经 Codex # 则正常 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2407#issuecomment-6186464961) |
 | [#2404](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2404) | [Bug]: 我实验了很多个google 的模型，gemini系列，都不能用 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2404#issuecomment-6186462974) |
 | [#2400](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2400) | [Bug]: 不确定什么原因导致后端未连接 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2400#issuecomment-6051542761) |
 | [#2398](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2398) | [Feature]: 对齐 OpenRouter Jev Router — 默认 ~typesafe/jev-latest 决策层智能选模型（可自选 Decisions 模型） | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2398#issuecomment-6051559409) |
@@ -126,7 +126,7 @@
 | [#2220](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2220) | [Bug]: 配置 Gemini 后新会话一直思考无输出，旧会话可正常响应 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2220#issuecomment-6212302705) |
 | [#2219](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2219) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2219#issuecomment-6231020178) |
 | [#2215](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2215) | [Feature]: 微信连接支持图片消息（附补丁） | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2215#issuecomment-6052540560) |
-| [#2213](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2213) | [Bug]: Codex++ v1.3.0 在 Codex Desktop 26.527.3686.0 上插件入口未解锁（API token 登录） | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2213#issuecomment-6231018144) |
+| [#2213](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2213) | [Bug]: Codex # v1.3.0 在 Codex Desktop 26.527.3686.0 上插件入口未解锁（API token 登录） | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2213#issuecomment-6231018144) |
 | [#2205](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2205) | [Bug]: 切换账户或者重启codex, 今日会话内容全部丢失, 最新的会话记录是昨天的! | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2205#issuecomment-6196447889) |
 | [#2204](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2204) | [Bug]: Mac os 27 安装codex++后无法打卡。 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2204#issuecomment-6231020754) |
 | [#2201](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2201) | [Question]: 重新启动codex疯狂占内存，反应时间也很慢 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2201#issuecomment-6231021318) |
@@ -134,7 +134,7 @@
 | [#2188](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2188) | [Discussion] 纯 API 下特殊插件的执行依赖与统一维护（关联 #2173 / #2171） | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2188#issuecomment-6052540917) |
 | [#2185](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2185) | [Bug]: Responses 并行图片 custom_tool_call 后丢失调用配对并返回 502 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2185#issuecomment-6211468109) |
 | [#2158](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2158) | [Bug]: 更新后启动报错显示找不到启动的exe | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2158#issuecomment-6231013204) |
-| [#2156](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2156) | Codex++ (v1.3.0) sends the same MCP namespace in **two different `tool_search_output` input items** within a s | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2156#issuecomment-6245692051) |
+| [#2156](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2156) | Codex # (v1.3.0) sends the same MCP namespace in **two different `tool_search_output` input items** within a s | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2156#issuecomment-6245692051) |
 | [#2147](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2147) | [Bug]: 通用配置合并无法保留 Obsidian MCP 配置，导致 invalid transport，且通用配置无法编辑 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2147#issuecomment-6196459293) |
 | [#2143](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2143) | Feature Request: 添加 Token 统计面板和实时 Token 显示功能 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2143#issuecomment-6195043924) |
 | [#2135](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2135) | [Feature]: 代理配置：想要一个配置供应商的地方可以单独配置代理网络出口的设置 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2135#issuecomment-6052541420) |
@@ -164,7 +164,7 @@
 | [#2042](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2042) | [Bug]: 侧边对话打不开，报错未能打开侧边聊天 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2042#issuecomment-5537865325) |
 | [#2040](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2040) | [Question]: 中转站的api-key，但是对话一直报错401，然后诊断供应商一直没问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2040#issuecomment-5537865336) |
 | [#2039](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2039) | [Question]:从管理工具重启codex++，任务栏图标崩溃，很难受 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2039#issuecomment-6232405210) |
-| [#2038](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2038) | [Bug]: 使用 Codex++ 的**中转注入模式**连接第三方 API（非官方 OpenAI 账号），Codex 会因为检测不到模型的工具调用能力标识，自动禁用 `js_repl` | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2038#issuecomment-5537865384) |
+| [#2038](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2038) | [Bug]: 使用 Codex # 的**中转注入模式**连接第三方 API（非官方 OpenAI 账号），Codex 会因为检测不到模型的工具调用能力标识，自动禁用 `js_repl` | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2038#issuecomment-5537865384) |
 | [#2033](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2033) | [Bug]: 打开codex++没有自动跳转到codex界面，一直停留在manager界面 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2033#issuecomment-5537900337) |
 | [#2032](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2032) | [Feature]: 能不能出个linux版本的 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2032#issuecomment-5537865408) |
 | [#2021](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2021) | [Question]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2021#issuecomment-5537900286) |
@@ -189,14 +189,14 @@
 | [#1840](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1840) | [功能]: 后续会打算增加云同步吗，适合多台电脑，类似CC Switch | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1840#issuecomment-5429664695) |
 | [#1825](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1825) | [Feature]: 备份与恢复 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1825#issuecomment-5429664587) |
 | [#1809](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1809) | [Feature]: 完成任务或者需要审批时给钉钉或飞书软件发送通知+远程审批 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1809#issuecomment-5429758961) |
-| [#1794](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1794) | [Feature]: Codex++1.2.44版本无法使用@computer use 、@Brower、@Chrome | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1794#issuecomment-5429760523) |
+| [#1794](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1794) | [Feature]: Codex #1.2.44版本无法使用@computer use 、@Brower、@Chrome | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1794#issuecomment-5429760523) |
 | [#1784](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1784) | [Bug]: 换肤功能无法使用 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1784#issuecomment-5429760891) |
 | [#1772](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1772) | [Feature] 支持独立配置本地 models.json，并在启动 Codex 前自动合并加载 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1772#issuecomment-5429820443) |
 | [#1752](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1752) | [Feature]: 本地会话管理增加以项目的形式展现 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1752#issuecomment-6195157557) |
 | [#1717](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1717) | [Bug]: 每次更新codex++的时候，下载进度条都会卡在92% | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1717#issuecomment-6232409965) |
 | [#1697](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1697) | [Feature]: 能不能增加一个开机静默启动的功能 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1697#issuecomment-5429957542) |
 | [#1680](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1680) | [Feature]: 功能优化 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1680#issuecomment-5429958834) |
-| [#1677](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1677) | [Bug]: 点击重启Codex++后没有启动 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1677#issuecomment-5429959167) |
+| [#1677](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1677) | [Bug]: 点击重启Codex #后没有启动 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1677#issuecomment-5429959167) |
 | [#1663](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1663) | [Bug]: 使用自定义CA（自签发证书）的上游API无法正常工作 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1663#issuecomment-6052550715) |
 | [#1590](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1590) | [Bug]: 终端工具无法挂载进会话 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1590#issuecomment-5430081255) |
 | [#1557](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1557) | [Feature]: 可否增加出口代理功能 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1557#issuecomment-5430118483) |
@@ -222,7 +222,7 @@
 | [#1457](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1457) | [Bug]: 自动审批无法提供授予权限 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1457#issuecomment-6052560034) |
 | [#1449](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1449) | [Question]:权限选项为啥没有完全访问权限选项啊 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1449#issuecomment-6052560086) |
 | [#1446](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1446) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1446#issuecomment-6052560123) |
-| [#1443](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1443) | [Bug]: 使用 Codex++ 启动后，打开内置浏览器会导致 Codex App 整体崩溃 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1443#issuecomment-6052560183) |
+| [#1443](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1443) | [Bug]: 使用 Codex # 启动后，打开内置浏览器会导致 Codex App 整体崩溃 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1443#issuecomment-6052560183) |
 | [#1441](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1441) | [Question]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1441#issuecomment-6052560239) |
 | [#1435](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1435) | [Question]: 打开manager以后显示检查不到内置codex | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1435#issuecomment-6052560286) |
 | [#1434](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1434) | [Bug]: IMG用不了，返回503 model_not_found | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1434#issuecomment-6052560326) |
@@ -269,7 +269,7 @@
 | [#1335](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1335) | [Bug]: codex++ watcher 进程反复弹出 terminal | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1335#issuecomment-6052586981) |
 | [#1333](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1333) | 脚本未正常启用 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1333#issuecomment-6245706101) |
 | [#1331](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1331) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1331#issuecomment-6052587041) |
-| [#1329](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1329) | [Bug]: Codex++无法通过系统代理连接到GitHub | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1329#issuecomment-6052587104) |
+| [#1329](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1329) | [Bug]: Codex #无法通过系统代理连接到GitHub | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1329#issuecomment-6052587104) |
 | [#1328](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1328) | [Bug]: 会话管理BUG | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1328#issuecomment-6052587175) |
 | [#1326](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1326) | [Feature]: 增加第三方非gpt模型能够创建使用Subagents子代理功能 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1326#issuecomment-6052587241) |
 | [#1320](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1320) | [Bug]: 长对话反复断连且无法继续对话 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1320#issuecomment-6052587297) |
@@ -326,7 +326,7 @@
 | [#1213](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1213) | [Bug]: agnes支持512了早就，默认显示还是256上下文 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1213#issuecomment-6195139883) |
 | [#1211](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1211) | [Feature]: 新版Codex把右侧浏览器合并成一个了，导致无法多开 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1211#issuecomment-6052614395) |
 | [#1209](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1209) | [Feature Request] 增加原生工具类型映射配置，或将 web_search_call 正确翻译回 custom_tool_call（关联 #586） | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1209#issuecomment-6195135828) |
-| [#1205](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1205) | [Bug]: 升级后 Codex++ 无法启动 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1205#issuecomment-6245697678) |
+| [#1205](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1205) | [Bug]: 升级后 Codex # 无法启动 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1205#issuecomment-6245697678) |
 | [#1203](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1203) | [Question]: 供应商、工具与插件问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1203#issuecomment-6052614440) |
 | [#1202](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1202) | [Feature]: 针对无人值守目标模式任务的自动错误恢复与重试机制 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1202#issuecomment-6052614490) |
 | [#1201](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1201) | [Bug]: UI错乱 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1201#issuecomment-6052614533) |
@@ -337,8 +337,8 @@
 | [#1190](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1190) | [Bug]: ~/.agent/skill 中手动添加的skill无法加载 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1190#issuecomment-6052622324) |
 | [#1189](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1189) | [Question]: codex不使用官方auth登录时频繁报“被空final打断了” | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1189#issuecomment-6052622409) |
 | [#1188](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1188) | [Bug]: 小米mimo套餐不支持？一直报错，而且官方更换了api域名？ | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1188#issuecomment-6052622493) |
-| [#1183](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1183) | [Bug]: Codex++不断自动向api后端发送 gpt-5.4 模型的请求 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1183#issuecomment-6052622554) |
-| [#1180](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1180) | [Config]: kimi-k2.7-code fails with Moonshot invalid thinking via Codex++ proxy | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1180#issuecomment-6052622634) |
+| [#1183](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1183) | [Bug]: Codex #不断自动向api后端发送 gpt-5.4 模型的请求 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1183#issuecomment-6052622554) |
+| [#1180](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1180) | [Config]: kimi-k2.7-code fails with Moonshot invalid thinking via Codex # proxy | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1180#issuecomment-6052622634) |
 | [#1177](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1177) | [Feature]: 应该支持本地绿色安装的codex app | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1177#issuecomment-6052622685) |
 | [#1176](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1176) | [Feature]: 让 ChatGPT 订阅通过 Codex 访问授权的本地工作区（本地桥接） | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1176#issuecomment-6245664308) |
 | [#1175](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1175) | [Bug]: 在进行供应商切换时回报回填当前供应商配置失败 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1175#issuecomment-6052622735) |
@@ -369,7 +369,7 @@
 | [#1112](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1112) | Repeated /thread-sort-keys failures and unstable Chats sidebar ordering on Windows | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1112#issuecomment-6052640610) |
 | [#1111](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1111) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1111#issuecomment-6052640661) |
 | [#1108](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1108) | feat: 支持模型名称映射（modelMappings）以兼容非 OpenAI 上游供应商 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1108#issuecomment-6052640713) |
-| [#1103](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1103) | [Bug]: 应用程序“Codex++”已不能再打开。 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1103#issuecomment-6052640765) |
+| [#1103](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1103) | [Bug]: 应用程序“Codex #”已不能再打开。 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1103#issuecomment-6052640765) |
 | [#1101](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1101) | [Bug]: windows无法同步 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1101#issuecomment-6052640822) |
 | [#1094](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1094) | [Question]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1094#issuecomment-6052640891) |
 | [#1093](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1093) | [Bug]: 各种配置都填好了，http://127.0.0.1:57321/v1连不上 | 咨询答复后关闭 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1093#issuecomment-6245715101) |
@@ -379,7 +379,7 @@
 | [#1085](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1085) | [Feature]: 能不能增加个批量移动或项目文件夹重新定位的功能 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1085#issuecomment-6195129335) |
 | [#1084](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1084) | [Question]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1084#issuecomment-6052641147) |
 | [#1081](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1081) | [Feature]: 不支持send_message_to_thread、read_thread，请求支持 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1081#issuecomment-6195128136) |
-| [#1079](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1079) | [Bug]: Codex++1.2.13版本无法使用computer use | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1079#issuecomment-6052641207) |
+| [#1079](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1079) | [Bug]: Codex #1.2.13版本无法使用computer use | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1079#issuecomment-6052641207) |
 | [#1077](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1077) | [Bug]: 用户脚本未加载 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1077#issuecomment-4732845336) |
 | [#1076](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1076) | [Bug]: 明明cc 配置模型可用，但是现在不会自动获取到我配置 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1076#issuecomment-6194978856) |
 | [#1072](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1072) | [Bug]: Macos最新版的系统，你这个不是最新的签名，后端经常掉啊 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1072#issuecomment-6052641256) |
@@ -394,7 +394,7 @@
 | [#1039](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1039) | [Bug]: 最新版本使用非常卡，对话拉不动 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1039#issuecomment-6052649202) |
 | [#1038](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1038) | [Bug]: figma插件无法使用 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1038#issuecomment-6052649249) |
 | [#1037](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1037) | [Question]: 会话无法移动 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1037#issuecomment-6052649292) |
-| [#1032](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1032) | [Bug]: 频繁出现Codex和后台Codex++后端断连； | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1032#issuecomment-6211470316) |
+| [#1032](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1032) | [Bug]: 频繁出现Codex和后台Codex #后端断连； | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1032#issuecomment-6211470316) |
 | [#1028](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1028) | [Feature]: 希望增加token统计，重置功能 | 可开发功能 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1028#issuecomment-6194979999) |
 | [#1026](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1026) | [Feature]: 关于linux运行的问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1026#issuecomment-6052649387) |
 | [#1024](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1024) | [Question]: 回答内容没有显示 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1024#issuecomment-6052649431) |
@@ -457,7 +457,7 @@
 | [#879](https://github.com/BigPizzaV3/CodexPlusPlus/issues/879) | [Question]: 无法使用网络搜索功能（没有使用梯子） | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/879#issuecomment-6052683292) |
 | [#876](https://github.com/BigPizzaV3/CodexPlusPlus/issues/876) | [Bug]: codex++ 打开codex，复制长文本到codex对话框，约3290个字符长度，此时codex界面卡死 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/876#issuecomment-6052683352) |
 | [#875](https://github.com/BigPizzaV3/CodexPlusPlus/issues/875) | [Bug]: 删除会话失败 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/875#issuecomment-6208719525) |
-| [#874](https://github.com/BigPizzaV3/CodexPlusPlus/issues/874) | [Bug]: 存在Codex++ 但是点击重启Codex++ 按钮报错失败 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/874#issuecomment-6232408772) |
+| [#874](https://github.com/BigPizzaV3/CodexPlusPlus/issues/874) | [Bug]: 存在Codex # 但是点击重启Codex # 按钮报错失败 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/874#issuecomment-6232408772) |
 | [#871](https://github.com/BigPizzaV3/CodexPlusPlus/issues/871) | [Question]: 使用codex遇到codex-auto-review发给DeepSeek的问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/871#issuecomment-6052683503) |
 | [#870](https://github.com/BigPizzaV3/CodexPlusPlus/issues/870) | [Feature]: 希望增加书签功能 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/870#issuecomment-6195120843) |
 | [#868](https://github.com/BigPizzaV3/CodexPlusPlus/issues/868) | [Question]: codex++启动后，codex后端连接不上 一直红灯 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/868#issuecomment-6052683566) |
@@ -472,9 +472,9 @@
 | [#855](https://github.com/BigPizzaV3/CodexPlusPlus/issues/855) | [Bug]: 项目对话消失 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/855#issuecomment-6052691676) |
 | [#854](https://github.com/BigPizzaV3/CodexPlusPlus/issues/854) | [Question]: 配置好第三方模型后还是要登录账号/使用key才能使用 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/854#issuecomment-6232402894) |
 | [#853](https://github.com/BigPizzaV3/CodexPlusPlus/issues/853) | [Bug]: 接入mimo-v2.5-pro报错 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/853#issuecomment-6052691794) |
-| [#851](https://github.com/BigPizzaV3/CodexPlusPlus/issues/851) | [Bug]: 使用Codex++设置操控电脑无法设置成功 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/851#issuecomment-6052691848) |
+| [#851](https://github.com/BigPizzaV3/CodexPlusPlus/issues/851) | [Bug]: 使用Codex #设置操控电脑无法设置成功 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/851#issuecomment-6052691848) |
 | [#850](https://github.com/BigPizzaV3/CodexPlusPlus/issues/850) | [Question]: 我使用的硅基流动中的deepseek-v4pro，为什么在codex中没有办法调用工具，换了kimi2.6，glm5.1也都不行，无法调用任何工具 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/850#issuecomment-6052691912) |
-| [#849](https://github.com/BigPizzaV3/CodexPlusPlus/issues/849) | [Bug]: Codex++ 管理器脚本市场无法加载,原因是 https://raw.githubusercontent.com/BigPizzaV3/CodexPlusPlusScriptMarket/main/ind | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/849#issuecomment-6194975604) |
+| [#849](https://github.com/BigPizzaV3/CodexPlusPlus/issues/849) | [Bug]: Codex # 管理器脚本市场无法加载,原因是 https://raw.githubusercontent.com/BigPizzaV3/CodexPlusPlusScriptMarket/main/ind | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/849#issuecomment-6194975604) |
 | [#848](https://github.com/BigPizzaV3/CodexPlusPlus/issues/848) | feat: show connection test result when saving API settings | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/848#issuecomment-6195117807) |
 | [#846](https://github.com/BigPizzaV3/CodexPlusPlus/issues/846) | [Bug]: 更新到 26.608.1337.0 后频繁闪退，跳出重试界面 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/846#issuecomment-6052692035) |
 | [#842](https://github.com/BigPizzaV3/CodexPlusPlus/issues/842) | [Bug]: DeepSeek API 模式下个性化面板中文 AGENTS.md 显示为问号(乱码) | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/842#issuecomment-6052692090) |
@@ -487,7 +487,7 @@
 | [#824](https://github.com/BigPizzaV3/CodexPlusPlus/issues/824) | [Config]:从codex++进codex他说读取不了本地文件 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/824#issuecomment-6052700213) |
 | [#823](https://github.com/BigPizzaV3/CodexPlusPlus/issues/823) | [Bug]: computer-use 插件加载失败后频繁重试，导致上下文膨胀和 SSE 断连 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/823#issuecomment-6052700262) |
 | [#822](https://github.com/BigPizzaV3/CodexPlusPlus/issues/822) | [Config]: 希望增加一个模型映射功能 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/822#issuecomment-6052700315) |
-| [#821](https://github.com/BigPizzaV3/CodexPlusPlus/issues/821) | Mac启动不了Codex++ 无法定位到Codex路径 手动指向也不行 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/821#issuecomment-6232408438) |
+| [#821](https://github.com/BigPizzaV3/CodexPlusPlus/issues/821) | Mac启动不了Codex # 无法定位到Codex路径 手动指向也不行 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/821#issuecomment-6232408438) |
 | [#818](https://github.com/BigPizzaV3/CodexPlusPlus/issues/818) | [Bug] Bundled marketplace 指向 temp 目录导致 computer-use / browser 等插件缺失 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/818#issuecomment-6052700438) |
 | [#817](https://github.com/BigPizzaV3/CodexPlusPlus/issues/817) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/817#issuecomment-6052700502) |
 | [#816](https://github.com/BigPizzaV3/CodexPlusPlus/issues/816) | [Bug]: 使用1.2.4版本的codex++管理工具启动codex++，无法更新网关模型 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/816#issuecomment-6052700585) |
@@ -517,7 +517,7 @@
 | [#760](https://github.com/BigPizzaV3/CodexPlusPlus/issues/760) | [Bug]: 打开设置每次都会重启 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/760#issuecomment-6052717261) |
 | [#758](https://github.com/BigPizzaV3/CodexPlusPlus/issues/758) | [Question]: [Bug]: unexpected end of data | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/758#issuecomment-6052717313) |
 | [#757](https://github.com/BigPizzaV3/CodexPlusPlus/issues/757) | [Config]: 啟動codex ++之後, 選擇不了配置的API Key | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/757#issuecomment-6052717374) |
-| [#755](https://github.com/BigPizzaV3/CodexPlusPlus/issues/755) | [Bug]: 不仅Codex++启动不了 codex也启动不了了 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/755#issuecomment-6052717445) |
+| [#755](https://github.com/BigPizzaV3/CodexPlusPlus/issues/755) | [Bug]: 不仅Codex #启动不了 codex也启动不了了 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/755#issuecomment-6052717445) |
 | [#754](https://github.com/BigPizzaV3/CodexPlusPlus/issues/754) | [Bug]: 官方登录 + API 混入模式启用后无法调用模型，会话一直“正在重新连接” | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/754#issuecomment-6052717499) |
 | [#749](https://github.com/BigPizzaV3/CodexPlusPlus/issues/749) | [Feature]: product design 插件找不到 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/749#issuecomment-6052717569) |
 | [#748](https://github.com/BigPizzaV3/CodexPlusPlus/issues/748) | image2无法使用 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/748#issuecomment-6052717610) |
@@ -531,7 +531,7 @@
 | [#725](https://github.com/BigPizzaV3/CodexPlusPlus/issues/725) | [Bug]: 1.2.3版本的codex++无法看到本地配置的skill并且会导致mcp和插件缺失 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/725#issuecomment-6052725746) |
 | [#722](https://github.com/BigPizzaV3/CodexPlusPlus/issues/722) | [Question]: C++已经升级到1.2.3，设置里面都是通的，启动CODEX后出现登录选择界面 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/722#issuecomment-6052725800) |
 | [#721](https://github.com/BigPizzaV3/CodexPlusPlus/issues/721) | [Question]:MAC os 重新安装 codex++后无法启动 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/721#issuecomment-6052725861) |
-| [#716](https://github.com/BigPizzaV3/CodexPlusPlus/issues/716) | [Bug]: 重启Codex++没有没有反应 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/716#issuecomment-6052725926) |
+| [#716](https://github.com/BigPizzaV3/CodexPlusPlus/issues/716) | [Bug]: 重启Codex #没有没有反应 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/716#issuecomment-6052725926) |
 | [#713](https://github.com/BigPizzaV3/CodexPlusPlus/issues/713) | [Question]: codex++接入ds使用后，ds网页不显示用量，但是在扣费 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/713#issuecomment-6052726009) |
 | [#712](https://github.com/BigPizzaV3/CodexPlusPlus/issues/712) | [Bug]: MacOS根本没法用：出错，启动不了，重启不了，关闭后没法再启动 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/712#issuecomment-6052726074) |
 | [#706](https://github.com/BigPizzaV3/CodexPlusPlus/issues/706) | [Bug]: token usage不见了 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/706#issuecomment-6052726129) |
@@ -543,7 +543,7 @@
 | [#695](https://github.com/BigPizzaV3/CodexPlusPlus/issues/695) | [Bug]: 工作空间依赖项显示未安装，并且无法重新安装 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/695#issuecomment-6052735138) |
 | [#690](https://github.com/BigPizzaV3/CodexPlusPlus/issues/690) | [Feature]: 可以添加一个功能，让 codex 默认进入 plan 模式吗 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/690#issuecomment-6052735170) |
 | [#688](https://github.com/BigPizzaV3/CodexPlusPlus/issues/688) | [Question]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/688#issuecomment-6052735230) |
-| [#686](https://github.com/BigPizzaV3/CodexPlusPlus/issues/686) | Codex++ 启动时隐藏 settings 页的 Context-Aware Suggestions 开关，导致用户无法手动关闭 Ambient Suggestions 消耗 token | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/686#issuecomment-6052735285) |
+| [#686](https://github.com/BigPizzaV3/CodexPlusPlus/issues/686) | Codex # 启动时隐藏 settings 页的 Context-Aware Suggestions 开关，导致用户无法手动关闭 Ambient Suggestions 消耗 token | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/686#issuecomment-6052735285) |
 | [#685](https://github.com/BigPizzaV3/CodexPlusPlus/issues/685) | [Question]: 更新新版本后，与作者在b站发的视频相比插件目录少了一个插件1 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/685#issuecomment-6052735353) |
 | [#675](https://github.com/BigPizzaV3/CodexPlusPlus/issues/675) | [Bug]: | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/675#issuecomment-6052735497) |
 | [#672](https://github.com/BigPizzaV3/CodexPlusPlus/issues/672) | [Bug]: 经过多轮会话之后，就会出现报错，只能打开新窗口才能解决 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/672#issuecomment-6052735550) |
@@ -570,7 +570,7 @@
 | [#615](https://github.com/BigPizzaV3/CodexPlusPlus/issues/615) | [Config]: 更新版本后，接入供应商失败 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/615#issuecomment-6052753346) |
 | [#611](https://github.com/BigPizzaV3/CodexPlusPlus/issues/611) | [Feature]: CODEX++管理工具的图标icon能和codex++启动器区分开吗？ | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/611#issuecomment-6232407482) |
 | [#610](https://github.com/BigPizzaV3/CodexPlusPlus/issues/610) | [Bug]: 什么时候解决mac用一会儿就失效的问题哦 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/610#issuecomment-6052753457) |
-| [#609](https://github.com/BigPizzaV3/CodexPlusPlus/issues/609) | [Bug]: 插件BUG Codex++ rewrites config.toml and clears bundled plugin cache | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/609#issuecomment-6196451108) |
+| [#609](https://github.com/BigPizzaV3/CodexPlusPlus/issues/609) | [Bug]: 插件BUG Codex # rewrites config.toml and clears bundled plugin cache | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/609#issuecomment-6196451108) |
 | [#608](https://github.com/BigPizzaV3/CodexPlusPlus/issues/608) | [Bug]: 所有工具不好用 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/608#issuecomment-6052753593) |
 | [#606](https://github.com/BigPizzaV3/CodexPlusPlus/issues/606) | [Bug]: codex++修复对话一直失败，修复了没有效果 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/606#issuecomment-6245683225) |
 | [#601](https://github.com/BigPizzaV3/CodexPlusPlus/issues/601) | [Bug]: 输出文本后返回的就是图中的问题了 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/601#issuecomment-6232399719) |
@@ -593,7 +593,7 @@
 | [#545](https://github.com/BigPizzaV3/CodexPlusPlus/issues/545) | [Bug]: 在任务栏中点击Codex图标后，会打开一个格式错误的窗口。 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/545#issuecomment-6195307494) |
 | [#542](https://github.com/BigPizzaV3/CodexPlusPlus/issues/542) | [Feature]: 图标问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/542#issuecomment-4604070825) |
 | [#537](https://github.com/BigPizzaV3/CodexPlusPlus/issues/537) | [Bug]: 无法跳转更新 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/537#issuecomment-6195306063) |
-| [#536](https://github.com/BigPizzaV3/CodexPlusPlus/issues/536) | [Bug]: 升级Codex++后Codex进入不了界面 一直停留在启动界面 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/536#issuecomment-6245629018) |
+| [#536](https://github.com/BigPizzaV3/CodexPlusPlus/issues/536) | [Bug]: 升级Codex #后Codex进入不了界面 一直停留在启动界面 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/536#issuecomment-6245629018) |
 | [#531](https://github.com/BigPizzaV3/CodexPlusPlus/issues/531) | [Question]: codex移动版 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/531#issuecomment-6245659428) |
 | [#530](https://github.com/BigPizzaV3/CodexPlusPlus/issues/530) | [Bug]: | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/530#issuecomment-6245655279) |
 | [#526](https://github.com/BigPizzaV3/CodexPlusPlus/issues/526) | [Question]: Computer Use插件无法使用 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/526#issuecomment-6245637560) |
@@ -606,8 +606,8 @@
 | [#511](https://github.com/BigPizzaV3/CodexPlusPlus/issues/511) | [Bug]: 已放入skills文件夹的skills未被加载 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/511#issuecomment-6195304649) |
 | [#510](https://github.com/BigPizzaV3/CodexPlusPlus/issues/510) | [Bug]: codex实际正常启动了，但是被codex++覆盖住了界面 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/510#issuecomment-6212311704) |
 | [#509](https://github.com/BigPizzaV3/CodexPlusPlus/issues/509) | [Question]: 检查不到codex beta的版本 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/509#issuecomment-6245654773) |
-| [#499](https://github.com/BigPizzaV3/CodexPlusPlus/issues/499) | [Question]: 点击“重启Codex++”，Codex为什么一直卡在启动界面呢？ | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/499#issuecomment-6245630111) |
-| [#498](https://github.com/BigPizzaV3/CodexPlusPlus/issues/498) | [Bug]: 通过Codex++管理工具无法重启codex和启动codex++，且无法使用Computer Use与Browser Use | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/498#issuecomment-6245638312) |
+| [#499](https://github.com/BigPizzaV3/CodexPlusPlus/issues/499) | [Question]: 点击“重启Codex #”，Codex为什么一直卡在启动界面呢？ | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/499#issuecomment-6245630111) |
+| [#498](https://github.com/BigPizzaV3/CodexPlusPlus/issues/498) | [Bug]: 通过Codex #管理工具无法重启codex和启动codex++，且无法使用Computer Use与Browser Use | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/498#issuecomment-6245638312) |
 | [#497](https://github.com/BigPizzaV3/CodexPlusPlus/issues/497) | [Bug]: 移动对话后，被移动的对话感觉没有真正移动到对应的项目下 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/497#issuecomment-6245662135) |
 | [#495](https://github.com/BigPizzaV3/CodexPlusPlus/issues/495) | [Bug]: 插件栏无法激活 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/495#issuecomment-6245638849) |
 | [#493](https://github.com/BigPizzaV3/CodexPlusPlus/issues/493) | [Bug]: 版本26.527.31326 (3390) 通过codex++ 打开秒退 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/493#issuecomment-6245630652) |
@@ -667,7 +667,7 @@
 | [#283](https://github.com/BigPizzaV3/CodexPlusPlus/issues/283) | 已经有官方登录但是检测不到 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/283#issuecomment-6245661634) |
 | [#282](https://github.com/BigPizzaV3/CodexPlusPlus/issues/282) | Window 下 一直提示failed to query CDP targets | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/282#issuecomment-6245632462) |
 | [#276](https://github.com/BigPizzaV3/CodexPlusPlus/issues/276) | 会话列表遮挡 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/276#issuecomment-6245651270) |
-| [#272](https://github.com/BigPizzaV3/CodexPlusPlus/issues/272) | macOS Apple Silicon 上 Codex++ 启动后界面空白 / 一直加载，但 helper 和 bridge 日志显示正常 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/272#issuecomment-6245632993) |
+| [#272](https://github.com/BigPizzaV3/CodexPlusPlus/issues/272) | macOS Apple Silicon 上 Codex # 启动后界面空白 / 一直加载，但 helper 和 bridge 日志显示正常 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/272#issuecomment-6245632993) |
 | [#267](https://github.com/BigPizzaV3/CodexPlusPlus/issues/267) | 介入minimax报错 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/267#issuecomment-6052772550) |
 | [#266](https://github.com/BigPizzaV3/CodexPlusPlus/issues/266) | v1.1.7断连问题 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/266#issuecomment-6245633679) |
 | [#263](https://github.com/BigPizzaV3/CodexPlusPlus/issues/263) | 官方混合 API 会断开手机端会话链路 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/263#issuecomment-6232400965) |
@@ -685,7 +685,7 @@
 | [#245](https://github.com/BigPizzaV3/CodexPlusPlus/issues/245) | 在供应商配置里勾选混入APIKEY会直接导致本地config文件重置为初始状态 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/245#issuecomment-6245694191) |
 | [#242](https://github.com/BigPizzaV3/CodexPlusPlus/issues/242) | 接api报错 | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/242#issuecomment-6245658404) |
 | [#240](https://github.com/BigPizzaV3/CodexPlusPlus/issues/240) | 历史会话修复后 Codex App 历史会话只剩 1 个 | 局部已修待验证 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/240#issuecomment-6245682553) |
-| [#239](https://github.com/BigPizzaV3/CodexPlusPlus/issues/239) | 启动 Codex++ 失败：failed to query CDP targets | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/239#issuecomment-6245634831) |
+| [#239](https://github.com/BigPizzaV3/CodexPlusPlus/issues/239) | 启动 Codex # 失败：failed to query CDP targets | 答复并保留 | [本轮回复](https://github.com/BigPizzaV3/CodexPlusPlus/issues/239#issuecomment-6245634831) |
 | [#231](https://github.com/BigPizzaV3/CodexPlusPlus/issues/231) | 使用 @ai-sdk/openai-compatible的 opencode-go怎么配置 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/231#issuecomment-6052780398) |
 | [#229](https://github.com/BigPizzaV3/CodexPlusPlus/issues/229) | 用了Codex+后，后面如果不用了，能否有一键恢复环境功能 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/229#issuecomment-6052780443) |
 | [#228](https://github.com/BigPizzaV3/CodexPlusPlus/issues/228) | 中转注入模式下建议支持本地模型列表/禁用模型探测，并提示 Responses provider 的 image_generation 兼容问题 | 保留既有诊断 | [既有诊断](https://github.com/BigPizzaV3/CodexPlusPlus/issues/228#issuecomment-6052780513) |

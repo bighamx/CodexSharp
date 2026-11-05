@@ -1,5 +1,5 @@
   /**
-   * 内置拓展：Codex++ 自带的功能也挂在拓展内核上，和第三方拓展走同一套生命周期
+   * 内置拓展：Codex # 自带的功能也挂在拓展内核上，和第三方拓展走同一套生命周期
    * （没有特权功能：自带的也能单独停用、被别的拓展顶替）。
    *
    *   - 每个内置功能是一个拓展实例（scriptKey = builtin:<id>）：实例在时功能可用，卸载时功能撤下；
@@ -7,7 +7,7 @@
    *   - 第三方拓展包在 codexpp.json 里声明 `replaces: ["<id>"]`，它启用时对应的内置拓展让位；
    *   - 功能自己的设置开关（如「Agent 桌宠」）照旧生效：内置拓展是外面一层，两者都开功能才出现。
    *
-   * 停用 / 顶替状态由 Codex++ 随用户脚本注入包下发（window.__codexPlusBuiltinExtensionState），
+   * 停用 / 顶替状态由 Codex # 随用户脚本注入包下发（window.__codexPlusBuiltinExtensionState），
    * 热重载时更新。功能的开关检查在注入早期（本分片执行前）、以及只抽单个分片的测试里也会被调用，所以只记
    * 「停用的」：globalThis.__codexPlusBuiltinInactive 里没有的 id 都算启用，功能侧写成
    * `!globalThis.__codexPlusBuiltinInactive?.has("<id>")`。实例卸载时加进集合，装上时移出。
@@ -29,7 +29,7 @@
    */
   function codexPlusBuiltinExtensionCatalog() {
     return [
-      // Agent 桌宠（含大肥鱼）、用量状态栏、请求状态条已改成随 Codex++ 发布的官方拓展包（bundled:agent-pet、
+      // Agent 桌宠（含大肥鱼）、用量状态栏、请求状态条已改成随 Codex # 发布的官方拓展包（bundled:agent-pet、
       // bundled:usage-statusline、bundled:proxy-request-status），不再是内置拓展。
       { id: "dictation", name: "语音听写", apply: codexPlusDictationExtension },
       { id: "turn-rewind", name: "轮次回退", apply: codexPlusTurnRewindExtension },
@@ -286,7 +286,7 @@
   }
 
   /**
-   * 对话宽度：完整扫描、窗口缩放时对齐对话区宽度；Codex++ 设置变了（管理器里改、心跳同步过来）且开关有变化时立即重算。
+   * 对话宽度：完整扫描、窗口缩放时对齐对话区宽度；Codex # 设置变了（管理器里改、心跳同步过来）且开关有变化时立即重算。
    */
   function codexPlusConversationViewExtension(ctx) {
     ctx.onScan(refreshConversationView);
@@ -348,7 +348,7 @@
         const node = document.createElement("div");
         node.id = "codex-plus-instance-identity";
         node.setAttribute("role", "status");
-        node.setAttribute("aria-label", `当前 Codex++ 多开身份：${label}`);
+        node.setAttribute("aria-label", `当前 Codex # 多开身份：${label}`);
         node.style.cssText = [
           "position:fixed",
           "top:8px",
@@ -370,7 +370,7 @@
           "letter-spacing:.02em",
           "opacity:.86",
         ].join(";");
-        node.textContent = `Codex++ 多开 · ${label}`;
+        node.textContent = `Codex # 多开 · ${label}`;
         container.appendChild(node);
       },
     });

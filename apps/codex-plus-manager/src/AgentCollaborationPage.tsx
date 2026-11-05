@@ -465,9 +465,9 @@ export function AgentCollaborationPage({ defaultCwd = "" }: { defaultCwd?: strin
                 <AppSelect ariaLabel={tf("{0} 同时执行任务数", [agent.name])} className="cx-set-select" disabled={!snapshot || busy === "save_config"} id={`agent-collaboration-concurrency-${agent.id}`} onChange={(next) => editAgent(agent.id, { maxConcurrentTasks: normalizeConcurrency(Number(next), concurrencyMax) }, true)} options={Array.from({ length: concurrencyMax }, (_, index) => ({ value: String(index + 1), label: index === 0 ? t("1（逐个执行，其余排队）") : String(index + 1) }))} size="sm" value={String(agent.maxConcurrentTasks)} />
               </CxRow>
               {agent.id === "deepseek" && <CxRow
-                detail="由 dsh 自行读取，Codex++ 不读取或保存"
+                detail="由 dsh 自行读取，Codex # 不读取或保存"
                 title="复用 DSH 已保存的登录与密钥"
-                tooltip="默认关闭。开启后由 dsh 自行读取已保存的认证，Codex++ 不读取或保存登录与密钥；不会自动选择桌面当前使用的模型。"
+                tooltip="默认关闭。开启后由 dsh 自行读取已保存的认证，Codex # 不读取或保存登录与密钥；不会自动选择桌面当前使用的模型。"
               >
                 <Switch disabled={!snapshot || busy === "save_config"} label="复用 DSH 已保存的登录与密钥" on={agent.reuseSavedAuth} onToggle={() => editAgent(agent.id, { reuseSavedAuth: !agent.reuseSavedAuth }, true)} />
               </CxRow>}
@@ -489,7 +489,7 @@ export function AgentCollaborationPage({ defaultCwd = "" }: { defaultCwd?: strin
           </CxRow>
           <CxRow
             badges={<CxBadge tone={runtimeTone}>{runtimeTitle}</CxBadge>}
-            detail={runtimeRefreshing ? "正在重新加载本机 MCP 配置、检查子 Agent 工具并刷新列表缓存。" : runtime?.status === "unavailable" ? "请用 Codex++ 启动或接管 Codex 后重试，也可在 Codex 中手动重新加载 MCP。" : runtime?.message || "检查子 Agent 工具是否已在本机 Codex 中加载"}
+            detail={runtimeRefreshing ? "正在重新加载本机 MCP 配置、检查子 Agent 工具并刷新列表缓存。" : runtime?.status === "unavailable" ? "请用 Codex # 启动或接管 Codex 后重试，也可在 Codex 中手动重新加载 MCP。" : runtime?.message || "检查子 Agent 工具是否已在本机 Codex 中加载"}
             title="运行中的 Codex"
             tooltip={[
               runtime && !runtimeRefreshing ? [runtime.reloadSucceeded ? "MCP 已重载" : "MCP 重载未确认", runtime.toolsReady ? `已找到子 Agent 工具${runtime.toolCount > 0 ? `（${runtime.toolCount} 个）` : ""}` : "子 Agent 工具未确认", runtime.cacheRefreshed ? "工具列表缓存已刷新" : "工具列表刷新待确认"].join(" · ") : "",

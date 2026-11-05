@@ -379,7 +379,7 @@ fn log_outcome_change(port: u16, outcome: &Result<Ipv4Addr, String>) {
 
 /// WSL 监听绑定成功后写进诊断日志的排查提示。
 pub const WSL_LISTENER_FIREWALL_HINT: &str = "已在 WSL 虚拟网卡上监听；如 WSL 内的 Codex 仍连不上网关，\
-     检查 Windows 防火墙（含 Hyper-V 防火墙）是否放行 Codex++ 的入站连接";
+     检查 Windows 防火墙（含 Hyper-V 防火墙）是否放行 Codex # 的入站连接";
 
 struct WslListener {
     addr: Ipv4Addr,
@@ -530,7 +530,7 @@ fn shutdown(mut listener: WslListener) {
 }
 
 /// 管理器运行期间（仅 Windows）每半分钟核对一次：WSL 虚拟网卡在 Windows 开机后要等 WSL 启动才有，
-/// 地址每次重启也可能变；Codex++ 往往比 WSL 先起来，启动时拿不到就靠这里补上。
+/// 地址每次重启也可能变；Codex # 往往比 WSL 先起来，启动时拿不到就靠这里补上。
 /// 写进 Codex 的地址不对时重写托管供应商（只动开着网关、且没被别的工具接管的 Codex）。
 pub fn start_codex_gateway_wsl_watch() {
     static STARTED: OnceLock<()> = OnceLock::new();
@@ -720,7 +720,7 @@ mod tests {
     #[test]
     fn listener_firewall_hint_points_to_windows_firewall() {
         assert!(WSL_LISTENER_FIREWALL_HINT.contains("Windows 防火墙"));
-        assert!(WSL_LISTENER_FIREWALL_HINT.contains("Codex++"));
+        assert!(WSL_LISTENER_FIREWALL_HINT.contains("Codex #"));
         assert!(!WSL_LISTENER_FIREWALL_HINT.contains("  "));
     }
 

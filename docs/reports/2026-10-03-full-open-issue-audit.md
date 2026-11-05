@@ -39,7 +39,7 @@
 | H | [#1012](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1012) | [Bug]: gemini3.5flash 错误（thought_signature） | crates/codex-plus-core/src/protocol_proxy.rs：在把上游 response 转回 Codex 格式时保留 Gemi | medium |
 | H | [#332](https://github.com/BigPizzaV3/CodexPlusPlus/issues/332) | gemini-3.5-flash 报缺少 thought_signature | crates/codex-plus-core/src/protocol_proxy.rs —— 需在响应侧捕获上游返回的 thought_signature | medium |
 | H | [#410](https://github.com/BigPizzaV3/CodexPlusPlus/issues/410) | system message 顺序问题导致 MiniMax API 报 2013 | 不适用（已修复，待发布） | n/a |
-| H | [#247](https://github.com/BigPizzaV3/CodexPlusPlus/issues/247) | Codex++ 注入失败：SkyComputerUseService 占用调试端口 9229 | crates/codex-plus-core/src/ports.rs:72-88 —— 去掉 `!is_windows` 短路，让 macOS 也走 `c | medium |
+| H | [#247](https://github.com/BigPizzaV3/CodexPlusPlus/issues/247) | Codex # 注入失败：SkyComputerUseService 占用调试端口 9229 | crates/codex-plus-core/src/ports.rs:72-88 —— 去掉 `!is_windows` 短路，让 macOS 也走 `c | medium |
 | H | [#240](https://github.com/BigPizzaV3/CodexPlusPlus/issues/240) | 历史会话修复后 Codex App 历史会话只剩 1 个 | crates/codex-plus-data/src/provider_sync.rs:1211-1255（audit_provider_sync_stat | medium |
 | M | [#1394](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1394) | [Bug]: 官方登录+混入API后无法使用GPT 5.6模型（system 消息为空） | crates/codex-plus-core/src/protocol_proxy.rs:3729 附近：构造 system 消息时若拼接结果为空（或仅空白 | small |
 | M | [#1888](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1888) | 供应商切换失败：回填当前供应商配置失败 | crates/codex-plus-core/src/relay_switch.rs:117-133 —— 错误信息应带上底层原因（profile 不存在  | small |
@@ -55,7 +55,7 @@
 | M | [#1359](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1359) | [Bug]: 侧边会话消失 | assets/inject/renderer-inject/ 侧边栏分片（fa3529f7 的落点） | small |
 | M | [#1971](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1971) | 切换供应商后重启只能进入登录界面 | crates/codex-plus-core/src/relay_switch.rs —— 沿用 68429a26 的 pure_api_auth_cont | small |
 | M | [#1851](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1851) | [ArrayParam] input[63].content array too long（ | crates/codex-plus-core/src/protocol_proxy.rs（历史 item 的 content 数组规整，需先抓取转换前后请求 | medium |
-| M | [#1032](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1032) | [Bug]: 频繁出现Codex和后台Codex++后端断连 | 不适用（已有未发布修复 5bb4f636 / c509c06d，本批无需再改码；若要根治需在 40-backend-settings.js 的自动重试与 l | n/a |
+| M | [#1032](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1032) | [Bug]: 频繁出现Codex和后台Codex #后端断连 | 不适用（已有未发布修复 5bb4f636 / c509c06d，本批无需再改码；若要根治需在 40-backend-settings.js 的自动重试与 l | n/a |
 | L | [#742](https://github.com/BigPizzaV3/CodexPlusPlus/issues/742) | 切换 gpt 账号后供应商 API Key 消失、纯 API 被改成官方登录 | 待定；先核对用户 auth.json 与 settings.json 的 providerSync/profiles 快照，再看 crates/codex- | medium |
 
 ### P2
@@ -66,7 +66,7 @@
 | H | [#2031](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2031) | GLM-5.3-Flash 本地图片 data URL 被上游拒绝，建议对 glm-* 规范 | crates/codex-plus-core/src/protocol_proxy.rs:3869（image_part_to_chat）：新增模型感知的  | small |
 | H | [#1488](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1488) | [Bug]: 供应商测试 测试「OpenAI Official」失败：Base URL 不能 | crates/codex-plus-core/src/relay_config.rs:856-862（test_relay_profile 入口）：官方登录 | small |
 | H | [#1160](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1160) | 免安装 codex，后端连接异常，且 codex 版本检测不到 | crates/codex-plus-core/src/app_paths.rs:676-690 —— 在 codex_version_file 之后加一档  | small |
-| H | [#862](https://github.com/BigPizzaV3/CodexPlusPlus/issues/862) | Codex 内自建的 SKILL 在 Codex++ 管理中显示为 0 | crates/codex-plus-core/src/skills.rs — 在 SkillsManager 的列表聚合里增加一趟「扫描 $CODEX_HO | small |
+| H | [#862](https://github.com/BigPizzaV3/CodexPlusPlus/issues/862) | Codex 内自建的 SKILL 在 Codex # 管理中显示为 0 | crates/codex-plus-core/src/skills.rs — 在 SkillsManager 的列表聚合里增加一趟「扫描 $CODEX_HO | small |
 | H | [#772](https://github.com/BigPizzaV3/CodexPlusPlus/issues/772) | [Bug]: Fast 开着但提示「当前模型未读取」（GPT-5.5 中转） | assets/inject/renderer-inject/20-menu.js:448-454 —— 让 codexServiceTierFastAvai | small |
 | H | [#586](https://github.com/BigPizzaV3/CodexPlusPlus/issues/586) | [Bug]: 纯API mimo-v2.5-pro web_search 原生工具被翻译为  | crates/codex-plus-core/src/protocol_proxy.rs:5098（tool_call_added_item）与 :5241 | medium |
 | H | [#2080](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2080) | [Bug]: 启动前自动修复历史会话通过快捷方式打开时无效 | apps/codex-plus-launcher/src/main.rs:88-102（早退分支需补 provider sync / 修复调用） | small |
@@ -82,15 +82,15 @@
 | M | [#985](https://github.com/BigPizzaV3/CodexPlusPlus/issues/985) | [Bug]: 下载 arm64 版本的 codex++ 之后 codex++.app 仍然是 | scripts/installer/macos/package-dmg.sh：打包后加一步产物校验（对 Contents/MacOS 下二进制跑 `file | small |
 | M | [#641](https://github.com/BigPizzaV3/CodexPlusPlus/issues/641) | [Bug]: 经常几个问题后出现 Expecting property name enclo | crates/codex-plus-core/src/protocol_proxy.rs:2511 push_tool_call_delta_into —— | medium |
 | M | [#618](https://github.com/BigPizzaV3/CodexPlusPlus/issues/618) | [Config]: 供应商切换回填失败：config.toml TOML 解析失败 | apps/codex-plus-manager/src-tauri 的 backfill_relay_profile_from_live 命令（经 rela | small |
-| M | [#609](https://github.com/BigPizzaV3/CodexPlusPlus/issues/609) | [Bug]: Codex++ 重写 config.toml 并清空 bundled 插件缓存 | crates/codex-plus-core/src/relay_config.rs:2082 preserve_live_app_settings ——  | small |
+| M | [#609](https://github.com/BigPizzaV3/CodexPlusPlus/issues/609) | [Bug]: Codex # 重写 config.toml 并清空 bundled 插件缓存 | crates/codex-plus-core/src/relay_config.rs:2082 preserve_live_app_settings ——  | small |
 | M | [#597](https://github.com/BigPizzaV3/CodexPlusPlus/issues/597) | [Config]: 添加插件或 MCP 导致已有插件全部消失 | crates/codex-plus-core/src/relay_config.rs:2082 preserve_live_app_settings ——  | small |
 | M | [#500](https://github.com/BigPizzaV3/CodexPlusPlus/issues/500) | [Bug]: 侧边的Timeline不准，而且时不时会抖动 | **已不适用**：Timeline 已于 v1.2.19 整体移除（见 §3.1 订正说明），本仓当前无此组件 | n/a |
 | M | [#300](https://github.com/BigPizzaV3/CodexPlusPlus/issues/300) | macOS 自动更新只挂载 DMG 未执行安装 | apps/codex-plus-manager/src-tauri/src/commands.rs（更新命令）—— 需在挂载后增加把 .app 复制到 /A | medium |
-| M | [#239](https://github.com/BigPizzaV3/CodexPlusPlus/issues/239) | 启动 Codex++ 失败：failed to query CDP targets | 先复测：升级到 v1.5.0 后重跑，若仍失败则看 `ports.rs:72-80` 是否把端口让到了 9229 之外而状态文件仍报 9229（`statu | small |
+| M | [#239](https://github.com/BigPizzaV3/CodexPlusPlus/issues/239) | 启动 Codex # 失败：failed to query CDP targets | 先复测：升级到 v1.5.0 后重跑，若仍失败则看 `ports.rs:72-80` 是否把端口让到了 9229 之外而状态文件仍报 9229（`statu | small |
 | M | [#1650](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1650) | 纯官方登录供应商无法持久化/恢复专属 config.toml | 待定：crates/codex-plus-core/src/relay_switch.rs:35-46 与 relay_config.rs 的 backfi | medium |
 | M | [#1498](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1498) | 界面 UI 频闪，切浅色主题显示异常（只有聊天框白，其余黑字） | assets/inject/renderer-inject/ 配色与防闪烁分片（需 assemble-renderer-inject.mjs 重组） | small |
 | M | [#1341](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1341) | [Question]: 点击会话管理的调度问题 | apps/codex-plus-manager/src-tauri/src/commands.rs（会话同步命令）+ 前端点击处理 | medium |
-| M | [#1329](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1329) | [Bug]: Codex++无法通过系统代理连接到GitHub | crates/codex-plus-core/src/http_client.rs:proxied_client —— 把 detect_system_pr | small |
+| M | [#1329](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1329) | [Bug]: Codex #无法通过系统代理连接到GitHub | crates/codex-plus-core/src/http_client.rs:proxied_client —— 把 detect_system_pr | small |
 | M | [#1905](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1905) | 主题/皮肤重启后失效，每次都要重新应用 | crates/codex-plus-core/src/dream_skin_runtime.rs —— 启动时按持久设置重新注入，而非依赖上次会话的运行时状 | medium |
 | M | [#1893](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1893) | 强制 codex 界面中文失效 | assets/inject/renderer-inject/00-prelude.js:97 起 —— 重载/重试路径；核对 api-key 模式重启后 l | small |
 | M | [#1784](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1784) | 换肤功能无法使用（原生输入框不可见 / 首页横幅不匹配） | crates/codex-plus-core/src/dream_skin.rs 的校验锚点 —— 按 Codex 新版 DOM 结构调整选择器（优先 da | medium |
@@ -156,7 +156,7 @@
 - 证据：crates/codex-plus-core/src/protocol_proxy.rs:259 `let messages = collapse_system_messages_to_head(messages);`，函数定义在同文件 :3713，实现是把全数组 role==system 的 content 收集后用 `\n\n` 拼接成单条 system 推到数组首位（:3729-3737），紧随 :258 normalize_chat_messages 之后。该行由 a8dcd29f（2026-10-02 17:03，"fix(protocol): 修复两处 tool 消息边界缺陷"）引入，`git tag --contains a8dcd29f` 输出为空，即晚于最新正式版 v1.5.0(2026-10-01)。
 - 落点：不适用（已修复，待发布）
 
-**#247** — Codex++ 注入失败：SkyComputerUseService 占用调试端口 9229 导致 CDP 连接失败
+**#247** — Codex # 注入失败：SkyComputerUseService 占用调试端口 9229 导致 CDP 连接失败
 
 - 结论：`confirmed-in-code` / P1 / 置信 high / 工作量 medium
 - 根因：确认是本仓缺陷：macOS 路径从不做调试端口占用检测，只无条件把 `--remote-debugging-port=9229` 交给 Codex；当 SkyComputerUseService 已占着 9229 时，新起的 Codex 拿不到该端口，注入永久失败。端口复用判定只看端口是否在监听，不看监听者是不是 Codex，建议按举报者方向补 macOS 的端口探测/让位。
@@ -229,14 +229,14 @@
 **#1540** — 进入 codex 之后界面卡死，切换会话就点不了
 
 - 结论：`likely-in-code` / P1 / 置信 medium / 工作量 small
-- 根因：切会话后整页无响应。仓库有直接对应的修复：b6a00c27「修复 Codex++ 重复注入导致卡死和白屏」，以及 5bb4f636（窗口隐藏不判定桥接失效、退避持续健康才清零，根治每分钟整页重注入）。但需确认这些提交是否已进 v1.5.0，且用户说「禁用插件/用兼容模式」未必真关掉了注入。
-- 证据：commit b6a00c27 修复 Codex++ 重复注入导致卡死和白屏；commit 5bb4f636 fix(bridge): 窗口隐藏不判定桥接失效 + 退避持续健康才清零，根治每分钟整页重注入。均需 git tag --contains 核实是否入 v1.5.0（5bb4f636 与 v1.5.0 notes 同期，疑似已发布）。
+- 根因：切会话后整页无响应。仓库有直接对应的修复：b6a00c27「修复 Codex # 重复注入导致卡死和白屏」，以及 5bb4f636（窗口隐藏不判定桥接失效、退避持续健康才清零，根治每分钟整页重注入）。但需确认这些提交是否已进 v1.5.0，且用户说「禁用插件/用兼容模式」未必真关掉了注入。
+- 证据：commit b6a00c27 修复 Codex # 重复注入导致卡死和白屏；commit 5bb4f636 fix(bridge): 窗口隐藏不判定桥接失效 + 退避持续健康才清零，根治每分钟整页重注入。均需 git tag --contains 核实是否入 v1.5.0（5bb4f636 与 v1.5.0 notes 同期，疑似已发布）。
 - 落点：crates/codex-plus-core/src/bridge.rs（重注入退避与健康判定）
 
 **#1522** — codex++ 静默启动入口无法稳定注入程序（四种状态随机）
 
 - 结论：`likely-in-code` / P1 / 置信 medium / 工作量 medium
-- 根因：静默启动入口时好时坏：绿点但脚本不生效、红灯断连、完全无指示，四种状态随机；用管理工具的「重启 Codex++」则稳定正常。核心差异是静默入口与重启走的路径/时序不同，仓库近年修过多次注入时序与桥接健康判定，需确认是否覆盖了静默入口这条路径。
+- 根因：静默启动入口时好时坏：绿点但脚本不生效、红灯断连、完全无指示，四种状态随机；用管理工具的「重启 Codex #」则稳定正常。核心差异是静默入口与重启走的路径/时序不同，仓库近年修过多次注入时序与桥接健康判定，需确认是否覆盖了静默入口这条路径。
 - 证据：相关提交：b6a00c27 修复重复注入导致卡死和白屏；5bb4f636 fix(bridge): 窗口隐藏不判定桥接失效 + 退避持续健康才清零，根治每分钟整页重注入；3ce9e74c fix(manager): 无效的 Codex 应用路径不再落库，避免启动永久失败。静默入口与重启入口的差异点在 launcher.rs（debug_port/helper_port 固定为 9229/57321，见用户日志）。用户版本 1.2.37，跨多个版本。
 - 落点：待定：crates/codex-plus-core/src/launcher.rs（静默入口与重启入口的启动时序/端口占用处理）
 
@@ -268,7 +268,7 @@
 - 证据：crates/codex-plus-core/src/protocol_proxy.rs 已有针对同类上游拒绝的修复注释与实现：:2145-2149（`resp_xxx`→`xxx`，避免 `resp_xxx_msg` 被拒，#1431）、:3003-3068（`[ApiIdParam] [input[N].id] [invalid_id_prefix]` 前缀重建，识别 item_/cp_/resp_ 后缀）；前轮审计 docs/reports/2026-09-11-open-pr-and-issue-triage.md:129-130 已把 #1851 与 #1796/#1781/#1431/#1493 归为同一族「responses→chat 转换后 ID 前缀/内容长度不对」。新开会话正常、旧会话报错，说明残留落在历史 item 上。
 - 落点：crates/codex-plus-core/src/protocol_proxy.rs（历史 item 的 content 数组规整，需先抓取转换前后请求体）
 
-**#1032** — [Bug]: 频繁出现Codex和后台Codex++后端断连
+**#1032** — [Bug]: 频繁出现Codex和后台Codex #后端断连
 
 - 结论：`likely-in-code` / P1 / 置信 medium / 工作量 n/a
 - 根因：「重启 Codex 后约 70% 概率连不上后端、状态灯红色、修复后端一直失败」与 #1001/#1008/#1014 同属「启动/重启生命周期 + 桥接看门狗」一条链路；main 上已有两处针对性修复（桥接在窗口隐藏时不再误判失效、启动与重启生命周期确定化），但两者都落在 v1.5.0 tag 之后，用户用的 1.2.9 拿不到。
@@ -310,10 +310,10 @@
 - 证据：crates/codex-plus-core/src/app_paths.rs:676-690 的 codex_app_version 回退链为 codex_package_version → codex_directory_version → codex_version_file，四者全部只认 MSIX 目录名、路径末段目录名与 `version` 文件；全仓 grep「149.0.7827.115.manifest」与「*.manifest 文件名解析」零命中，launcher.rs 测试只有 app_paths_extracts_codex_version_from_portable_version_file（tests/launcher.rs:171）与 directory_version 两档，没有 manifest 文件名档。
 - 落点：crates/codex-plus-core/src/app_paths.rs:676-690 —— 在 codex_version_file 之后加一档 fallback：若不大于 12 位数字点分且以 .manifest 结尾的文件存在于 app_dir（有的解包目录放在 app/ 下），取其文件名去掉扩展名作为版本；同时按 is_version_like 校验，避免误吞无关文件。配套在 crates/codex-plus-core/tests/launcher.rs 增加 portable/unpacked 形态用例。
 
-**#862** — Codex 内自建的 SKILL 在 Codex++ 管理中显示为 0
+**#862** — Codex 内自建的 SKILL 在 Codex # 管理中显示为 0
 
 - 结论：`confirmed-in-code` / P2 / 置信 high / 工作量 small
-- 根因：用户让 Codex 自己创建 skill 并已落在 skills 目录、Codex 里能看到 45 个，但 Codex++「工具与插件」显示 Skills 为 0；根因是 Codex++ 只列「自家安装的 + 远端仓库缓存的 + 内置 .system」三类，从不扫描 $CODEX_HOME/skills 下的本地 skill 目录。
+- 根因：用户让 Codex 自己创建 skill 并已落在 skills 目录、Codex 里能看到 45 个，但 Codex #「工具与插件」显示 Skills 为 0；根因是 Codex # 只列「自家安装的 + 远端仓库缓存的 + 内置 .system」三类，从不扫描 $CODEX_HOME/skills 下的本地 skill 目录。
 - 证据：crates/codex-plus-core/src/skills.rs:1-20 的模块头明确写「codex 的 skill 是文件系统约定……它扫描 $CODEX_HOME/skills/<id>/SKILL.md」，但列表实现只遍历 `state.installed`（skills.rs:296-311）与 `self.list_bundled_skills()`（skills.rs:318-350，只读 linked_dir()/.system）。全仓无「扫描 $CODEX_HOME/skills 目录」的代码：`grep -rn "skills" crates/codex-plus-core/src/codex_home.rs` 仅命中一条测试用的 home.join("skills").join("x")（codex_home.rs:235）。管理器侧入口 list_insta
 - 落点：crates/codex-plus-core/src/skills.rs — 在 SkillsManager 的列表聚合里增加一趟「扫描 $CODEX_HOME/skills 目录」：read_dir linked_dir()，凡是有 SKILL.md 且 id 不在 installed/bundled 集合里的，作为「本地/外部」条目返回（只读、不参与卸载），并给 SkillEntry 加一个来源字段区分。管理器侧 commands.rs:4964 的 skills_payload 无需改结构，前端按新来源字段展示分组即可。
 
@@ -348,14 +348,14 @@
 **#959** — [Question]: 用 DeepSeek 这种纯文本模型时，只要在项目文件夹和聊天里面有图片，对话就会出现报错
 
 - 结论：`confirmed-in-code` / P2 / 置信 high / 工作量 trivial
-- 根因：这是已实现的 per-model 图片处理能力：DeepSeek 等纯文本模型收到图片块会 400，Codex++ 提供「按模型配置图片处理」三档（原样发送 / 剥离占位符 / VLM 转述）。用户未配置时默认是 send-as-is，因此仍会把图片原样发给纯文本模型而报错。
+- 根因：这是已实现的 per-model 图片处理能力：DeepSeek 等纯文本模型收到图片块会 400，Codex # 提供「按模型配置图片处理」三档（原样发送 / 剥离占位符 / VLM 转述）。用户未配置时默认是 send-as-is，因此仍会把图片原样发给纯文本模型而报错。
 - 证据：crates/codex-plus-core/src/vision.rs:109-119 ImageHandling 枚举三档 send-as-is/strip/vlm，:161 image_handling_mode 未命中时回退 SendAsIs；:188 strip_images_only 把图片块替换为「[图片已省略]」；per-model 查表 key 归一化在 :126-155（配套修复 ecb71213 / 064775ab，issue #2345）。前端入口为模型行「模型配置」图片处理选项。
 - 落点：crates/codex-plus-core/src/vision.rs:161（image_handling_mode）+ 管理端模型配置面板
 
 **#944** — [Bug]: 在codex中glm-5.1无法开启思考
 
 - 结论：`confirmed-in-code` / P2 / 置信 high / 工作量 small
-- 根因：GLM 走 Chat Completions 上游时被归入 Thinking 方言，Codex++ 会据请求体的 reasoning 字段生成 thinking 参数；用户看到 thinking.type=disabled 说明该请求没有被识别为「已开启推理」。当前代码里 reasoning_requested 会把 reasoning.effort 为 none/off/disabled 或 reasoning 缺失/为 null 判为未开启——需要用户侧的 reasoning 字段实况才能定位是 Codex 端未下发还是我们判反。
+- 根因：GLM 走 Chat Completions 上游时被归入 Thinking 方言，Codex # 会据请求体的 reasoning 字段生成 thinking 参数；用户看到 thinking.type=disabled 说明该请求没有被识别为「已开启推理」。当前代码里 reasoning_requested 会把 reasoning.effort 为 none/off/disabled 或 reasoning 缺失/为 null 判为未开启——需要用户侧的 reasoning 字段实况才能定位是 Codex 端未下发还是我们判反。
 - 证据：crates/codex-plus-core/src/protocol_proxy.rs:6117-6151 apply_chat_reasoning_options：reasoning_enabled 为假时写 "thinking":{"type":"disabled"}；:6193-6213 infer_chat_reasoning_style 把含 glm / zhipu / z.ai / kimi / moonshot / mimo 的模型判为 ChatReasoningStyle::Thinking；:6182-6191 reasoning_requested 的判定口径（effort 为 none/off/disabled，或无 reasoning/为 null → 未开启）。用户版本 1.2.5 早于 e94efdb4（2026-06-01，含于 v1.1.9）之后的多轮 t
 - 落点：crates/codex-plus-core/src/protocol_proxy.rs:6117-6151, 6182-6213
 
@@ -422,7 +422,7 @@
 - 证据：relay_config.rs:1622 parse_toml_document 对非空内容失败即 `anyhow::bail!("config.toml TOML 解析失败：{error}")`。对比之下，同文件的另外两处读取点已有容错：relay_config.rs:2089 `let Ok(live_doc) = parse_toml_document(&live_text) else { return Ok(...) }`（preserve_live_app_settings 在 live 解析失败时降级而非报错）；relay_config.rs:2350 apply_external_catalog_fallback 同样降级。前端 App.tsx:3085-3102 snapshotActiveRelayFilesBeforeSwitch 在 !isSuccessStatus 
 - 落点：apps/codex-plus-manager/src-tauri 的 backfill_relay_profile_from_live 命令（经 relay_config.rs 的读取路径）应比照 relay_config.rs:2089 的写法，在 parse 失败时降级返回原 settings 并给出「config.toml 有语法错误，请先修复」的可操作提示，而不是让整条切换流程失败
 
-**#609** — [Bug]: Codex++ 重写 config.toml 并清空 bundled 插件缓存
+**#609** — [Bug]: Codex # 重写 config.toml 并清空 bundled 插件缓存
 
 - 结论：`confirmed-in-code` / P2 / 置信 medium / 工作量 small
 - 根因：切换/启动时重写 config.toml 会丢掉 plugin/marketplace/mcp_servers 段，插件变 not installed；仓库已逐步补齐各类保留逻辑，但「plugins 段」在 preserve_live_app_settings 的保留清单里未见显式处理，需确认是否仍会丢。
@@ -454,7 +454,7 @@
 - 证据：全仓 grep "自动更新" / "install_dmg" / "hdiutil" 相关实现未命中自动安装步骤；.github/workflows/release-assets.yml:141 附近只有 codesign 检查。用户描述「只完成了第 1、2 步（下载、挂载），缺少第 3 步自动覆盖安装」。
 - 落点：apps/codex-plus-manager/src-tauri/src/commands.rs（更新命令）—— 需在挂载后增加把 .app 复制到 /Applications 并重启应用的步骤，或用 .app.zip 后台解压覆盖
 
-**#239** — 启动 Codex++ 失败：failed to query CDP targets
+**#239** — 启动 Codex # 失败：failed to query CDP targets
 
 - 结论：`confirmed-in-code` / P2 / 置信 medium / 工作量 small
 - 根因：Windows 上 Debug 9229 查询不到 CDP target，属于启动/注入链路的已知失败面；错误文本出自本仓 `cdp.rs`。端口虽在 Windows 有让位逻辑，但用户是 1.1.5（早于让位逻辑与 CDP 恢复改动），需按新版复测后判定是否仍有残留缺陷。
@@ -482,10 +482,10 @@
 - 证据：apps/codex-plus-launcher/src/main.rs:454 `tokio::task::spawn_blocking(\|\| codex_plus_data::run_provider_sync(None))`、:471 与 :738 也是 spawn_blocking —— 同步本身是放在阻塞线程池跑的。但 Tauri 命令层（apps/codex-plus-manager/src-tauri/src/commands.rs）中触发同步的那个命令是否 await 而非阻塞、以及点击是否每次都全量跑，需要逐个命令确认，本批未逐行核对。
 - 落点：apps/codex-plus-manager/src-tauri/src/commands.rs（会话同步命令）+ 前端点击处理
 
-**#1329** — [Bug]: Codex++无法通过系统代理连接到GitHub
+**#1329** — [Bug]: Codex #无法通过系统代理连接到GitHub
 
 - 结论：`likely-in-code` / P2 / 置信 medium / 工作量 small
-- 根因：脚本市场加载失败、检查更新失败，因为 Codex++ 不走系统代理。代码里确实有系统代理探测（detect_system_proxy），但出网用的 reqwest client 只设了 user_agent，没有把探测到的代理挂上去——默认只认环境变量。
+- 根因：脚本市场加载失败、检查更新失败，因为 Codex # 不走系统代理。代码里确实有系统代理探测（detect_system_proxy），但出网用的 reqwest client 只设了 user_agent，没有把探测到的代理挂上去——默认只认环境变量。
 - 证据：crates/codex-plus-core/src/proxy.rs:13 `pub fn detect_system_proxy()` 存在，并有完整的平台实现（Windows 读注册表 Internet Settings 的 windows_system_proxy()，macOS 走 scutil --proxy 的 parse_macos_scutil_proxy()），说明系统代理是被探测的；但 crates/codex-plus-core/src/http_client.rs:1-8 的 `proxied_client` 只有 `.user_agent(ua)`，没有 `.proxy(...)`——全仓 grep `.proxy(` 在 crates/ 与 apps/ 的 Rust 源码里零命中。reqwest 的默认行为是读 HTTP(S)_PROXY 环境变量，因此「开了
 - 落点：crates/codex-plus-core/src/http_client.rs:proxied_client —— 把 detect_system_proxy() 的结果显式挂到 reqwest builder 上
 
@@ -556,13 +556,13 @@
 
 - 结论：`likely-in-code` / P2 / 置信 medium / 工作量 small
 - 根因：用户把 Codex 装在了 C:\codex++ 目录，诊断里 codex_app 显示 found 但 codex_version 为 null，且启动报 'failed to launch Codex executable C:\codex++\codex.exe'。路径解析对含着「codex++」字样的目录名有明确的排除规则，极可能是这一条把用户的真实 Codex 目录一并排除了。
-- 证据：crates/codex-plus-core/src/app_paths.rs:532-569 is_codex_plus_plus_path：逐段检查路径组件，只要任一段（小写后）等于 "codex++" / "codexplusplus" / "codex-plus-plus" 或包含 "codex-plus-manager" 即返回 true → normalize_codex_app_path 在第 515-517 行直接返回 None。用户路径 C:\codex++ 的组件正是 "codex++"，因此被判为「Codex++ 自己的安装目录」而拒绝。版本探测失败（codex_version=null）与启动失败同源于此。
-- 落点：crates/codex-plus-core/src/app_paths.rs:532 is_codex_plus_plus_path —— 收紧判定：不能只凭目录名含 'codex++' 就排除，应同时要求该目录里确实存在本产品可执行文件（如 codex-plus-plus-manager.exe / uninstall.exe + 本产品注册表键），否则视为用户自定义路径放行；同时建议在路径解析失败时把「被判定为 Codex++ 安装目录而跳过」写进诊断日志，避免这类静默拒绝。
+- 证据：crates/codex-plus-core/src/app_paths.rs:532-569 is_codex_plus_plus_path：逐段检查路径组件，只要任一段（小写后）等于 "codex++" / "codexplusplus" / "codex-plus-plus" 或包含 "codex-plus-manager" 即返回 true → normalize_codex_app_path 在第 515-517 行直接返回 None。用户路径 C:\codex++ 的组件正是 "codex++"，因此被判为「Codex # 自己的安装目录」而拒绝。版本探测失败（codex_version=null）与启动失败同源于此。
+- 落点：crates/codex-plus-core/src/app_paths.rs:532 is_codex_plus_plus_path —— 收紧判定：不能只凭目录名含 'codex++' 就排除，应同时要求该目录里确实存在本产品可执行文件（如 codex-plus-plus-manager.exe / uninstall.exe + 本产品注册表键），否则视为用户自定义路径放行；同时建议在路径解析失败时把「被判定为 Codex # 安装目录而跳过」写进诊断日志，避免这类静默拒绝。
 
 **#495** — [Bug]: 插件栏无法激活
 
 - 结论：`likely-in-code` / P2 / 置信 medium / 工作量 small
-- 根因：重启 Codex++ 或通过管理工具启动后都无法激活插件栏。插件解锁依赖对客户端压缩产物中某个 filter 回调的形态匹配，客户端一升级形态变化就会失灵；仓库在 v1.5.0 之后刚改过这处识别方式（改用结构正则），但该修复尚未发布，所以用户装 v1.5.0 仍会踩到。
+- 根因：重启 Codex # 或通过管理工具启动后都无法激活插件栏。插件解锁依赖对客户端压缩产物中某个 filter 回调的形态匹配，客户端一升级形态变化就会失灵；仓库在 v1.5.0 之后刚改过这处识别方式（改用结构正则），但该修复尚未发布，所以用户装 v1.5.0 仍会踩到。
 - 证据：assets/inject/renderer-inject/60-plugin-marketplace.js:1-6 注释明确「结构式匹配 <arr>.filter(p => !<list>.includes(p.name))，必须锚定 filter 箭头形态且箭头参数与 .name 的宿主同名」，:8-15 isCodexPluginMarketplaceHiddenFilter、:22-52 patches Array.prototype.filter 并发送 plugin_marketplace_hidden_filter_bypassed 诊断。修复提交 241d6ca4（2026-10-02 fix(inject): 插件解锁改用结构正则识别 marketplace 过滤器），git tag --contains 241d6ca4 无 v1.* 命中，即晚于 v1.5.0、尚未发
 - 落点：assets/inject/renderer-inject/60-plugin-marketplace.js:1-52（修复已存在，需发版送达用户）
 
@@ -604,14 +604,14 @@
 **#692** — renderer-inject.js 硬编码中文显示名导致插件市场标签错乱
 
 - 结论：`confirmed-in-code` / P3 / 置信 high / 工作量 small
-- 根因：插件市场显示名被硬编码成中文编号「OpenAI插件1/2/3(Codex++)」，覆盖了上游返回的原始 displayName；函数在现仓库仍原样存在，只是行号已漂移。
-- 证据：assets/inject/renderer-inject/50-navigation.js:82-89 定义 displayNameForPluginMarketplaceName，:83 `openai-bundled`→"OpenAI插件1(Codex++)"、:84 `openai-curated`→"OpenAI插件2(Codex++)"、:85 `openai-primary-runtime`→"OpenAI插件3(Codex++)"、:86 `openai-api-curated`→"OpenAI插件4"、:89 codex-plus-curated/openai-curated-remote→"OpenAI插件5"；组装产物 assets/inject/renderer-inject.js:6337-6345，调用点 :6351 用 marketplace.displayN
+- 根因：插件市场显示名被硬编码成中文编号「OpenAI插件1/2/3(Codex #)」，覆盖了上游返回的原始 displayName；函数在现仓库仍原样存在，只是行号已漂移。
+- 证据：assets/inject/renderer-inject/50-navigation.js:82-89 定义 displayNameForPluginMarketplaceName，:83 `openai-bundled`→"OpenAI插件1(Codex #)"、:84 `openai-curated`→"OpenAI插件2(Codex #)"、:85 `openai-primary-runtime`→"OpenAI插件3(Codex #)"、:86 `openai-api-curated`→"OpenAI插件4"、:89 codex-plus-curated/openai-curated-remote→"OpenAI插件5"；组装产物 assets/inject/renderer-inject.js:6337-6345，调用点 :6351 用 marketplace.displayN
 - 落点：assets/inject/renderer-inject/50-navigation.js:82-90：改回 `return fallback`（或把编号改为英文如 "Official Marketplace"）；同步更新 crates/codex-plus-core/tests/cdp_bridge.rs:2505/2568-2584 的字面量断言，然后跑 node scripts/assemble-renderer-inject.mjs 重组产物。注意该函数同时承担「多个 marketplace 去重展示」职责，纯 return fallback 前需确认不会退回同名重复条目。
 
 **#1975** — 统一侧边栏/列表项右侧状态指示灯右边距
 
 - 结论：`confirmed-in-code` / P3 / 置信 medium / 工作量 trivial
-- 根因：侧边栏顶部「Codex++」行的状态灯比下方列表项更靠右，同一垂直线未对齐，是纯 CSS 内边距不一致，修起来很小。
+- 根因：侧边栏顶部「Codex #」行的状态灯比下方列表项更靠右，同一垂直线未对齐，是纯 CSS 内边距不一致，修起来很小。
 - 证据：app 侧样式集中在 apps/codex-plus-manager/src/styles.css（含 scrollbar-gutter 等布局规则，见 443 / 1124 / 5381 行）；正文准确指出了「顶部指示灯更靠右」的对齐差异。
 - 落点：apps/codex-plus-manager/src/styles.css —— 让顶部标题行与列表项容器共用同一右内边距（列表项预留滚动条 gutter 时顶部也要预留）
 
@@ -661,7 +661,7 @@
 | issue | 主题 | 证据 |
 |---|---|---|
 | [#162](https://github.com/BigPizzaV3/CodexPlusPlus/issues/162) | WSL 模式下删除会话提示成功，但重启后会恢复 | commit d90c0c05（2026-09-30）「fix(sessions): WSL 模式下删除会话真正删除 rollout 文件 (#162)」，`git tag --contains d90c0c05` 返回 v1.5.0 → 已发布。改动落在 c |
-| [#215](https://github.com/BigPizzaV3/CodexPlusPlus/issues/215) | 最新的Codex侧边栏pin按钮与Codex++删除按钮重叠 | `assets/inject/renderer-inject/80-session-share.js:1461-1470` 的 `nativeActionButtonsFromRow` 明确把 `/(pin\|archive\|置顶\|归档)/i` 纳入识别； |
+| [#215](https://github.com/BigPizzaV3/CodexPlusPlus/issues/215) | 最新的Codex侧边栏pin按钮与Codex #删除按钮重叠 | `assets/inject/renderer-inject/80-session-share.js:1461-1470` 的 `nativeActionButtonsFromRow` 明确把 `/(pin\|archive\|置顶\|归档)/i` 纳入识别； |
 | [#275](https://github.com/BigPizzaV3/CodexPlusPlus/issues/275) | MCP Server tools marked as 'Unsupported' — n | 6b02b74a「fix: 写盘前用 live 补齐 mcp_servers 条目，修掉 node_repl 被打散」，git tag --contains 6b02b74a 含 v1.4.0、v1.5.0；实现见 crates/codex-plus-core |
 | [#323](https://github.com/BigPizzaV3/CodexPlusPlus/issues/323) | 加 session 批量删除功能 | `git log -S "批量删除会话" -- apps/codex-plus-manager/src/App.tsx` → 6023b1ba「feat: release 1.2.20」；`git merge-base --is-ancestor 6023b1 |
 | [#326](https://github.com/BigPizzaV3/CodexPlusPlus/issues/326) | 希望 manager 与 codex-plus 端口可修改 | apps/codex-plus-manager/src/App.tsx:6819-6832 两个 Field：「Debug 端口」「Helper 端口」；默认值 :1220-1221 `debugPort: "9229"` / `helperPort: "57 |
@@ -688,7 +688,7 @@
 | [#739](https://github.com/BigPizzaV3/CodexPlusPlus/issues/739) | codex++ 启动的 Codex 在任务栏没有应用图标 | 实现见 crates/codex-plus-core/src/windows_integration.rs:414 apply_codexplusplus_icon_to_process_window（调 apply_window_icons + :608 a |
 | [#752](https://github.com/BigPizzaV3/CodexPlusPlus/issues/752) | [Bug]: 沙盒设置权限改不改、config 被覆盖 | crates/codex-plus-core/src/relay_config.rs:2098 `for key in ["sandbox_mode", "approval_policy", "sandbox_workspace_write", "window |
 | [#774](https://github.com/BigPizzaV3/CodexPlusPlus/issues/774) | [Bug]: stream disconnected before completion | crates/codex-plus-core/src/protocol_proxy.rs:5402-5408「Codex 把 output_tokens_details.reasoning_tokens 当必填解析」后写入 `"output_tokens_de |
-| [#801](https://github.com/BigPizzaV3/CodexPlusPlus/issues/801) | 最新版 Codex++ 开启 Fast 失败（service_tier_dispatch | assets/inject/renderer-inject/30-service-tier.js:945-951 loadDispatcher 依次尝试 ["setting-storage-", "vscode-api-", "app-initial-"]，并 |
+| [#801](https://github.com/BigPizzaV3/CodexPlusPlus/issues/801) | 最新版 Codex # 开启 Fast 失败（service_tier_dispatch | assets/inject/renderer-inject/30-service-tier.js:945-951 loadDispatcher 依次尝试 ["setting-storage-", "vscode-api-", "app-initial-"]，并 |
 | [#825](https://github.com/BigPizzaV3/CodexPlusPlus/issues/825) | 检查更新下载了 arm 版（Intel Mac） | commit bd872071 (2026-06-21) "fix(update): select macOS DMG matching current arch (was picking first asset, sometimes arm64 on x64 |
 | [#826](https://github.com/BigPizzaV3/CodexPlusPlus/issues/826) | WSL2+代理导致 57321 bind 失败，建议支持自定义端口 | commit 0e9a86a7 (2026-09-15) "fix: helper 端口绑定失败分类报错，协议代理端口支持环境变量整体挪动 (issue #2189)"；新增 CODEX_PLUS_PROTOCOL_PROXY_PORT 覆盖并统一 proto |
 | [#886](https://github.com/BigPizzaV3/CodexPlusPlus/issues/886) | [Bug]: 脚本市场 index.json 语法错误 | 索引 URL 常量在 `crates/codex-plus-core/src/script_market.rs:7-8`；解码失败文案在同文件 `:73`。实测：`curl -s https://raw.githubusercontent.com/BigPiz |
@@ -726,7 +726,7 @@
 | [#2103](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2103) | [Bug]: 插件无法加载（config.toml:74:1: invalid tran | `cd1eba23 fix(relay-config): 用语义合并替代行级去重, 修复 config.toml invalid transport`（2026-08-27），`git tag --contains cd1eba23` 含 v1.3.0 / v |
 | [#2113](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2113) | [Feature]: 同时打开多个供应商的 api | `d3f1f1fb feat: add aggregate relay provider rotation`（2026-06-01），`git tag --contains d3f1f1fb` 含 v1.2.15 起的全部后续 tag 直至 v1.5.0。数据 |
 | [#2124](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2124) | GPT6 模型未更新 | `27fd20dd feat(models): 从 openai/codex 官方仓库同步 gpt-6-astra 与 gpt-5.6-sol 元数据`（2026-09-18），`git tag --contains 27fd20dd` 含 v1.4.0 与  |
-| [#2162](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2162) | [Feature]: 主界面 Codex++ 图标旁的绿点能否消除 | apps/codex-plus-manager/src/App.tsx:3571 的 `className="update-dot"` 仅在 `const hasUpdate = update?.updateAvailable === true`（App.ts |
+| [#2162](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2162) | [Feature]: 主界面 Codex # 图标旁的绿点能否消除 | apps/codex-plus-manager/src/App.tsx:3571 的 `className="update-dot"` 仅在 `const hasUpdate = update?.updateAvailable === true`（App.ts |
 
 ### 4.2 重复提单（23 条）
 
@@ -754,7 +754,7 @@
 | [#1833](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1833) | 聚合供应商：多会话分别使用不同供应商 | #2113 |
 | [#1973](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1973) | 给 codex++ 单独配置代理 | #2135 |
 | [#2025](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2025) | [Question] 供应商选择组合供应商的问题：卡登录页 + 同对话仍轮转 | #2036 |
-| [#2214](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2214) | Codex++ v1.3.0 在 Codex Desktop 26.527.3686.0 | #2211 |
+| [#2214](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2214) | Codex # v1.3.0 在 Codex Desktop 26.527.3686.0 | #2211 |
 
 ### 4.3 不是本仓的问题（71 条）
 
@@ -766,11 +766,11 @@
 | [#218](https://github.com/BigPizzaV3/CodexPlusPlus/issues/218) | codex使用三方api代理出现的问题 | `encrypted content ... could not be verified` 是官方加密内容（用于官方登录态的加密载荷）在换到第三方 provider 后无法解密/校验，属于上游服务端的加密归属校验；本仓不 |
 | [#234](https://github.com/BigPizzaV3/CodexPlusPlus/issues/234) | 接第三方api报错 | `Unknown parameter: 'stream_options.include_usage'` 是上游供应商（经 litellm/Azure）不接受该字段，而该字段是 Codex 协议转译时按 Chat Comp |
 | [#333](https://github.com/BigPizzaV3/CodexPlusPlus/issues/333) | MacOS 26.5 无法打开提示文件受损 | macOS 提示「已损坏，无法打开」。原因是安装包未签名/未公证，被 Gatekeeper 隔离。README 已给出官方解法（xattr 去隔离）。与 #330 同一根因。 |
-| [#334](https://github.com/BigPizzaV3/CodexPlusPlus/issues/334) | 能否支持 ChatGPT for PowerPoint | 诉求是接入 ChatGPT for PowerPoint。那是 OpenAI 自家的 Office 插件产品线，不在 Codex++（Codex 桌面客户端的外部启动器）的能力范围内。 |
+| [#334](https://github.com/BigPizzaV3/CodexPlusPlus/issues/334) | 能否支持 ChatGPT for PowerPoint | 诉求是接入 ChatGPT for PowerPoint。那是 OpenAI 自家的 Office 插件产品线，不在 Codex #（Codex 桌面客户端的外部启动器）的能力范围内。 |
 | [#354](https://github.com/BigPizzaV3/CodexPlusPlus/issues/354) | exec_command 完全失效 CreateProcess No such  | 错误串出自 Codex 客户端自身的统一执行沙箱（create unified exec process），本仓代码里不存在这句错误，也没有参与 exec_command 的进程创建。属于上游 Codex runtime |
 | [#367](https://github.com/BigPizzaV3/CodexPlusPlus/issues/367) | Gemini 思维链签名 thought_signature 报错 | Gemini 要求把上一轮 functionCall 里的加密 thought_signature 原样带回，而该字段是 Google 私有字段、不在 OpenAI 协议里；走 chat/responses 翻译通道时它 |
 | [#377](https://github.com/BigPizzaV3/CodexPlusPlus/issues/377) | mac 升级系统后无法安装，报「已损坏」，没有「仍要打开」选项 | 「应用已损坏，无法打开」是新版 macOS 对未公证/带隔离属性的 app 的 Gatekeeper 提示，官方出路就是去掉隔离属性；用户说「隐私与安全性里没有『仍要打开』」正是因为该提示走的是损坏分支而非未验证开发者分 |
-| [#399](https://github.com/BigPizzaV3/CodexPlusPlus/issues/399) | 接入国产模型 mimo 后不能访问外部链接 / 有没有 WebSearch | 联网检索是 Codex 客户端按模型能力下发的内置工具（web_search），第三方模型若不在客户端的支持名单里就不会拿到该工具，Codex++ 只做协议翻译不注入检索能力。 |
+| [#399](https://github.com/BigPizzaV3/CodexPlusPlus/issues/399) | 接入国产模型 mimo 后不能访问外部链接 / 有没有 WebSearch | 联网检索是 Codex 客户端按模型能力下发的内置工具（web_search），第三方模型若不在客户端的支持名单里就不会拿到该工具，Codex # 只做协议翻译不注入检索能力。 |
 | [#405](https://github.com/BigPizzaV3/CodexPlusPlus/issues/405) | 优化管理工具 UI 设计 | 纯主观审美诉求，没有指出任何具体页面/组件的可用性问题，不构成可跟进的缺陷。 |
 | [#418](https://github.com/BigPizzaV3/CodexPlusPlus/issues/418) | 切换供应商后无法拉起 Codex（AppTranslocation 路径不存在） | 错误路径在 /private/var/folders/.../AppTranslocation/ 下，说明 app 是直接从 dmg 里运行、被 macOS 的 Gatekeeper 路径重定向到随机隔离目录，重启或移动 |
 | [#427](https://github.com/BigPizzaV3/CodexPlusPlus/issues/427) | config.toml 里 mcp_servers.node_repl.env  | 报错出自 Codex 客户端对 config.toml 的解析：`[mcp_servers."node_repl.env"]` 这种把 env 写成子表、且与 `[mcp_servers.node_repl]` 并存的结 |
@@ -786,91 +786,91 @@
 | [#709](https://github.com/BigPizzaV3/CodexPlusPlus/issues/709) | Codex 本地中转服务与代理服务器冲突（502） | WebView2 走系统代理时把 127.0.0.1:57321 的请求发给代理导致 502——用户自己已给出正确结论，属 WebView2 行为，非本仓可修。 |
 | [#710](https://github.com/BigPizzaV3/CodexPlusPlus/issues/710) | 请求更新 Codex 官方插件（Product Design） | 希望新增官方 Product Design 插件——插件目录由 OpenAI 官方远端目录下发，本工具只做显示层解锁，无法凭空新增插件。 |
 | [#731](https://github.com/BigPizzaV3/CodexPlusPlus/issues/731) | 希望支持图片/视频生成 API | 要求新增 /v1/images/generations 与 /v1/videos 支持——这超出本工具「Codex 客户端配置与协议翻译」的范围，属产品边界外。 |
-| [#759](https://github.com/BigPizzaV3/CodexPlusPlus/issues/759) | [Question]: 用 DeepSeek 但模型自称 GPT | 询问第三方模型为何自称 GPT。Codex++ 只写 config.toml / auth.json 与注入层，不参与也不会改写发给上游的 system prompt；模型自述身份来自上游供应商自己的模板或蒸馏数据。 |
+| [#759](https://github.com/BigPizzaV3/CodexPlusPlus/issues/759) | [Question]: 用 DeepSeek 但模型自称 GPT | 询问第三方模型为何自称 GPT。Codex # 只写 config.toml / auth.json 与注入层，不参与也不会改写发给上游的 system prompt；模型自述身份来自上游供应商自己的模板或蒸馏数据。 |
 | [#780](https://github.com/BigPizzaV3/CodexPlusPlus/issues/780) | [Config]: 导入 agnes 模型后仍要登录 GPT 账号且显示额度不足 | 报错原文是上游返回：The 'agnes-2.0-flash' model is not supported when using Codex with a ChatGPT account。这是 Codex 官方对「Ch |
 | [#782](https://github.com/BigPizzaV3/CodexPlusPlus/issues/782) | [Config]: kimicode 无法接入（HTTP 403） | 供应商测试返回 HTTP 403，错误信息是 Kimi 服务端给出的：Kimi For Coding is currently only available for Coding Agents such as Kimi  |
 | [#852](https://github.com/BigPizzaV3/CodexPlusPlus/issues/852) | 401 Unauthorized: Invalid token（aidraw36 | 错误是第三方中转站返回的 401「Invalid token」，且带对方 request id；这是上游鉴权拒绝，与本仓无关，正文自己也没勾「已确认是最新版」。 |
-| [#896](https://github.com/BigPizzaV3/CodexPlusPlus/issues/896) | [Question]: 使用第三方api 缓存(cache)=0 问题 | 对比 Claude Code 接火山方舟缓存命中 75%、Codex 客户端走 Codex++ 命中 0。缓存命中由上游与请求体前缀稳定性决定，本仓不参与 prompt cache 的构造或改写，属上游/供应商侧行为。 |
+| [#896](https://github.com/BigPizzaV3/CodexPlusPlus/issues/896) | [Question]: 使用第三方api 缓存(cache)=0 问题 | 对比 Claude Code 接火山方舟缓存命中 75%、Codex 客户端走 Codex # 命中 0。缓存命中由上游与请求体前缀稳定性决定，本仓不参与 prompt cache 的构造或改写，属上游/供应商侧行为。 |
 | [#909](https://github.com/BigPizzaV3/CodexPlusPlus/issues/909) | [Bug]: 上下文问题 | 报的是上游 `agnes-2.0-flash` 返回 262144 上限的 ContextWindowExceededError，且正文被用户自己的提示词/对话日志淹没（含「霓虹弹力球实验室」那段），属于供应商侧窗口限制 |
 | [#927](https://github.com/BigPizzaV3/CodexPlusPlus/issues/927) | [Question]: 无法更新（error sending request f | 报错是 HTTP 请求发不出去（error sending request = reqwest 连接层失败），即本机到 GitHub 的网络被阻断。检查更新走的是 GitHub Releases 的 latest.jso |
 | [#971](https://github.com/BigPizzaV3/CodexPlusPlus/issues/971) | [Bug]: kimi coding plan 报错 403 | 403 响应体明确说明 Kimi For Coding 只对 Coding Agents（Kimi CLI、Claude Code、Roo Code 等）开放，是服务端对调用方的准入判断，与是否携带 agent head |
 | [#1067](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1067) | [Bug]: 无法使用 computer use（node_repl kerne | 报错来自上游 Codex 的 cua_node 运行时（node_repl 内核），错误码 CreateProcessAsUserW failed: 5 是 Windows 的 ERROR_ACCESS_DENIED—— |
 | [#1086](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1086) | [Question]: 用 ai 更换项目路径后侧边栏会话点击后会消失 | 用户用 sqlite3 直接 UPDATE threads.cwd，又用 sed 批量改写 ~/.codex/sessions 下的 jsonl，破坏了 Codex 自身的会话索引一致性；侧边栏消失是 Codex 客户端 |
 | [#1088](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1088) | [Bug]: 图片无法发送 | 报错来自上游中转/供应商——它明确回「No endpoints found that support image input」，说明 mimo-v2.5-pro 这条链路上没有支持图片输入的 endpoint；Codex |
-| [#1105](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1105) | Launching Codex via Codex++ appears to t | 崩溃二进制是 /Applications/Codex.app/Contents/PlugIns/CodexDockTilePlugin.plugin，栈在 setDockTile:，用户自己也已确认「Crashing b |
-| [#1107](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1107) | [Question]: Codex 无法根据命令下载文件和写入文件修改，只「拟真 | 用户看到的「由于当前的沙盒模式限制，我需要提升权限才能执行 git clone」是上游 Codex 的沙盒/审批提示，属于 Codex 的安全策略表现，不是 Codex++ 的缺陷；Codex++ 反而专门做了「跨供应商 |
-| [#1128](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1128) | [Question]: codex 内部的 chrome 插件显示连接正常但无法 | 与 1135 同源：解析出来的根因（node_repl MCP 要求 sandboxPolicy 元数据、Codex++ 未传）是 Codex 自己的推断，仓库里没有任何注入/剥离该字段的代码。Chrome connec |
+| [#1105](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1105) | Launching Codex via Codex # appears to t | 崩溃二进制是 /Applications/Codex.app/Contents/PlugIns/CodexDockTilePlugin.plugin，栈在 setDockTile:，用户自己也已确认「Crashing b |
+| [#1107](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1107) | [Question]: Codex 无法根据命令下载文件和写入文件修改，只「拟真 | 用户看到的「由于当前的沙盒模式限制，我需要提升权限才能执行 git clone」是上游 Codex 的沙盒/审批提示，属于 Codex 的安全策略表现，不是 Codex # 的缺陷；Codex # 反而专门做了「跨供应商 |
+| [#1128](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1128) | [Question]: codex 内部的 chrome 插件显示连接正常但无法 | 与 1135 同源：解析出来的根因（node_repl MCP 要求 sandboxPolicy 元数据、Codex # 未传）是 Codex 自己的推断，仓库里没有任何注入/剥离该字段的代码。Chrome connec |
 | [#1135](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1135) | [Bug]: 官方 hotfix 后 sandboxPolicy 不再报错，但混 | 混合 API 模式下 Chrome connector 接不上，两种失败表现（工具列表里没有 node_repl/js、agent.browsers.get('extension') 报 Browser is not a |
 | [#1153](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1153) | The 'agnes-2.0-flash' model is not suppo | 该报错由 Codex 客户端在 ChatGPT 账号登录态下发出：官方登录态只允许官方模型，第三方模型必须走 API 供应商（纯 API / 混合）模式。属于上游行为，不是本仓缺陷。 |
 | [#1159](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1159) | 权限批准问题：按钮被 requirements.toml 锁定 | 「权限被 requirements.toml 锁定」是 Codex 客户端自身的策略提示文案，本仓既不读也不写该文件，不产生这个提示。用户在本机找不到该文件也说明它来自 Codex 的内置默认策略或远端下发。 |
-| [#1164](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1164) | 添加的 Gmail 和 GitHub 插件无法登录和认证 | 插件的登录/授权流程由 Codex 官方插件的连接器机制完成，Codex++ 只负责把插件市场注册到 config.toml 并解锁列表，不代办 OAuth。 |
-| [#1165](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1165) | Access is denied，没有办法绕过沙盒限制来修改文件 | 沙盒与审批策略由 Codex 客户端（及其 requirements.toml 策略）决定，Codex++ 不介入也不提供绕过。用户已经在和 LM Studio 侧对话，这是本机沙盒/文件权限问题。 |
+| [#1164](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1164) | 添加的 Gmail 和 GitHub 插件无法登录和认证 | 插件的登录/授权流程由 Codex 官方插件的连接器机制完成，Codex # 只负责把插件市场注册到 config.toml 并解锁列表，不代办 OAuth。 |
+| [#1165](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1165) | Access is denied，没有办法绕过沙盒限制来修改文件 | 沙盒与审批策略由 Codex 客户端（及其 requirements.toml 策略）决定，Codex # 不介入也不提供绕过。用户已经在和 LM Studio 侧对话，这是本机沙盒/文件权限问题。 |
 | [#1168](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1168) | code++ 是否支持接入 Claude 模型 | 用户看到的报错「该模型为 Claude 模型，仅支持 Anthropic (/v1/messages) 协议调用」来自第三方中转站的服务端，不是本仓代码产生；仓库的 protocol_proxy 只实现 Response |
 | [#1174](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1174) | agnes-video-v2.0 已注册 /v1/models，但 /v1/vi | 「未知后端路径」是本仓本地 helper 后端的 404 兜底响应，它只代理 responses/chat/completions/audio transcriptions/images generations 这几条固 |
-| [#1184](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1184) | [Bug]: macOS M4 点击启动 Codex++ 立马闪退 | 崩溃报告显示崩溃进程是 Codex 本体（com.openai.codex），触发线程为 CrBrowserMain，栈顶在 Codex Framework 的 temporal_rs_PlainDateTime_hou |
+| [#1184](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1184) | [Bug]: macOS M4 点击启动 Codex # 立马闪退 | 崩溃报告显示崩溃进程是 Codex 本体（com.openai.codex），触发线程为 CrBrowserMain，栈顶在 Codex Framework 的 temporal_rs_PlainDateTime_hou |
 | [#1193](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1193) | [Bug]: Windows Computer Use 读取窗口报 SetIsB | 报错出自 Windows 平台接口调用（SetIsBorderRequired / E_NOINTERFACE），属上游 computer-use 插件的实现，本仓无该字符串。 |
 | [#1207](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1207) | [Bug]: macOS 15.7.5 管理工具完全无法运行 - AMFI 拦截 | 根因是 macOS 的 AMFI/amfid 在加载阶段拒绝该二进制，属于系统签名校验，不是本仓代码能干预的行为。 |
-| [#1222](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1222) | [Feature]: The following plugins are mis | 用户说插件列表缺少 Cowart / Product Design，缺的是上游 OpenAI 官方插件目录里的条目，不是 Codex++ 的清单，本仓无任何可改代码。 |
+| [#1222](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1222) | [Feature]: The following plugins are mis | 用户说插件列表缺少 Cowart / Product Design，缺的是上游 OpenAI 官方插件目录里的条目，不是 Codex # 的清单，本仓无任何可改代码。 |
 | [#1225](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1225) | 桥接 Responses API 时，原生 Computer Use 工具引发  | 「tool type 'custom' is not supported by this gateway phase」是 MiMo 网关自己拒收 Responses 原生 custom 工具，wire_api=respo |
 | [#1238](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1238) | [Bug]: mimo 的 plan 在测试中能正常，进入 codex 后不能使 | 报错 tool type 'web_search' is not supported by this gateway phase 是 MiMo 网关拒收 Codex 注入的内置 web_search 工具，与 #1225 |
 | [#1249](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1249) | [Question]: 经常对话抛出异常，就无法继续了 | 上游返回 400 BadRequestError「Expecting property name enclosed in double quotes: line 1 column 2」，是 agnes-ai 中转站把请求 |
-| [#1266](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1266) | [Bug]: 在 SQL 脚本中指定了数据库，执行 SQL 时还需要在应用内手动 | 报告的是 SQL 脚本/数据库执行工具的需求（脚本里写 USE db 后自动选中），与 Codex++（Codex 客户端增强+供应商中转）完全无关，明显发错仓库。 |
+| [#1266](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1266) | [Bug]: 在 SQL 脚本中指定了数据库，执行 SQL 时还需要在应用内手动 | 报告的是 SQL 脚本/数据库执行工具的需求（脚本里写 USE db 后自动选中），与 Codex #（Codex 客户端增强+供应商中转）完全无关，明显发错仓库。 |
 | [#1383](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1383) | [Bug]: Chrome Browser Control fails with | 报错来自 CreateProcessWithLogonW（Windows 二次登录创建进程）失败 1385（用户无「作为批处理作业登录」权利），调用方是 Codex 客户端的统一 exec 通道，不是本仓代码。用户已自行 |
 | [#1409](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1409) | [Bug]: Invalid Value: 'tools'. Function  | 报错是「同一个请求里 image_gen.imagegen 与一个 hosted tool 冲突」。本仓从不向请求注入生图工具（只做工具类型识别与转发），冲突来自客户端/插件侧的 imagegen 技能与官方内置 hos |
-| [#1411](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1411) | [Bug]: stream disconnected before comple | 报错里的端口 15721 不是 Codex++ 的协议代理端口（本仓默认 57321），说明流量根本没走 Codex++ 的代理，是别的东西（另一个代理软件/残留配置）占用了；与 #1410 同一条。 |
+| [#1411](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1411) | [Bug]: stream disconnected before comple | 报错里的端口 15721 不是 Codex # 的协议代理端口（本仓默认 57321），说明流量根本没走 Codex # 的代理，是别的东西（另一个代理软件/残留配置）占用了；与 #1410 同一条。 |
 | [#1428](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1428) | [Bug]: 更新codex 26.707版本后，设置菜单改为中文，大部分仍为英 | 汉化不全与启动变慢都来自上游 Codex 与 ChatGPT 合并后的客户端本身：语言包由官方 Statsig 下发的翻译覆盖决定，本仓只做 navigator.language 覆写，翻不了官方没提供的条目；启动变慢是 |
-| [#1454](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1454) | [Bug]: Error from provider (Console Go): | 「Console Go」不是 Codex++ 里的任何概念：全仓零命中，报错来自用户配置的那个中转/供应商上游。文本请求走 OpenCode Go 正常、图片请求被分流到 Console Go 报上游失败，是用户侧的多供 |
+| [#1454](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1454) | [Bug]: Error from provider (Console Go): | 「Console Go」不是 Codex # 里的任何概念：全仓零命中，报错来自用户配置的那个中转/供应商上游。文本请求走 OpenCode Go 正常、图片请求被分流到 Console Go 报上游失败，是用户侧的多供 |
 | [#1456](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1456) | [Bug]: 无法调用子agent（Provide either message | 报错「Provide either message or items, but not both」出自上游 Codex 客户端的请求校验：调用子 agent 时同时提交了 message 和 items。全仓没有这个校验 |
-| [#1459](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1459) | [Bug]: The 'agnes-2.0-flash' model is no | 上游 Codex 的限制：用 ChatGPT 账号登录时不允许自定义模型。用户在 ChatGPT 登录态下切了自定义模型 agnes-2.0-flash，被上游客户端按账号模式拦下，不是 Codex++ 的 bug。 |
-| [#1495](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1495) | Microsoft Store 版 codex 未注册 codex:// 协议， | MS Store 版安装后没注册 codex:// 协议，Codex++ 拉起失败；用户自己也说「已手动修复」。注册 Windows 协议处理器应由 Codex 的安装包负责，本仓 grep 不到 codex:// 相关 |
-| [#1497](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1497) | 与 cc-switch 冲突导致 config.toml 混乱（名字是供应商 1 | 两个工具都在写同一份 ~/.codex/config.toml，后写的覆盖先写的，产生名字与 base_url 混用。这是两个管理器争抢同一文件的固有冲突，不是 Codex++ 单方面缺陷；仓库有 cc-switch 导 |
-| [#1766](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1766) | 从 API 供应商切换到 GPT Plus 后，旧会话派生新会话报 invali | encrypted_content 是上游 Codex 服务端的加密推理内容，只有签发它的那条链路（同一供应商/账号）才能解密校验。跨供应商派生必然失败，Codex++ 已能检测并提示，属上游机制限制，非本仓缺陷。 |
-| [#1945](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1945) | 自动安全审查始终失败 20012 Model does not exist (g | 自动审查走的模型由 Codex 内核/桌面端固定选择，不经过 Codex++ 的别名或映射层；用户已自测 model_aliases 与 approval_policy 均无效，属上游策略。 |
+| [#1459](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1459) | [Bug]: The 'agnes-2.0-flash' model is no | 上游 Codex 的限制：用 ChatGPT 账号登录时不允许自定义模型。用户在 ChatGPT 登录态下切了自定义模型 agnes-2.0-flash，被上游客户端按账号模式拦下，不是 Codex # 的 bug。 |
+| [#1495](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1495) | Microsoft Store 版 codex 未注册 codex:// 协议， | MS Store 版安装后没注册 codex:// 协议，Codex # 拉起失败；用户自己也说「已手动修复」。注册 Windows 协议处理器应由 Codex 的安装包负责，本仓 grep 不到 codex:// 相关 |
+| [#1497](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1497) | 与 cc-switch 冲突导致 config.toml 混乱（名字是供应商 1 | 两个工具都在写同一份 ~/.codex/config.toml，后写的覆盖先写的，产生名字与 base_url 混用。这是两个管理器争抢同一文件的固有冲突，不是 Codex # 单方面缺陷；仓库有 cc-switch 导 |
+| [#1766](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1766) | 从 API 供应商切换到 GPT Plus 后，旧会话派生新会话报 invali | encrypted_content 是上游 Codex 服务端的加密推理内容，只有签发它的那条链路（同一供应商/账号）才能解密校验。跨供应商派生必然失败，Codex # 已能检测并提示，属上游机制限制，非本仓缺陷。 |
+| [#1945](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1945) | 自动安全审查始终失败 20012 Model does not exist (g | 自动审查走的模型由 Codex 内核/桌面端固定选择，不经过 Codex # 的别名或映射层；用户已自测 model_aliases 与 approval_policy 均无效，属上游策略。 |
 | [#1997](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1997) | invalid transport in mcp_servers.codex_a | 报错来自 Codex 内核校验一条只含 enabled_tools、缺 command/url 的 mcp_servers.codex_app；全仓搜索 codex_app 作为 MCP 条目的字面量零命中，本仓不生成该 |
 | [#2037](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2037) | [Question] 静默启动入口被删，怎么重新下载 exe | 用户误删了静默启动快捷方式，问 exe 从哪重新下载。这是使用问题不是缺陷：静默启动靠 `--background` 参数，重装或手动新建指向同一 exe 加该参数的快捷方式即可，无需重新下载。可回答。 |
 | [#2071](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2071) | [Bug]: macOS 报 bundle binary is unavaila | 错误路径里的 `AppTranslocation/.../d/Codex++.app/...` 是 macOS Gatekeeper 的隔离态随机挂载路径，说明应用是从 DMG/下载位置直接运行、未移入「应用程序」并去除 |
-| [#2125](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2125) | Opencode Go 接入后提示缺少请求头 x-opencode-sessio | 该 400 由 OpenCode 服务端返回，要求客户端带 `x-opencode-session`（用于把同一会话路由到同一后端）。这个头是调用方语义，Codex++ 不生成会话 ID，属于供应商侧策略。但本仓支持自定 |
+| [#2125](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2125) | Opencode Go 接入后提示缺少请求头 x-opencode-sessio | 该 400 由 OpenCode 服务端返回，要求客户端带 `x-opencode-session`（用于把同一会话路由到同一后端）。这个头是调用方语义，Codex # 不生成会话 ID，属于供应商侧策略。但本仓支持自定 |
 | [#2132](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2132) | kimi k3 几轮对话后 exceeded retry limit, last | 429 由上游/中转站限流产生，重试耗尽后由 codex 客户端抛出该错误。本仓对 429 有冷却与排队机制，不是缺陷；m1 pro 上重启无效也符合「服务端限流」的特征。 |
 
 ### 4.4 信息不足（36 条）
 
 | issue | 主题 | 建议回复 |
 |---|---|---|
-| [#171](https://github.com/BigPizzaV3/CodexPlusPlus/issues/171) | 对话派生不了 | 这条正文是空的（只有一个空链接），没法判断问题，先关闭。如果还需要跟进请重开并说明：你说的「派生对话」是 Codex++ 的哪个功能（还是 Codex 客户端自带的分支/fork 对话），失败时有没有报错提示，以及完整操作步骤。 |
+| [#171](https://github.com/BigPizzaV3/CodexPlusPlus/issues/171) | 对话派生不了 | 这条正文是空的（只有一个空链接），没法判断问题，先关闭。如果还需要跟进请重开并说明：你说的「派生对话」是 Codex # 的哪个功能（还是 Codex 客户端自带的分支/fork 对话），失败时有没有报错提示，以及完整操作步骤。 |
 | [#172](https://github.com/BigPizzaV3/CodexPlusPlus/issues/172) | 插件安装失败 | 缺少可定位的信息，先关掉，需要时重开。请在重开时补充：1) 装的是哪个插件（名字或来源）；2) 失败时的完整报错文案/截图；3) Codex 客户端版本与本工具版本；4) 设置里是「完整增强」还是「兼容增强」模式。插件市场链路在兼容增强模式 |
 | [#281](https://github.com/BigPizzaV3/CodexPlusPlus/issues/281) | 插件无法支持设置目标 | 这条没有正文，我不确定「设置目标」指的是哪一处：是插件市场里选安装目标，还是插件运行时指定的目标？麻烦补充具体位置和期望行为（最好带截图文字），我们再判断是否在支持范围内。 |
 | [#290](https://github.com/BigPizzaV3/CodexPlusPlus/issues/290) | codex cli无法使用 后期可以加一下适配吗 | 这条没有正文，看不出具体卡在哪一步。麻烦补充： 1) 你说的 codex cli 是 Codex 自带的命令行，还是独立安装的 codex CLI； 2) 具体报错原文； 3) 你期望它读到的配置（~/.codex/config.toml  |
-| [#294](https://github.com/BigPizzaV3/CodexPlusPlus/issues/294) | 删除会话后，再选项目工作目录或模型报错 | 这条缺的信息比较多，麻烦补一下才能查： 1) 报错弹窗/控制台的原文（截图里的文字也请贴出来，我们这边拿不到图片内容）； 2) 版本号（管理工具和 Codex++ 启动器）； 3) 复现步骤：删的是哪个会话（已归档还是普通会话）、之后是在哪 |
-| [#307](https://github.com/BigPizzaV3/CodexPlusPlus/issues/307) | 点击删除后重新发起会话报错 | 正文是空的，麻烦补充：1) 完整报错原文或截图；2) Codex++ 版本；3) 是「删除会话后立刻新建会话」还是「删除后回到原会话继续对话」时报错；4) 会话是本地会话还是来自 Codex 云端。补充后我来定位。这条与 #343（删除后重 |
-| [#347](https://github.com/BigPizzaV3/CodexPlusPlus/issues/347) | 后端一直连接不上 | 需要这些信息才能定位，麻烦补充：1) Codex++ 版本与管理工具版本；2) 「后端连接不上」出现在哪个入口（启动 Codex / 切换供应商 / 模型列表 / 状态页）；3) 报错原文截图或文字；4) 诊断日志：Windows 在 `% |
-| [#364](https://github.com/BigPizzaV3/CodexPlusPlus/issues/364) | 打开 codex 异常 | 这条没有可判断的信息（当前行为是空的，也没有日志或截图），先关闭。麻烦重开时补上：Codex++ 版本、系统、点的是哪个按钮、以及「打开」之后具体看到什么——黑屏／卡住／报错弹窗／直接退出？如果有报错弹窗，把弹窗文字或截图贴上。另外诊断日志 |
+| [#294](https://github.com/BigPizzaV3/CodexPlusPlus/issues/294) | 删除会话后，再选项目工作目录或模型报错 | 这条缺的信息比较多，麻烦补一下才能查： 1) 报错弹窗/控制台的原文（截图里的文字也请贴出来，我们这边拿不到图片内容）； 2) 版本号（管理工具和 Codex # 启动器）； 3) 复现步骤：删的是哪个会话（已归档还是普通会话）、之后是在哪 |
+| [#307](https://github.com/BigPizzaV3/CodexPlusPlus/issues/307) | 点击删除后重新发起会话报错 | 正文是空的，麻烦补充：1) 完整报错原文或截图；2) Codex # 版本；3) 是「删除会话后立刻新建会话」还是「删除后回到原会话继续对话」时报错；4) 会话是本地会话还是来自 Codex 云端。补充后我来定位。这条与 #343（删除后重 |
+| [#347](https://github.com/BigPizzaV3/CodexPlusPlus/issues/347) | 后端一直连接不上 | 需要这些信息才能定位，麻烦补充：1) Codex # 版本与管理工具版本；2) 「后端连接不上」出现在哪个入口（启动 Codex / 切换供应商 / 模型列表 / 状态页）；3) 报错原文截图或文字；4) 诊断日志：Windows 在 `% |
+| [#364](https://github.com/BigPizzaV3/CodexPlusPlus/issues/364) | 打开 codex 异常 | 这条没有可判断的信息（当前行为是空的，也没有日志或截图），先关闭。麻烦重开时补上：Codex # 版本、系统、点的是哪个按钮、以及「打开」之后具体看到什么——黑屏／卡住／报错弹窗／直接退出？如果有报错弹窗，把弹窗文字或截图贴上。另外诊断日志 |
 | [#372](https://github.com/BigPizzaV3/CodexPlusPlus/issues/372) | 开启 codex 后后端突然崩溃 | 信息不足，暂时没法定位。「后端崩溃」可能是桥接看门狗、代理进程或 Codex 客户端本身退出，三者的日志位置和修法完全不同。麻烦补：(1) 崩溃发生时管理工具状态页显示的是什么（桥接已连接/未连接、代理端口）；(2) 诊断日志里崩溃前后 1 |
 | [#416](https://github.com/BigPizzaV3/CodexPlusPlus/issues/416) | 配置问题求解：用 chat 协议如何转换，使用 llama 部署的本地模型 | 信息太少没法给具体答案，先按下面填一遍就能通：本地 llama 一般走 OpenAI 兼容的 Chat Completions —— 在「新增供应商」里选「纯 API」，Base URL 填你 llama 服务的地址加 `/v1`（例如 ` |
-| [#458](https://github.com/BigPizzaV3/CodexPlusPlus/issues/458) | [Question]: （空）这是什么bug | 这条只有一句话，我们看不到你说的 bug 是什么。请补充现象描述 + 截图 + Codex++ 与 Codex 客户端版本，重新提一条我们就能跟进。  如果不确定该附什么：把界面上出问题的地方截图、把报错文本原样贴出来，基本就够了。 |
-| [#462](https://github.com/BigPizzaV3/CodexPlusPlus/issues/462) | [Question]: 删除会话有时候会出现这种情况 | 这条正文是空的，我们看不到「这种情况」指什么。麻烦补充：  1. 具体现象（删除后列表没更新？残留？报错弹窗？） 2. 复现步骤 3. Codex++ 版本 + Codex 客户端版本 + 系统 4. 有报错的话贴错误文本  合上一条新 i |
-| [#477](https://github.com/BigPizzaV3/CodexPlusPlus/issues/477) | [Bug]: 无法使用 Computer Use，脚本市场的脚本没加载成功，无法 | 这条把三个不相关的问题塞在一起了，而且预期行为/复现步骤/日志都是占位符，我们没法定位。麻烦拆成三条分别提，每条带上：Codex++ 版本、Codex 客户端版本、复现步骤、以及对应的日志片段。  其中 Computer Use 无法使用可 |
+| [#458](https://github.com/BigPizzaV3/CodexPlusPlus/issues/458) | [Question]: （空）这是什么bug | 这条只有一句话，我们看不到你说的 bug 是什么。请补充现象描述 + 截图 + Codex # 与 Codex 客户端版本，重新提一条我们就能跟进。  如果不确定该附什么：把界面上出问题的地方截图、把报错文本原样贴出来，基本就够了。 |
+| [#462](https://github.com/BigPizzaV3/CodexPlusPlus/issues/462) | [Question]: 删除会话有时候会出现这种情况 | 这条正文是空的，我们看不到「这种情况」指什么。麻烦补充：  1. 具体现象（删除后列表没更新？残留？报错弹窗？） 2. 复现步骤 3. Codex # 版本 + Codex 客户端版本 + 系统 4. 有报错的话贴错误文本  合上一条新 i |
+| [#477](https://github.com/BigPizzaV3/CodexPlusPlus/issues/477) | [Bug]: 无法使用 Computer Use，脚本市场的脚本没加载成功，无法 | 这条把三个不相关的问题塞在一起了，而且预期行为/复现步骤/日志都是占位符，我们没法定位。麻烦拆成三条分别提，每条带上：Codex # 版本、Codex 客户端版本、复现步骤、以及对应的日志片段。  其中 Computer Use 无法使用可 |
 | [#506](https://github.com/BigPizzaV3/CodexPlusPlus/issues/506) | [Question]: gpt-5.3-codex-spark用不了，codex | 麻烦把具体现象补一下：「用不了」是指模型下拉里选不到它、选了之后请求报错（那请把报错原文发来）、还是客户端提示它需要图片输入？另外告诉我们是走官方账号还是第三方供应商。模型名与能力（是否支持图片）由上游和供应商决定，我们需要看到报错才能判断 |
 | [#508](https://github.com/BigPizzaV3/CodexPlusPlus/issues/508) | [Bug]: 安装的插件全部授权失败 | 这条描述里能用的信息太少，我们没法定位。麻烦补上：1) 确切版本号（1.19 应该是 1.1.9？管理工具关于页能看到）；2) 「授权失败」出现的位置和原文提示（是插件市场里点安装时弹的，还是 Codex 里点授权时弹的）；3) 一个具体插 |
 | [#523](https://github.com/BigPizzaV3/CodexPlusPlus/issues/523) | [Question]: 安装后启动报错（双击快捷方式弹窗） | 麻烦把弹窗上的文字（或截图）贴出来——是缺 DLL、权限不足、还是找不到 Codex 安装路径，处理方式完全不同。另外顺手发一下 %USERPROFILE%\.codex-plus\diagnostic.log 里启动那几行。已经试过卸载重 |
 | [#584](https://github.com/BigPizzaV3/CodexPlusPlus/issues/584) | [Bug]: 接入外部模型不成功怎么回事 | 信息不足以定位，麻烦补充：1) 用的是哪种接入模式（官方 / 纯 API / 聚合）与上游协议（Responses 还是 Chat Completions）；2) 供应商详情页里「测试」按钮的结果文案；3) ~/.codex-session |
-| [#604](https://github.com/BigPizzaV3/CodexPlusPlus/issues/604) | [Bug]: 新对话选择不了大模型 | 需要更多信息：1) 用的是官方登录还是第三方 API；2) 点开模型下拉是空白、还是选项点不动；3) Codex++ 版本与 Codex 版本；4) 诊断日志里 /codex-model-catalog 那次请求的返回状态。补充后再跟。 |
+| [#604](https://github.com/BigPizzaV3/CodexPlusPlus/issues/604) | [Bug]: 新对话选择不了大模型 | 需要更多信息：1) 用的是官方登录还是第三方 API；2) 点开模型下拉是空白、还是选项点不动；3) Codex # 版本与 Codex 版本；4) 诊断日志里 /codex-model-catalog 那次请求的返回状态。补充后再跟。 |
 | [#612](https://github.com/BigPizzaV3/CodexPlusPlus/issues/612) | [Question]: 无法卸载 | 需要补充具体信息才能处理：1) Windows 还是 macOS；2) 是在「设置-应用」里找不到卸载项，还是点了卸载报错、报什么错；3) 是否用了绿色/免安装版本。补充后我们再跟。Windows 上如果是卸载项残留，可以检查注册表里的 C |
 | [#656](https://github.com/BigPizzaV3/CodexPlusPlus/issues/656) | [Bug]: 使用子代理subagent对话截断 | 信息不足，无法定位。麻烦补充：1) 用的是哪家供应商和哪个模型；2) 是否走协议翻译（chatCompletions 接入）还是原生 responses；3) 「截断」的具体表现——是子代理输出中途停止、工具调用被切断，还是界面只显示了一部 |
 | [#708](https://github.com/BigPizzaV3/CodexPlusPlus/issues/708) | 复杂多轮进程任务只执行第一轮就终止 | 这条缺关键信息，麻烦补：(1) 「只执行第一轮就终止」时的**具体表现**——是界面停在某一步没有继续、报了错误、还是整轮直接结束？有没有报错文案？(2) 用同样配置换一个主流模型（如官方 GPT）跑同一任务，是否也终止？这能区分是模型/插 |
 | [#720](https://github.com/BigPizzaV3/CodexPlusPlus/issues/720) | 插件安装失败怎么解决 | 这条没有正文，没法定位。麻烦补充：(1) 插件名与来源（官方精选 / 本地安装包 / 第三方市场）；(2) 失败时的**完整报错文案**（截图或复制文字）；(3) 本工具与 Codex 的版本号；(4) 当前接入模式（官方登录 / 纯 AP |
-| [#820](https://github.com/BigPizzaV3/CodexPlusPlus/issues/820) | [Bug]: 一直不行 deepseek | 信息不太够，麻烦补三样：Codex++ 的具体版本号、DeepSeek 供应商里填的 Base URL 与所选协议（Responses 还是 Chat Completions）、以及点"发送 hi 测试"后弹出的完整报错。DeepSeek  |
-| [#1051](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1051) | [Question]: codex++ 工具连不上 codex 更新之后 | 信息太少了，麻烦补充： 1. Codex 客户端更新到哪个版本、Codex++ 是哪个版本； 2. 「连不上」的具体表现——是管理工具里显示未检测到 Codex、还是启动后页面空白、对话报错？ 3. 管理工具概览里的诊断 JSON（里面 c |
-| [#1123](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1123) | 空 issue（仅标题「我确认这不是已有功能可以完成的操作。」） | 这条 issue 只有标题、没有正文，标题看起来是表单里「提交前确认」那一行的残留文本，我们没法从里面知道你要反馈什么。  如果是误提交，麻烦直接关掉；如果有具体问题，重新开一条并写清楚：现象、复现步骤、Codex++ 版本号、系统，以及相 |
+| [#820](https://github.com/BigPizzaV3/CodexPlusPlus/issues/820) | [Bug]: 一直不行 deepseek | 信息不太够，麻烦补三样：Codex # 的具体版本号、DeepSeek 供应商里填的 Base URL 与所选协议（Responses 还是 Chat Completions）、以及点"发送 hi 测试"后弹出的完整报错。DeepSeek  |
+| [#1051](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1051) | [Question]: codex++ 工具连不上 codex 更新之后 | 信息太少了，麻烦补充： 1. Codex 客户端更新到哪个版本、Codex # 是哪个版本； 2. 「连不上」的具体表现——是管理工具里显示未检测到 Codex、还是启动后页面空白、对话报错？ 3. 管理工具概览里的诊断 JSON（里面 c |
+| [#1123](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1123) | 空 issue（仅标题「我确认这不是已有功能可以完成的操作。」） | 这条 issue 只有标题、没有正文，标题看起来是表单里「提交前确认」那一行的残留文本，我们没法从里面知道你要反馈什么。  如果是误提交，麻烦直接关掉；如果有具体问题，重新开一条并写清楚：现象、复现步骤、Codex # 版本号、系统，以及相 |
 | [#1208](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1208) | [Config]: 火山引擎额度充足但总是尝试连接、跑不起来 | 这条缺少可定位的信息，麻烦补充：1) config.toml 中对应的 model / model_provider / [model_providers.*] 片段（API Key 打码）；2) 在供应商管理里点「测试」的结果；3) ~/ |
-| [#1219](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1219) | [Bug]: openai_error bad_response_status_ | 这条报告里的内容主要是你自己终端的一段 shell 报错，看不到 Codex++ 这边的实际错误。麻烦补充：1) Codex++ 版本与 Codex 版本；2) 管理工具里的日志（~/.codex-session-delete/codex- |
+| [#1219](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1219) | [Bug]: openai_error bad_response_status_ | 这条报告里的内容主要是你自己终端的一段 shell 报错，看不到 Codex # 这边的实际错误。麻烦补充：1) Codex # 版本与 Codex 版本；2) 管理工具里的日志（~/.codex-session-delete/codex- |
 | [#1228](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1228) | [Feature]: 希望做账号AI切换功能 | 这条信息太少，我没法判断你指的是哪种切换。麻烦补充：(1)「账号」是指多个 ChatGPT 官方账号之间切换，还是多个中转站 Key（供应商）之间切换？(2) 现在你是怎么做的，哪里不够用？(3) 期望的交互在哪一层（管理器里一键切，还是想 |
 | [#1237](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1237) | [Config]: CCS 配置 API 登录不上 | 这条没法定位，麻烦补充：(1) 完整的报错文案（Codex 界面上的原文）；(2) Base URL 和上游协议（Chat Completions 还是 Responses）；(3) 是纯 API 模式还是官方登录混入 Key；(4) 管理 |
-| [#1278](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1278) | [Question]: 越更新越卡 | 这条需要更多信息才能处理。请补充：①Codex++ 版本与系统；②卡的是管理工具界面还是 Codex 对话界面（或两者）；③大概什么时候开始卡（打开即卡、长时间使用后、还是特定操作时）；④任务管理器里哪个进程占用高。另外可先用 v1.5.0 |
-| [#1327](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1327) | [Bug]:（无标题）历史对话修复时报错卡死 | 这条报告里没有可定位的信息，我们没法复现或判断。麻烦补充：①修复历史对话时控制台的完整报错文本（或 Codex++ 诊断日志里对应的那几行）；②出问题的会话是哪个供应商/哪种接入模式；③先升级到最新版 v1.5.0 复测一次，如果还复现请把 |
+| [#1278](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1278) | [Question]: 越更新越卡 | 这条需要更多信息才能处理。请补充：①Codex # 版本与系统；②卡的是管理工具界面还是 Codex 对话界面（或两者）；③大概什么时候开始卡（打开即卡、长时间使用后、还是特定操作时）；④任务管理器里哪个进程占用高。另外可先用 v1.5.0 |
+| [#1327](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1327) | [Bug]:（无标题）历史对话修复时报错卡死 | 这条报告里没有可定位的信息，我们没法复现或判断。麻烦补充：①修复历史对话时控制台的完整报错文本（或 Codex # 诊断日志里对应的那几行）；②出问题的会话是哪个供应商/哪种接入模式；③先升级到最新版 v1.5.0 复测一次，如果还复现请把 |
 | [#1332](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1332) | [Bug]: 为什么每次出现api报错 | 这条没有可用的信息（正文只有一个「111」），我这边没法判断是什么报错。麻烦重新开一条，带上：1) 报错原文（完整那一行）；2) 是哪个供应商、哪个模型；3) ~/.codex/config.toml 相关字段（脱敏）；4) 管理工具的诊断 |
 | [#1412](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1412) | [Bug]: apply_patch 出现问题 | 信息不足，需要补充：1) apply_patch 报错的完整文字；2) 出问题的具体操作（改哪个文件、patch 内容大致长什么样）；3) 是否只在某个供应商/模型下出现。补充：apply_patch 是 Codex 客户端自带的工具，不是 |
-| [#1466](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1466) | [Feature]: 点击codex插件出现错误 | 信息不足，无法定位。请补充：1）报错的完整文案或截图；2）Codex++ 版本与 Codex 客户端版本；3）是否用的是纯 API 中转（而非官方登录）；4）管理工具诊断日志里报错前后的记录。插件市场有已知的「26.818+ 远程认证 /  |
-| [#1889](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1889) | 换肤换不了（无正文） | 这条内容为空，无法定位。请参照 #1784 的格式补充：Codex++ 版本、系统、点了哪些步骤、皮肤管理页的报错文字或截图。补全后我们再看；如果你遇到的就是 #1784 里的报错，直接到那条跟进即可。 |
+| [#1466](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1466) | [Feature]: 点击codex插件出现错误 | 信息不足，无法定位。请补充：1）报错的完整文案或截图；2）Codex # 版本与 Codex 客户端版本；3）是否用的是纯 API 中转（而非官方登录）；4）管理工具诊断日志里报错前后的记录。插件市场有已知的「26.818+ 远程认证 /  |
+| [#1889](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1889) | 换肤换不了（无正文） | 这条内容为空，无法定位。请参照 #1784 的格式补充：Codex # 版本、系统、点了哪些步骤、皮肤管理页的报错文字或截图。补全后我们再看；如果你遇到的就是 #1784 里的报错，直接到那条跟进即可。 |
 | [#1994](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1994) | 重启 codex++ 无法遍历路径 | 这条报告缺少可定位的信息：「当前行为 / 预期行为 / 日志」三栏都是空的，只写了「点击重启 codex++」。麻烦补充：1) 具体的报错原文或截图；2) 「无法遍历路径」指的是管理工具里哪个界面、哪条路径；3) 诊断日志（管理工具→日志→ |
 
 ---
@@ -883,41 +883,41 @@
 |---|---|---|
 | [#322](https://github.com/BigPizzaV3/CodexPlusPlus/issues/322) | 请求加中间层处理图片（多模态） | 用户希望有个中间层先把图片处理掉，再以纯文本交给不支持多模态的国内模型。这个能力本仓已经实现：per-model 的图片处理模式含 Strip（剥离图片换占位符）与 Vlm（本地小模型分析后转文字）。 |
 | [#346](https://github.com/BigPizzaV3/CodexPlusPlus/issues/346) | 不通过 ccx-windows-amd64 如何直连 llama.cpp | 用户在问怎么绕过 ccx 直连本地 llama.cpp。可以答：用管理工具的「自定义供应商」填 llama.cpp 的 OpenAI 兼容地址即可；ollama 与 lmstudio 供应商 ID 在本仓是保留名。 |
-| [#555](https://github.com/BigPizzaV3/CodexPlusPlus/issues/555) | [Question]: 多台电脑之间怎么同步codex++的配置文件？ | 询问如何跨机同步 Codex++ 的工具与供应商配置，属可回答的用法问题；本仓未提供云端同步功能，但配置集中存放且供应商配置可复制。 |
+| [#555](https://github.com/BigPizzaV3/CodexPlusPlus/issues/555) | [Question]: 多台电脑之间怎么同步codex++的配置文件？ | 询问如何跨机同步 Codex # 的工具与供应商配置，属可回答的用法问题；本仓未提供云端同步功能，但配置集中存放且供应商配置可复制。 |
 | [#794](https://github.com/BigPizzaV3/CodexPlusPlus/issues/794) | 当前版本不支持 mimo-v2.5-pro（无思考模式、无 1M 上下文） | 用户的 config.toml 里 model_catalog_json 指向 cc-switch 生成的 catalog，同时顶层已写 model_context_window=1000000——按现有实现，外部 catalog 指针存在 |
 | [#802](https://github.com/BigPizzaV3/CodexPlusPlus/issues/802) | 请问这个项目的开源协议是什么？ | 问许可证。仓库根目录有 LICENSE，README 明确写 AGPL-3.0-only。 |
-| [#828](https://github.com/BigPizzaV3/CodexPlusPlus/issues/828) | [Question]: 怎么使用本地模型 | 纯使用提问——怎么接本地模型。Codex++ 的 RelayProfile 本就支持自定义 base_url、协议与无鉴权上游，指向本机服务即可。 |
+| [#828](https://github.com/BigPizzaV3/CodexPlusPlus/issues/828) | [Question]: 怎么使用本地模型 | 纯使用提问——怎么接本地模型。Codex # 的 RelayProfile 本就支持自定义 base_url、协议与无鉴权上游，指向本机服务即可。 |
 | [#831](https://github.com/BigPizzaV3/CodexPlusPlus/issues/831) | 如何把界面语言切换成英文 | 用户问管理器界面怎么切成英文；答案是界面右上角有语言切换按钮（点一次持久化并重载），无需改配置文件或环境变量。 |
 | [#835](https://github.com/BigPizzaV3/CodexPlusPlus/issues/835) | 老是提示 invalid params, context window exce | 这条错误由上游供应商返回（错误码 2013 不是本仓文案），说明实际发送的上下文超过了该模型声明的窗口；要么是模型窗口配得比供应商实际支持的大，要么是自动压缩阈值没压住。 |
-| [#840](https://github.com/BigPizzaV3/CodexPlusPlus/issues/840) | deepseek-v4 的 1M 上下文改 config 不生效 | 用户手写 model_context_window=1000000 但不生效；原因是他手写的值与 Codex++ 生成的 catalog 并存时会被降级——只要存在外部/非托管的 model_catalog_json 指针，每模型窗口就退化 |
+| [#840](https://github.com/BigPizzaV3/CodexPlusPlus/issues/840) | deepseek-v4 的 1M 上下文改 config 不生效 | 用户手写 model_context_window=1000000 但不生效；原因是他手写的值与 Codex # 生成的 catalog 并存时会被降级——只要存在外部/非托管的 model_catalog_json 指针，每模型窗口就退化 |
 | [#850](https://github.com/BigPizzaV3/CodexPlusPlus/issues/850) | 硅基流动的 deepseek-v4pro/kimi2.6/glm5.1 都无法调 | 用户把 Base URL 填成 https://api.siliconflow.cn/v1 时测试报 400、换成 https://siliconflow.cn 测试 200 但对话无回复；核心是 base_url 该不该带 /v1、以及第 |
 | [#854](https://github.com/BigPizzaV3/CodexPlusPlus/issues/854) | 配好第三方模型后仍要求登录账号或用 key | 用户配置第三方模型后仍被要求登录；这通常不是配置没生效，而是 Codex 侧仍判定必须走官方登录态，或者是切换后 auth.json 与 provider 不匹配（历史上有一笔正是这个），需要按步骤排查。 |
-| [#860](https://github.com/BigPizzaV3/CodexPlusPlus/issues/860) | opencode go 套餐如何配置供应商 | 用户在问 opencode 的 Go 套餐能否纳入 Codex++ 供应商配置；这是使用咨询，仓库里没有 opencode 预设，需要按「自定义供应商 + 其 OpenAI 兼容端点」回答。 |
-| [#923](https://github.com/BigPizzaV3/CodexPlusPlus/issues/923) | [Question]: 自动化执行的时候，默认使用的GPT模型，能调整吗？ | 与 #966 同一问题：自动化任务由 Codex 客户端发起，用的模型来自 Codex 默认模型，Codex++ 不参与该链路的模型选择，因此报错里仍是 gpt-5.4。 |
-| [#940](https://github.com/BigPizzaV3/CodexPlusPlus/issues/940) | [Config]: 可以使用ccswitch的配置来配置1M上下文 | 用户给出的做法（让 ccswitch 生成 cc-switch-model-catalog.json，再在 config.toml 顶层写 model_catalog_json 指向它）在 Codex++ 上是可行的，但会被 Codex++ |
+| [#860](https://github.com/BigPizzaV3/CodexPlusPlus/issues/860) | opencode go 套餐如何配置供应商 | 用户在问 opencode 的 Go 套餐能否纳入 Codex # 供应商配置；这是使用咨询，仓库里没有 opencode 预设，需要按「自定义供应商 + 其 OpenAI 兼容端点」回答。 |
+| [#923](https://github.com/BigPizzaV3/CodexPlusPlus/issues/923) | [Question]: 自动化执行的时候，默认使用的GPT模型，能调整吗？ | 与 #966 同一问题：自动化任务由 Codex 客户端发起，用的模型来自 Codex 默认模型，Codex # 不参与该链路的模型选择，因此报错里仍是 gpt-5.4。 |
+| [#940](https://github.com/BigPizzaV3/CodexPlusPlus/issues/940) | [Config]: 可以使用ccswitch的配置来配置1M上下文 | 用户给出的做法（让 ccswitch 生成 cc-switch-model-catalog.json，再在 config.toml 顶层写 model_catalog_json 指向它）在 Codex # 上是可行的，但会被 Codex # |
 | [#966](https://github.com/BigPizzaV3/CodexPlusPlus/issues/966) | [Question]: 自动化任务模型报错 | 自动化（Automation）是 Codex 客户端自身的能力，它执行时用的模型由 Codex 内部选定/继承当时默认模型，而不是由 CodexPlusPlus 的供应商配置下发；报错显示上游确实收到了 gpt-5.4 而不是 deepse |
 | [#1003](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1003) | [Config]: 切换供应商 api，配置文件是不是可以用同一个呢？ | 用户在问「切换供应商后原来配置的没了」是不是设计如此；可以明确回答：每个 profile 各自生成配置并覆盖 live config.toml，但非托管的第三方条目（MCP/hooks/features 等）会被保留，所以看起来「原来的没了 |
-| [#1093](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1093) | [Bug]: 各种配置都填好了，http://127.0.0.1:57321/v | 用户把 127.0.0.1:57321/v1 当成可以在浏览器里打开的地址去测，其实它是 Codex++ 写进 config.toml 的本地协议代理入口，只接受 Codex 客户端发出的 Responses 请求，用浏览器 GET 当然打 |
+| [#1093](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1093) | [Bug]: 各种配置都填好了，http://127.0.0.1:57321/v | 用户把 127.0.0.1:57321/v1 当成可以在浏览器里打开的地址去测，其实它是 Codex # 写进 config.toml 的本地协议代理入口，只接受 Codex 客户端发出的 Responses 请求，用浏览器 GET 当然打 |
 | [#1190](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1190) | [Bug]: ~/.agent/skill 中手动添加的 skill 无法加载 | 用户使用的路径不对：Codex 的 skill 是文件系统约定，扫描的是 $CODEX_HOME/skills/<id>/SKILL.md，不是 ~/.agent/skill，因此放在那里永远不会被加载。 |
 | [#1212](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1212) | [Question]: Responses 转 Chat Completions | 不会丢失。翻译层会保留 tools 声明并双向映射工具调用：请求侧把 Responses 的 function/custom 工具转成 Chat 的 function 工具，响应侧把上游的 tool_calls 回译成 function_c |
-| [#1257](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1257) | [Question]: 中文转换问题（换电脑后界面不出中文） | 界面回退英文是因为官方 zh-CN 语言包没加载成功（Codex 走 Statsig/网络下发语言包），Codex++ 的「强制中文界面」开关就是为此准备的，属设置/环境问题而非 bug。 |
+| [#1257](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1257) | [Question]: 中文转换问题（换电脑后界面不出中文） | 界面回退英文是因为官方 zh-CN 语言包没加载成功（Codex 走 Statsig/网络下发语言包），Codex # 的「强制中文界面」开关就是为此准备的，属设置/环境问题而非 bug。 |
 | [#1260](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1260) | [Bug]: config.toml 中的 model_context_wind | 报告本身判断正确：codex 的窗口以模型目录 ModelInfo 为准，config.toml 的 model_context_window 对目录里不存在的 slug 不构成硬覆盖。这正是本仓 model_catalog_json 机制 |
 | [#1267](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1267) | [Question]: Windows 上想用手机远程控制，除登录 GPT 账号 | 问的是能否在不登录 ChatGPT 官方账号的前提下用手机远程控制 Codex；远程控制是官方 Codex 的能力，且依赖官方账号身份，第三方中转无法替代。 |
-| [#1289](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1289) | [Feature]: 每次都要审批，怎么让审批消失 | 实为使用问题（如何减少 Codex 的审批弹窗），不是 Codex++ 的功能缺陷。审批策略由 Codex 本体的 approval 设置决定，可在 Codex 侧调整。可直接答复。 |
+| [#1289](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1289) | [Feature]: 每次都要审批，怎么让审批消失 | 实为使用问题（如何减少 Codex 的审批弹窗），不是 Codex # 的功能缺陷。审批策略由 Codex 本体的 approval 设置决定，可在 Codex 侧调整。可直接答复。 |
 | [#1319](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1319) | [Question]: 新增/删除供应商后其它供应商的链接会变动 | 这是设计使然：走协议翻译的供应商 base_url 指向本机协议代理（127.0.0.1:57321/v1），代理端口按环境变化时所有供应商的链接会一起变；聚合/无鉴权模式的凭据也是统一占位符。可直接答复。 |
-| [#1355](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1355) | [Question]: 如何彻底删除codex++ | 问如何彻底卸载 Codex++，是不是删掉几百 KB 的图标就行。纯支持类问题，仓库里有卸载相关的实现（installer 的卸载项、watcher 的 uninstall、startup 快捷方式清理）可以直接照此回答。 |
+| [#1355](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1355) | [Question]: 如何彻底删除codex++ | 问如何彻底卸载 Codex #，是不是删掉几百 KB 的图标就行。纯支持类问题，仓库里有卸载相关的实现（installer 的卸载项、watcher 的 uninstall、startup 快捷方式清理）可以直接照此回答。 |
 | [#1375](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1375) | [Question]: 历史会话误点归档后，如何恢复正常 | 问的是归档后如何恢复。归档由 Codex 客户端维护（archived_sessions 目录 + threads.archived 标记），应在客户端侧撤销，不是缺陷问题。 |
 | [#1440](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1440) | [Question]: 之前用＋＋接的ds的api，怎么切换回gpt | 可回答的操作问题：怎么从第三方（DeepSeek）切回官方 GPT 订阅。本仓有官方模式（relay_mode = Official，不写 API 文件）与官方登录态检测，切换是既有能力。 |
-| [#1449](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1449) | [Question]: 权限选项为啥没有完全访问权限选项啊 | 可回答的问题：用户只看到「替我审批」和「请求批准」，找不到完全访问。完全访问（danger-full-access）在 Codex 客户端自己的权限/沙箱设置里，不在 Codex++ 的审批模式二选一里。 |
+| [#1449](https://github.com/BigPizzaV3/CodexPlusPlus/issues/1449) | [Question]: 权限选项为啥没有完全访问权限选项啊 | 可回答的问题：用户只看到「替我审批」和「请求批准」，找不到完全访问。完全访问（danger-full-access）在 Codex 客户端自己的权限/沙箱设置里，不在 Codex # 的审批模式二选一里。 |
 | [#2020](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2020) | [Question] 能否一个对话用官方账号、另一个用 deepseek API | 可回答的功能性问题。Codex 的模型/供应商是进程级配置（config.toml 的 model + model_provider），不是对话级，所以同一个桌面端进程里做不到逐对话切换；用户看到的那句「not supported when |
-| [#2051](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2051) | [Question] pureApi 中转站用户当前最适合哪个 Codex 版本 | 这是提问而非缺陷，且用户自己做了很完整的版本矩阵实测。可回答的部分是第 2 问：9229 是 Codex++ 自己下发的 --remote-debugging-port，9329 是开「原生菜单本地化」时下发的 --inspect 端口（d |
+| [#2051](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2051) | [Question] pureApi 中转站用户当前最适合哪个 Codex 版本 | 这是提问而非缺陷，且用户自己做了很完整的版本矩阵实测。可回答的部分是第 2 问：9229 是 Codex # 自己下发的 --remote-debugging-port，9329 是开「原生菜单本地化」时下发的 --inspect 端口（d |
 | [#2120](https://github.com/BigPizzaV3/CodexPlusPlus/issues/2120) | 大佬不更新了吗？ | 纯咨询「是否还维护」。事实是持续在更新：v1.5.0 发布于 2026-10-01，此后 main 上仍有提交。可直接据实答复。 |
 
 ---
 
 ## 6. 需进一步排查
 
-250 条证据不足以定论，主要是报障时未附日志/版本/复现步骤。建议统一回帖要求补 `latest-status.json`、Codex++ 版本号与完整报错原文。
+250 条证据不足以定论，主要是报障时未附日志/版本/复现步骤。建议统一回帖要求补 `latest-status.json`、Codex # 版本号与完整报错原文。
 
 ---
 

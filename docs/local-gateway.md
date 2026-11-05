@@ -3,7 +3,7 @@
 两种模式完全独立、可以随时切换：
 
 - **直连模式**（原来的方式）：每个 Agent 有自己的供应商列表（Codex、Claude、Grok 各管各的），切换时直接改写 Agent 的配置文件。
-- **网关模式**：网关有自己的一份供应商池和组，所有接入的 Agent 共用整个池。Agent 的配置指向 Codex++ 本地 helper，
+- **网关模式**：网关有自己的一份供应商池和组，所有接入的 Agent 共用整个池。Agent 的配置指向 Codex # 本地 helper，
   请求在网关里按模型名选供应商。
 
 网关的数据只存在 `<状态目录>/gateway.json`，不读也不写 `settings.json` 里直连模式的供应商；
@@ -73,7 +73,7 @@ Grok ─────────POST /gw/grok/v1/responses───┤  helper�
 - Codex：开启时在直连模式的供应商列表里放一个托管供应商 `codex-plus-gateway`（地址 `/gw/codex/v1`，Responses），
   用直连模式自己的切换流程写进 `~/.codex`（回填、冲突检测、模型目录照旧）；关闭时切回开启前的供应商并删掉托管供应商。
   被网关接管时，Codex 供应商页里别的供应商不能直接选（前端按钮置灰，后端 `switch_relay_profile` 也会拦下），
-  要先「断开并还原」；断开后「Codex++ 网关」那一项还在时，选回它等于重新接入。
+  要先「断开并还原」；断开后「Codex # 网关」那一项还在时，选回它等于重新接入。
   Codex 用 ChatGPT 账号登录着时，托管供应商带 openai 会话身份（`model_provider = "openai"`，传输在
   `[model_providers.custom]`）：Codex 保留官方登录（会话、额度、远程控制照旧），`openai_base_url` 指向本地代理，
   本地代理这一跳转给网关、不另记请求日志。Codex 自己没登录、池里有网关登录的 ChatGPT 账号时，接入时把它
@@ -86,7 +86,7 @@ Grok ─────────POST /gw/grok/v1/responses───┤  helper�
 - Claude Code：开启时写入托管供应商 `codex-plus-gateway`（`ANTHROPIC_BASE_URL` 指向网关），
   复用「关键字段」切换逻辑，hooks / permissions 等用户键不动；关闭时切回开启前的供应商。
 - Grok：写入一个指向网关的 Responses 供应商；关闭时重新应用 Grok 页当前选中的供应商。
-- Codex++ 不再提供 Claude Code / Grok 的供应商配置页：不接入网关时，它们照自己的配置文件直连；「断开并还原」恢复接入前的配置。
+- Codex # 不再提供 Claude Code / Grok 的供应商配置页：不接入网关时，它们照自己的配置文件直连；「断开并还原」恢复接入前的配置。
 
 ## 接入方式
 
@@ -99,8 +99,8 @@ Agent 打开「接入」后，池里所有打开的供应商的模型和所有�
 「本地网关」页分四个标签：
 
 - **智能体**：已接入的 Agent 在上，「未设置」的在下。每行：图标、名字和本机 CLI 版本、状态、档位 / 模型入口、模型下拉、接入开关。
-  模型下拉顶部是「默认（不经 Codex++）」和「断开 Codex++（还原配置）」，左侧可切到全部 / 收藏 / 某个供应商；
-  未接入时选一个模型即接入。池里的模型之后是一组 Agent 自带的模型，标「直连，不经 Codex++」（`gateway/own_models.rs`）：
+  模型下拉顶部是「默认（不经 Codex #）」和「断开 Codex #（还原配置）」，左侧可切到全部 / 收藏 / 某个供应商；
+  未接入时选一个模型即接入。池里的模型之后是一组 Agent 自带的模型，标「直连，不经 Codex #」（`gateway/own_models.rs`）：
   Codex 列断开后会回到的直连供应商的模型（官方登录读 `models_cache.json`，记为 OpenAI；聚合供应商列它发布给 Codex 的模型目录；别的供应商读它的模型列表），
   Claude Code 列 opus / sonnet / haiku 等别名（直连 Anthropic，或用户自己配的 `ANTHROPIC_BASE_URL`）。
   选中 = 断开并还原，再把模型写进 Agent 自己的配置（Codex `config.toml` 根上的 `model`，Claude Code `settings.json`
@@ -141,7 +141,7 @@ Agent 打开「接入」后，池里所有打开的供应商的模型和所有�
 - Claude Code：`settings.json` 的 `env.ANTHROPIC_BASE_URL` 是否是 `/gw/claude`；
 - Grok：`config.toml` 里是否还有 `/gw/grok`。
 
-被改掉时 Agent 卡片不再显示「已接入」，改成「配置被 X 改了，Agent 现在不经过 Codex++」并给「重新接入」；
+被改掉时 Agent 卡片不再显示「已接入」，改成「配置被 X 改了，Agent 现在不经过 Codex #」并给「重新接入」；
 能按地址或文件名认出 CC Switch（`:15721`、`cc-switch-*`）。窗口回到前台时会静默重读。
 
 ## 订阅登录
@@ -178,7 +178,7 @@ Agent 打开「接入」后，池里所有打开的供应商的模型和所有�
 
 ## 限制
 
-- 网关只在 Codex++ 运行时可用。可在「本地网关 → 网关」标签打开「退出时恢复直连」。
+- 网关只在 Codex # 运行时可用。可在「本地网关 → 网关」标签打开「退出时恢复直连」。
 - 上游是 OpenAI 协议时，Anthropic 独有能力会有损失：`cache_control` 被忽略、
   服务端工具（web_search 等）只有原生 Responses 上游支持、PDF 附件取决于上游、
   思考块签名由网关隧道保存（`cpxgw1.` 前缀），换回 Anthropic 上游时会被剔除。

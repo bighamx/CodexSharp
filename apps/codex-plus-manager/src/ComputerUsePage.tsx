@@ -486,7 +486,7 @@ function ComputerUseMacPage() {
   const removeCustomTarget = async (target: CuCustomTarget) => {
     if (lock.current) return;
     const confirmed = await appConfirm(
-      `${t("删除后会先移除写入")} ${target.configPath} ${t("的 Codex++ 条目（别人写的不动），再从列表里去掉。")}`,
+      `${t("删除后会先移除写入")} ${target.configPath} ${t("的 Codex # 条目（别人写的不动），再从列表里去掉。")}`,
       { title: t("删除自定义目标"), confirmText: t("删除"), danger: true },
     );
     if (!confirmed || !mounted.current) return;
@@ -606,7 +606,7 @@ function ComputerUseMacPage() {
   };
 
   /**
-   * 工作原理图，布局与网关总览一致：左列 AI 客户端 → 中间 Codex++ MCP 服务 → 右列被操作的对象，
+   * 工作原理图，布局与网关总览一致：左列 AI 客户端 → 中间 Codex # MCP 服务 → 右列被操作的对象，
    * 用同一个 HubTopology 按节点真实位置画曲线。已接入的客户端实线连到中间，未接入的虚线；
    * 运行时（ChatGPT.app、Chrome 扩展）缺失时右侧连线变成告警色。
    */
@@ -625,7 +625,7 @@ function ComputerUseMacPage() {
       { from: "cu-core", to: "cu-target:chrome", tone: extStatus == null || chromeReady ? "idle" : "warn", weight: 0.25 },
     ];
     return <section className="cu-card cu-flow-card" aria-label={t("工作原理")}
-      title={t("Codex++ 把 ChatGPT.app 里现成的 Computer Use 与 Chrome 扩展，通过 MCP 转给其它 AI 客户端。左边点「接入」；操作方式、审批与悬浮预览在图下方设置。")}>
+      title={t("Codex # 把 ChatGPT.app 里现成的 Computer Use 与 Chrome 扩展，通过 MCP 转给其它 AI 客户端。左边点「接入」；操作方式、审批与悬浮预览在图下方设置。")}>
       <HubTopology links={links}>
         <div className="hub-col">
           <div className="hub-col-head"><span>{t("你的 AI 客户端")}</span><span>{status ? tf("已接入 {0} 个", [connectedCount]) : ""}</span></div>
@@ -635,7 +635,7 @@ function ComputerUseMacPage() {
 
         <div className="hub-core cu-hub-core" data-node="cu-core" data-running={found}>
           <img alt="" src={APP_LOGO_URL} />
-          <strong>{t("Codex++ MCP 服务")}</strong>
+          <strong>{t("Codex # MCP 服务")}</strong>
           <div className="cu-hub-services">
             <div><MousePointerClick size={14} aria-hidden="true" /><b>codex-plus-cu</b><small>{t("桌面操控")}</small></div>
             <div><Globe size={14} aria-hidden="true" /><b>codex-plus-browser</b><small>{cuMode === "js" ? t("JS 方式下并入 codex-plus-cu") : t("浏览器控制")}</small></div>
@@ -798,7 +798,7 @@ function ComputerUseMacPage() {
         {renderFlow()}
         {codexLeftover ? (
           <div role="alert">
-            <CxBanner icon={<AlertTriangle />} title={t("Codex 配置里残留了旧版本写入的 Codex++ Computer Use 条目，会和 Codex 自带的重复，可能出现 ambiguous 报错。移除后重启 Codex 生效。")} tone="warn">
+            <CxBanner icon={<AlertTriangle />} title={t("Codex 配置里残留了旧版本写入的 Codex # Computer Use 条目，会和 Codex 自带的重复，可能出现 ambiguous 报错。移除后重启 Codex 生效。")} tone="warn">
               <button className="cx-secondary" type="button" disabled={locked} onClick={() => void mutateTarget("codex", "uninstall")}>{t("移除")}</button>
             </CxBanner>
           </div>
@@ -884,8 +884,8 @@ function ComputerUseMacPage() {
                 <CxRow
                   key={key}
                   badges={<CxBadge tone={entry.decision !== "allow" ? "danger" : "ok"}
-                    title={entry.source === "computer-use" ? t("Computer Use 自己记的，Codex 也读这一份；撤销后 Codex 里也会重新询问。") : t("旧版 Codex++ 记录，只对 Codex++ 生效。")}>
-                    {entry.decision !== "allow" ? t("拒绝") : entry.source === "computer-use" ? t("与 Codex 共用") : t("Codex++ 旧记录")}
+                    title={entry.source === "computer-use" ? t("Computer Use 自己记的，Codex 也读这一份；撤销后 Codex 里也会重新询问。") : t("旧版 Codex # 记录，只对 Codex # 生效。")}>
+                    {entry.decision !== "allow" ? t("拒绝") : entry.source === "computer-use" ? t("与 Codex 共用") : t("Codex # 旧记录")}
                   </CxBadge>}
                   detail={entry.displayName ? <code className="cx-set-path" title={key}>{key}</code> : null}
                   title={entry.displayName || key}
