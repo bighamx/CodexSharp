@@ -381,6 +381,15 @@ impl UserScriptManager {
     }
 
     pub fn delete_user_script(&self, key: &str) -> anyhow::Result<UserScriptConfig> {
+        self.delete_user_script_with_trash(key, &default_extension_trash_dir())
+    }
+
+    /// 同 [`Self::delete_user_script`]，拓展包（文件夹）移进 `trash_dir`。测试用它指定临时废纸篓。
+    pub fn delete_user_script_with_trash(
+        &self,
+        key: &str,
+        trash_dir: &std::path::Path,
+    ) -> anyhow::Result<UserScriptConfig> {
         let Some(file_name) = key.strip_prefix("user:").filter(|value| !value.is_empty()) else {
             anyhow::bail!("only user scripts can be deleted");
         };
@@ -408,18 +417,11 @@ impl UserScriptManager {
             if !canonical_path.starts_with(&canonical_user_dir) || canonical_path == canonical_user_dir {
                 anyhow::bail!("refusing to delete script outside user script directory");
             }
-            // 拓展包是 `user_dir/<id>/` 目录：只有确实带 codexpp.json 的目录才整个删掉，
-            // 免得误删用户放在脚本目录里的其它东西；符号链接在 canonicalize 后指到目录外会先被上面挡掉。
             if canonical_path.is_dir() {
-                if !canonical_path.join(EXTENSION_MANIFEST_FILE).is_file() {
-                    anyhow::bail!(
-                        "目录里没有 {}，不是拓展包，未删除：{}",
-                        EXTENSION_MANIFEST_FILE,
-                        canonical_path.display()
-                    );
-                }
-                fs::remove_dir_all(&canonical_path).with_context(|| {
-                    format!("failed to delete extension package {}", canonical_path.display())
+                // 拓展包是文件夹（#2919）：不做递归删除，整个移进废纸篓，可以找回。
+                // 符号链接指向目录时 canonicalize 已解开，上面的目录归属检查同样适用。
+                crate::gateway::sessions::move_to_trash(&canonical_path, trash_dir).with_context(|| {
+                    format!("拓展包移进废纸篓失败：{}", canonical_path.display())
                 })?;
             } else {
                 fs::remove_file(&canonical_path).with_context(|| {
@@ -2341,6 +2343,15 @@ static ASSET_CACHE: std::sync::LazyLock<Mutex<std::collections::HashMap<PathBuf,
 const EXTENSION_READ_MAX_TOTAL_BYTES: usize = 512 * 1024;
 
 /// 拓展包对应的脚本 key。
+/// 卸载拓展包用的废纸篓：macOS 是用户的 `~/.Trash`，其他系统放在 Codex # 状态目录里（可找回）。
+pub fn default_extension_trash_dir() -> PathBuf {
+    #[cfg(target_os = "macos")]
+    if let Some(home) = std::env::var_os("HOME") {
+        return PathBuf::from(home).join(".Trash");
+    }
+    crate::paths::default_app_state_dir().join("deleted-extensions")
+}
+
 pub fn extension_package_key(id: &str) -> String {
     format!("user:{id}")
 }

@@ -167,6 +167,7 @@ fn windows_installer_migrates_existing_shortcuts_without_reviving_deleted_ones()
 
         // 正式键 + 旧版键；快捷方式改名不影响卸载登记的键名。
         // 卸载登记的键名不随快捷方式改名。
+        // 卸载登记的键名不随快捷方式改名。
         for key in ["CodexPlusPlus", "Codex++"] {
             let read = format!(
                 r#"ReadRegStr $ExistingInstall HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\{key}" "InstallLocation""#
@@ -354,7 +355,7 @@ mod macos_install {
         std::fs::create_dir_all(contents.join("_CodeSignature")).unwrap();
         std::fs::create_dir_all(contents.join("Resources")).unwrap();
         let plist = contents.join("Info.plist");
-        std::fs::write(&plist, "<plist><dict><key>CodexPlusUnifiedApp</key><true/><key>CFBundleName</key><string>Codex++</string><key>CFBundleIdentifier</key><string>com.bigpizzav3.codexplusplus</string><key>CFBundleExecutable</key><string>CodexPlusPlus</string><key>CFBundleIconFile</key><string>native.icns</string><key>LSUIElement</key><false/></dict></plist>").unwrap();
+        std::fs::write(&plist, "<plist><dict><key>CodexPlusUnifiedApp</key><true/><key>CFBundleName</key><string>Codex #</string><key>CFBundleIdentifier</key><string>com.bigpizzav3.codexplusplus</string><key>CFBundleExecutable</key><string>CodexPlusPlus</string><key>CFBundleIconFile</key><string>native.icns</string><key>LSUIElement</key><false/></dict></plist>").unwrap();
         let signature = contents.join("_CodeSignature/CodeResources");
         std::fs::write(&signature, b"sealed resource sentinel").unwrap();
         let icon = contents.join("Resources/native.icns");
@@ -393,7 +394,7 @@ mod macos_install {
                 .join("Codex++.app/Contents/MacOS/codex-plus-plus")
                 .exists()
         );
-        assert!(!root.path().join("Codex++ 管理工具.app").exists());
+        assert!(!root.path().join("Codex # 管理工具.app").exists());
     }
 
     #[test]
@@ -430,7 +431,7 @@ mod macos_install {
             .collect::<Vec<_>>();
         assert_eq!(snapshot(&copied), before);
         assert_eq!(snapshot(&files), before);
-        assert!(!target.path().join("Codex++ 管理工具.app").exists());
+        assert!(!target.path().join("Codex # 管理工具.app").exists());
     }
 
     #[test]
@@ -439,7 +440,7 @@ mod macos_install {
         let files = write_native_app(root.path());
         let before_gui = snapshot(&files);
         let original = root.path().join("Codex++.app");
-        let renamed = root.path().join("Codex++ 2.app");
+        let renamed = root.path().join("Codex # 2.app");
         std::fs::rename(root.path().join("Codex++.app"), &renamed).unwrap();
         let current = renamed.join("Contents/MacOS/CodexPlusPlus");
         let legacy = write_native_app(root.path());
