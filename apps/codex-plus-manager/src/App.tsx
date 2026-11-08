@@ -121,7 +121,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { isGitHubRepositoryHomepage } from "./github-repository";
 import { NativeBrowserStatusView, nativeBrowserConsent } from "./native-browser-settings";
 import { AgentCachePanel } from "./agent-cache";
-import { rebaseSettingsEdits } from "./settings-rebase";
+import { mergeRotatedAuthContents, rebaseSettingsEdits } from "./settings-rebase";
 import {
   contextEntriesByKind,
   dedupeContextEntryList,
@@ -137,6 +137,7 @@ import {
 import { summarizeRecentRequests, type RecentRequestSummary } from "./overview-model";
 import { AgentCollaborationPage } from "./AgentCollaborationPage";
 import { DshPluginsPanel } from "./DshPluginsPanel";
+import { ConfigDoctorPanel } from "./ConfigDoctorPanel";
 import { CommunityExtensionsPanel, type CommunitySort } from "./CommunityExtensionsPanel";
 import { ExtensionCard, githubAvatar } from "./ExtensionCard";
 import { CuratedPackagesSection, type BlockedInstall, type CuratedPackage } from "./CuratedPackages";
@@ -168,7 +169,7 @@ import { hasCodexEnhancements, SETUP_STORAGE_KEY, serializeSetupState, shouldSho
 import { AgentFocusDialog } from "./AgentFocusDialog";
 import { AgentDisconnectDialog } from "./AgentDisconnectDialog";
 import { agentVisible, commitAgentFocusSelection, providersHidden, singleAgent, type AgentFocus, type FocusMode } from "./agent-focus-model";
-import { backupAgentFocus, needAgentFocusPrompt, restoreAgentFocusFromSettings, saveAgentFocus, useAgentFocus } from "./agent-focus-store";
+import { backupAgentFocus, needAgentFocusPrompt, resolveAgentFocusPrompt, restoreAgentFocusFromSettings, saveAgentFocus, useAgentFocus } from "./agent-focus-store";
 import { AgentDashboard, type DashboardAgent, type DashboardStat, type DashboardStatus } from "./AgentDashboard";
 import { TOUR_STORAGE_KEY, TOUR_VERSION } from "./onboarding-model";
 import "./ToolPages.css";
@@ -289,6 +290,7 @@ import {
   normalizeAggregateDefaultRelayId,
 } from "./aggregate-members";
 import { relayAuthForLiveDraft, shouldBackfillRelayProfileBeforeSwitch } from "./relay-live-files";
+import { NativeAuthControl, SavedAuthAccountField } from "./NativeAuthControls";
 import { relayBillingCacheKey, relayBillingProbeEligible, type RelayBillingProbe } from "./relay-billing";
 import { RelayBillingLine, RelayBillingRetry, useRelayBillingProbe } from "./RelayBillingLine";
 import { apiKeyPreview, createRelayApiKey, normalizeRelayApiKeys, relayProfileWithNormalizedApiKeys, relayProfileWithUpdatedApiKey, type RelayApiKey } from "./provider-api-keys";
@@ -519,6 +521,8 @@ type BackendSettings = WhaleBalanceSettings & {
   codexAppThirdPartyReasoningCollapse: boolean;
   /** 拿不到远程功能开关（国内网络）时补开「替我审批」入口（#2817），默认关。 */
   codexAppOfflineAutoReview: boolean;
+  /** Statsig 界面增强：隐藏升级推销、放宽网络超时、补开记忆，默认关。 */
+  codexAppStatsigOverrides: boolean;
   /** 纯 API Key 模式启动 Codex 前把 Work 视图写回 Codex，避开 Work browser access 报错。 */
   codexAppDisableWorkView: boolean;
   codexAppPetRealMouseLook: boolean;
@@ -628,6 +632,7 @@ export type RelayProfile = {
   relayMode: RelayMode;
   sessionProvider?: RelaySessionProvider;
   officialMixApiKey: boolean;
+  officialAccountRef?: string;
   hideOfficialUsageAlert: boolean;
   testModel: string;
   configContents: string;
@@ -1600,6 +1605,7 @@ const defaultSettings: BackendSettings = {
   codexAppNativePredictions: false,
   codexAppThirdPartyReasoningCollapse: false,
   codexAppOfflineAutoReview: false,
+  codexAppStatsigOverrides: false,
   codexAppDisableWorkView: false,
   codexAppPetRealMouseLook: false,
   codexAppActivityOverlayRight: false,
@@ -1773,10 +1779,33 @@ export function App() {
   const [setupOpen, setSetupOpen] = useState(initialSetupOpen);
   // 使用模式（只管理 Codex / 全部功能）：没问过就先问，问完再进首次引导（引导按模式换说法）。
   const agentFocus = useAgentFocus();
-  const [agentFocusOpen, setAgentFocusOpen] = useState(needAgentFocusPrompt);
+  // 问卷等设置文件读回来再决定弹不弹（#2936）：本地存储为空不等于没选过，设置文件里可能记着。
+  const [agentFocusOpen, setAgentFocusOpen] = useState(false);
+  // 判定期间入门清单也先不出，免得它先闪一下再被问卷盖住。
+  const [agentFocusChecking, setAgentFocusChecking] = useState(needAgentFocusPrompt);
+  useEffect(() => {
+    if (!agentFocusChecking) return;
+    let disposed = false;
+    void resolveAgentFocusPrompt(async () => {
+      // 单独读一次设置：常规的设置加载排在网络请求之后，要等好几秒。
+      const result = await invoke<SettingsResult>("load_settings");
+      return isSuccessStatus(result.status) ? result.settings.managerAgentFocus : undefined;
+    }).then((ask) => {
+      if (disposed) return;
+      if (ask) setAgentFocusOpen(true);
+      setAgentFocusChecking(false);
+    });
+    return () => { disposed = true; };
+    // 只在启动时判定一次。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const cancelAgentFocus = useCallback(() => {
     setAgentFocusOpen(false);
-    if (!agentFocus) setSetupOpen(false);
+    if (!agentFocus) {
+      // 第一次问时点「稍后设置」：按全部功能记下（和没选时的显示一样），之后启动不再追问，设置里随时可改（#2936）。
+      saveAgentFocus("all");
+      setSetupOpen(false);
+    }
   }, [agentFocus]);
   // 本地存储丢了使用模式、设置文件里还记着时补回来，问卷不再每次启动都弹（#2902）。
   const settingsLoaded = Boolean(settings);
@@ -1888,13 +1917,52 @@ export function App() {
     [settings, settingsForm],
   );
 
+  /// 保存撞上 settings_revision_conflict（后台 token 刷新等抢先写盘）时自动恢复：
+  /// 拉最新设置，把本次提交的编辑 rebase 上去、合并外部轮换的登录 token 后重试一次；
+  /// 再次冲突或读取失败返回 null，由调用方按原逻辑抛错、保留草稿。
+  const retrySaveSettingsAfterConflict = async <T,>(
+    args: Record<string, unknown> | undefined,
+    snapshot: BackendSettings | undefined,
+  ): Promise<T | null> => {
+    const previous = settingsRef.current?.settings;
+    if (!snapshot || !previous) return null;
+    let latest: SettingsResult;
+    try {
+      latest = await invoke<SettingsResult>("load_settings");
+    } catch {
+      return null;
+    }
+    if (!latest || !isSuccessStatus(latest.status)) return null;
+    const base = normalizeSettings(previous);
+    const fresh = normalizeSettings(latest.settings);
+    const merged = mergeRotatedAuthContents(
+      rebaseSettingsEdits(normalizeSettings(snapshot), base, fresh),
+      base,
+      fresh,
+    );
+    try {
+      const retried = await invoke<T>("save_settings", {
+        ...args,
+        settings: merged,
+        expectedRevision: merged.revision || "",
+      });
+      const response = retried as { message?: string };
+      if (response?.message?.includes("settings_revision_conflict")) return null;
+      return retried;
+    } catch {
+      return null;
+    }
+  };
+
   const call = <T,>(command: string, args?: Record<string, unknown>) => {
     const snapshot = args?.settings as BackendSettings | undefined;
     return invoke<T>(command, command === "save_settings"
       ? { ...args, expectedRevision: snapshot?.revision || "" }
-      : args).then((result) => {
+      : args).then(async (result) => {
         const response = result as { message?: string };
         if (command === "save_settings" && response?.message?.includes("settings_revision_conflict")) {
+          const recovered = await retrySaveSettingsAfterConflict<T>(args, snapshot);
+          if (recovered !== null) return recovered;
           // 所有保存调用都保留当前草稿，不能把失败响应当成新表单回填。
           throw new Error(response.message);
         }
@@ -1981,8 +2049,8 @@ export function App() {
     }
   };
 
-  // Computer Use 和 Claude 增强页的开关由后端单独写进 settings.json：只合并这些键和版本号，
-  // 别处没保存的草稿保持不动；否则表单里的旧版本号会让之后的保存全部报冲突。
+  // Computer Use 和 Claude 增强页的开关、使用模式由后端单独写进 settings.json：只合并这些键和版本号，
+  // 别处没保存的草稿保持不动；否则表单里的旧版本号会让之后的保存全部报冲突（#2937）。
   useEffect(() => {
     const sync = async () => {
       const result = await run(() => call<SettingsResult>("load_settings"));
@@ -1994,6 +2062,8 @@ export function App() {
         for (const key of [
           "computerUseMode", "computerUseApproval", "computerUsePip",
           "claudeAppVoiceInput", "claudeAppLocalization", "claudeAppExtensions", "claudeAppComputerUse", "claudeAppBashTimeout",
+          // 使用模式也要带上：表单留着旧值，下一次整份保存会把刚记下的模式写回去。
+          "managerAgentFocus",
         ]) merged[key] = fresh[key];
         return merged as BackendSettings;
       });
@@ -5012,7 +5082,7 @@ export function App() {
             : routeTitle(navAliasRoute[route] ?? route);
 
   // 入门清单放在侧栏底部（参照 Cursor 的 Getting Started 卡片）：平时收成一张进度卡，点开在上方展开清单。
-  const setupCard = setupOpen && !agentFocusOpen ? (
+  const setupCard = setupOpen && !agentFocusOpen && !agentFocusChecking ? (
           <OnboardingSetup
             focus={agentFocus}
             codexInstalled={overview ? overview.codex_app.status === "found" : null}
@@ -8052,6 +8122,7 @@ function RelayScreen({
         )}
       />
       {connection}
+      <NativeAuthControl />
       <EnvConflictNotice envConflicts={envConflicts} actions={actions} />
       <SshRemoteLoopbackNotice notice={envConflicts?.sshRemoteLoopback ?? null} />
       {!normalized.relayProfilesEnabled ? (
@@ -11635,6 +11706,7 @@ function useLightweightModeSetting() {
   return { enabled, saving, error, toggle };
 }
 
+
 /// 整体设置页（最左侧齿轮）。
 ///
 /// 只放与当前 Agent 无关的应用级选项，内容不随 Agent 切换而变。
@@ -11716,6 +11788,7 @@ function GlobalSettingsScreen({
           </CxCard>
         </CxSection>
       </div>
+      <ConfigDoctorPanel />
       <div className="cx-set-group" id="app-settings-config">
         <CxSection title={t("配置备份与迁移")}>
           <CxCard>
@@ -13249,7 +13322,7 @@ function RelayProfileEditor({
                   mode: "pureApi" as const,
                   icon: KeyRound,
                   title: t("纯 API"),
-                  description: t("只使用 API 凭据，不依赖官方登录。"),
+                  description: t("使用 API 凭据，原生登录账号独立选择。"),
                 },
               ]).map(({ mode, icon: Icon, title, description }) => (
                 <button
@@ -13269,6 +13342,9 @@ function RelayProfileEditor({
                 </button>
               ))}
             </div>
+            {editorMode !== "pureApi" ? (
+              <SavedAuthAccountField onChange={(officialAccountRef) => updateDraft({ officialAccountRef })} value={profile.officialAccountRef ?? ""} />
+            ) : null}
             {showApiFields ? (
               <div className="relay-inline-connection">
                 <div className="relay-inline-connection-head">
@@ -15606,6 +15682,7 @@ function appSettingsSections() {
   return [
     { id: "app-settings-general", label: t("基础设置") },
     { id: "app-settings-config", label: t("配置文件") },
+    { id: "app-settings-doctor", label: t("配置体检") },
     { id: "app-settings-update", label: t("版本与更新") },
     { id: "app-settings-about", label: t("关于") },
     { id: "app-settings-logs", label: t("日志") },
@@ -16758,6 +16835,7 @@ function settingsNavEntries(focus: AgentFocus, codexAvailable: boolean): Setting
   const entries: SettingsNavEntry[] = [
     { key: "general", label: t("通用"), icon: Settings, route: "settings", sections: ["app-settings-general"], group: "app", keywords: "theme mode tour 主题 模式 引导 托盘" },
     { key: "config", label: t("配置文件"), icon: FileCode2, route: "settings", sections: ["app-settings-config"], group: "app", keywords: "backup import export 备份 导入 导出 路径" },
+    { key: "doctor", label: t("配置体检"), icon: Stethoscope, route: "settings", sections: ["app-settings-doctor"], group: "app", keywords: "doctor ai config check health 体检 检查 诊断 配置" },
     { key: "update", label: t("版本与更新"), icon: Download, route: "settings", sections: ["app-settings-update"], group: "app", keywords: "update version 更新 版本" },
     { key: "logs", label: t("日志与诊断"), icon: ScrollText, route: "settings", sections: ["app-settings-logs", "app-settings-diagnostics"], group: "app", keywords: "logs diagnostics 日志 诊断" },
     { key: "about", label: t("关于"), icon: Info, route: "settings", sections: ["app-settings-about"], group: "app", keywords: "about github 关于" },
