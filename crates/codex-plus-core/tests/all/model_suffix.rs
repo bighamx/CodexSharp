@@ -433,6 +433,65 @@ fn gpt61_sol_metadata_exposes_max_ultra_fast_and_272k_default() {
     }
 }
 
+/// 在隔离的 CODEX_HOME 里生成单模型目录条目，保证断言不依赖本机官方缓存。
+fn build_catalog_model(slug: &str) -> serde_json::Value {
+    let entries = collect_catalog_entries(slug, &HashMap::new(), &HashMap::new(), "");
+    let catalog: serde_json::Value =
+        serde_json::from_str(&build_model_catalog_json(&entries, None)).unwrap();
+    catalog["models"][0].clone()
+}
+
+#[test]
+fn prefixed_model_entries_inherit_bare_model_window_metadata() {
+    let _lock = runtime_cache_env_lock();
+    let temp = tempfile::tempdir().unwrap();
+    let _guard = CodexHomeEnvGuard::set(temp.path());
+
+    let bare = build_catalog_model("gpt-6.1-sol");
+    for slug in ["chatgpt/gpt-6.1-sol", "chatgpt-2/gpt-6.1-sol"] {
+        let prefixed = build_catalog_model(slug);
+        assert_eq!(prefixed["context_window"], bare["context_window"], "slug={slug}");
+        assert_eq!(prefixed["max_context_window"], bare["max_context_window"], "slug={slug}");
+        assert_eq!(
+            prefixed["effective_context_window_percent"],
+            bare["effective_context_window_percent"],
+            "slug={slug}"
+        );
+        assert_eq!(prefixed["display_name"], bare["display_name"], "slug={slug}");
+    }
+    // 兼容元数据登记的真实窗口：272000 基础 + 872000 上限；修复前带前缀条目
+    // 走通用模板，两处一起写死 272000，Codex 侧上下文百分比小一圈。
+    assert_eq!(bare["context_window"], 272_000u64);
+    assert_eq!(bare["max_context_window"], 872_000u64);
+    assert_eq!(build_catalog_model("chatgpt/gpt-6.1-sol")["max_context_window"], 872_000u64);
+
+    // 用户显式窗口（[200K] 后缀）仍然最优先，前缀不改变覆盖顺序。
+    let overridden = build_catalog_model("chatgpt/gpt-6.1-sol[200K]");
+    assert_eq!(overridden["context_window"], 200_000u64);
+    assert_eq!(overridden["max_context_window"], 200_000u64);
+}
+
+#[test]
+fn slash_native_model_ids_do_not_inherit_wrong_metadata() {
+    let _lock = runtime_cache_env_lock();
+    let temp = tempfile::tempdir().unwrap();
+    let _guard = CodexHomeEnvGuard::set(temp.path());
+
+    // 原生 ID 本身带 / 的模型：剥前缀后命中同一上游模型的按该模型解析，不一致才危险。
+    let owner = build_catalog_model("deepseek/deepseek-v4-flash");
+    let bare = build_catalog_model("deepseek-v4-flash");
+    assert_eq!(owner["context_window"], bare["context_window"]);
+    assert_eq!(owner["max_context_window"], bare["max_context_window"]);
+    assert_eq!(owner["display_name"], bare["display_name"]);
+
+    // 完全未登记的多段 ID 保持通用模板，不乱认亲戚。
+    let unknown = build_catalog_model("Pro/BAAI/bge-m3");
+    assert_eq!(unknown["slug"], "Pro/BAAI/bge-m3");
+    assert_eq!(unknown["display_name"], "Pro/BAAI/bge-m3");
+    assert_eq!(unknown["context_window"], 272_000u64);
+    assert_eq!(unknown["max_context_window"], 272_000u64);
+}
+
 #[test]
 fn collect_entries_adopts_suffix_for_current_model_from_list() {
     // 当前 model 本身无后缀，但 model_list 中靠后位置有同名带后缀条目。

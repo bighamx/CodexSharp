@@ -797,6 +797,22 @@ fn model_template_entry(slug: &str) -> (Value, bool) {
     if let Some(metadata) = resolve_builtin_metadata(slug) {
         return (metadata.entry, true);
     }
+    // 带供应商前缀的条目（`chatgpt/gpt-6.1-sol`）逐段剥前缀重试：同一个上游模型
+    // 无论从哪个入口（裸名自动切换 / 某家供应商名下）进目录，都该拿到同一份窗口
+    // 元数据。元数据全部按裸名登记（兼容资产、官方 models_cache 缓存），前缀条目
+    // 解析不到就回退通用模板，context_window/max_context_window 一起写死 272000，
+    // Codex 侧上下文百分比比裸名（872000）小一圈，还会随目录重生成在
+    // 258K/272K/475K/828K 之间跳（官方缓存里 sol 的 context_window 是 500000）。
+    let mut candidate = slug;
+    while let Some(index) = candidate.rfind('/') {
+        candidate = &candidate[index + 1..];
+        if candidate.is_empty() {
+            break;
+        }
+        if let Some(metadata) = resolve_builtin_metadata(candidate) {
+            return (metadata.entry, true);
+        }
+    }
     (
         first_bundled_template_entry().unwrap_or_else(|| json!({})),
         false,
