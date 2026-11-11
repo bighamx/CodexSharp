@@ -11679,14 +11679,14 @@ function AboutScreen({
             <CxRow title={t("Codex 版本")}>
               <span className="cx-set-value">{overview?.codex_version ?? t("未检测到")}</span>
             </CxRow>
-            <CxRow detail="github.com/BigPizzaV3/CodexPlusPlus" onClick={() => openUrl("https://github.com/BigPizzaV3/CodexPlusPlus")} title={t("项目地址")}>
+            <CxRow detail="github.com/bighamx/CodexSharp" onClick={() => openUrl("https://github.com/bighamx/CodexSharp")} title={t("项目地址")}>
               <ExternalLink aria-hidden="true" className="cx-set-chevron" />
             </CxRow>
           </CxCard>
         </CxSection>
         <CxSection title={t("反馈与社区")}>
           <CxCard>
-            <CxRow detail={t("在 GitHub Issues 报告问题或提建议")} icon={<Github />} onClick={() => openUrl("https://github.com/BigPizzaV3/CodexPlusPlus/issues")} title={t("反馈问题")}>
+            <CxRow detail={t("在 GitHub Issues 报告问题或提建议")} icon={<Github />} onClick={() => openUrl("https://github.com/bighamx/CodexSharp/issues")} title={t("反馈问题")}>
               <ExternalLink aria-hidden="true" className="cx-set-chevron" />
             </CxRow>
             <CxRow detail="discord.gg/y96kX7A76v" icon={<MessageCircle />} onClick={() => openUrl("https://discord.gg/y96kX7A76v")} title="Discord">

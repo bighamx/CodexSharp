@@ -8,9 +8,9 @@ use serde_json::{Value, json};
 #[cfg(any(target_os = "macos", test))]
 pub mod macos;
 
-pub const DEFAULT_REPOSITORY: &str = "BigPizzaV3/CodexPlusPlus";
+pub const DEFAULT_REPOSITORY: &str = "bighamx/CodexSharp";
 pub const DEFAULT_LATEST_JSON_URL: &str =
-    "https://github.com/BigPizzaV3/CodexPlusPlus/releases/latest/download/latest.json";
+    "https://github.com/bighamx/CodexSharp/releases/latest/download/latest.json";
 const UPDATE_CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
 const UPDATE_DOWNLOAD_TIMEOUT: Duration = Duration::from_secs(600);
 
@@ -643,9 +643,14 @@ fn is_linux_native_arch_asset(name: &str) -> bool {
     native_tokens.iter().any(|token| lower.contains(token))
 }
 
+/// 本仓库（Codex # fork）的安装包叫 `CodexSharp-...`，上游叫 `CodexPlusPlus-...`，
+/// 两套命名都要认，否则换到自己的仓库后检查更新会挑不到资产。
+fn is_branded_codex_asset(name: &str) -> bool {
+    name.contains("codex") && (name.contains("plus") || name.contains("sharp"))
+}
+
 fn is_windows_installer_asset(name: &str) -> bool {
-    name.contains("codex")
-        && name.contains("plus")
+    is_branded_codex_asset(name)
         && (name.ends_with(".msi")
             || name.ends_with("-setup.exe")
             || name.ends_with("_setup.exe")
@@ -656,7 +661,7 @@ fn is_windows_installer_asset(name: &str) -> bool {
 fn is_macos_installer_asset(name: &str) -> bool {
     // Loose shape check; arch preference is handled by platform_asset_rank
     // via is_macos_native_arch_asset.
-    name.contains("codex") && name.contains("plus") && name.ends_with(".dmg")
+    is_branded_codex_asset(name) && name.ends_with(".dmg")
 }
 
 pub fn launch_installer(path: &Path) -> anyhow::Result<()> {
