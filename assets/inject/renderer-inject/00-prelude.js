@@ -402,7 +402,7 @@
   const codexPlusSidebarNavId = "codex-plus-sidebar-nav";
   const codexPlusPageClass = "codex-plus-page-overlay";
   // 新版 Codex 在最左侧多出一条导航图标栏（navigation rail）。
-  // 三个入口分别挂进去：Codex # 主页、「拓展」（原用户脚本）和「推荐内容」。
+  // 两个入口分别挂进去：Codex # 主页与「拓展」（原用户脚本）；「推荐内容」在本 fork 已去掉。
   // 三者各自是一个独立页面，不再作为弹窗里的二级 tab。
   const codexPlusRailNavId = "codex-plus-rail-nav";
   const codexPlusRailExtensionsId = "codex-plus-rail-extensions";

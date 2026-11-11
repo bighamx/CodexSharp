@@ -1038,17 +1038,18 @@ describe("renderer injection header compatibility", () => {
     assert.match(renderer, /selectCodexPlusTab\(pageNav\.getAttribute\("data-codex-plus-page-nav"\)\)/);
   });
 
-  it("把三个 rail 入口都接成独立页面，并跟随 Codex 的界面缩放", async () => {
+  it("rail 只建 Codex # 与拓展两个入口（可关），并跟随 Codex 的界面缩放", async () => {
     const renderer = await readFile(new URL("../../../assets/inject/renderer-inject.js", import.meta.url), "utf8");
 
-    // 推荐内容从弹窗二级 tab 提成图标栏上的一级入口。
+    // 「推荐内容」入口在本 fork 已去掉：图标栏只建 Codex # 与拓展两个入口。
+    assert.doesNotMatch(renderer, /id: codexPlusRailSponsorId, label: "推荐内容"/);
+    // 常量与页面代码仍保留，teardown 靠它清掉旧版本已经插进原生图标栏的入口。
     assert.match(renderer, /const codexPlusRailSponsorId = "codex-plus-rail-sponsor"/);
-    assert.match(renderer, /const codexPlusSponsorTab = "sponsor"/);
-    assert.match(renderer, /function openCodexPlusSponsor\(\)/);
-    assert.match(renderer, /id: codexPlusRailSponsorId, label: "推荐内容"/);
-    // 三个入口都要参与选中态映射，否则「推荐内容」亮不起来。
-    assert.match(renderer, /\[codexPlusRailSponsorId, "sponsor"\],/);
-    assert.match(renderer, /if \(tab === codexPlusSponsorTab\) return "sponsor";/);
+    // 两个入口都受设置控制（管理器「增强 → 外观」），默认显示。
+    assert.match(renderer, /const railEntries = \(\(\) => \{[^]*?window\.__CODEX_PLUS_RAIL_ENTRIES__/);
+    assert.match(renderer, /railEntries\.codex\s*\n?\s*\? \{ id: codexPlusRailNavId/);
+    assert.match(renderer, /railEntries\.extensions\s*\n?\s*\? \{ id: codexPlusRailExtensionsId/);
+    assert.match(renderer, /if \(!railEntries\.codex\) document\.getElementById\(codexPlusRailNavId\)\?\.remove\(\);/);
 
     // 弹窗里的 tab 条已随入口外移删除，不该再有残留。
     assert.doesNotMatch(renderer, /codex-plus-tab-button/);

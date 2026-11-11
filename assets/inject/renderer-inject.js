@@ -402,7 +402,7 @@
   const codexPlusSidebarNavId = "codex-plus-sidebar-nav";
   const codexPlusPageClass = "codex-plus-page-overlay";
   // 新版 Codex 在最左侧多出一条导航图标栏（navigation rail）。
-  // 三个入口分别挂进去：Codex # 主页、「拓展」（原用户脚本）和「推荐内容」。
+  // 两个入口分别挂进去：Codex # 主页与「拓展」（原用户脚本）；「推荐内容」在本 fork 已去掉。
   // 三者各自是一个独立页面，不再作为弹窗里的二级 tab。
   const codexPlusRailNavId = "codex-plus-rail-nav";
   const codexPlusRailExtensionsId = "codex-plus-rail-extensions";
@@ -7978,11 +7978,27 @@
       sponsor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
     };
 
+    // 入口是否显示由设置决定（管理器「增强 → 外观」里的两个开关），默认都显示。
+    // 配置由注入脚本开头写入 window.__CODEX_PLUS_RAIL_ENTRIES__，缺省视为开。
+    const railEntries = (() => {
+      const config = window.__CODEX_PLUS_RAIL_ENTRIES__;
+      if (!config || typeof config !== "object") return { codex: true, extensions: true };
+      return { codex: config.codex !== false, extensions: config.extensions !== false };
+    })();
     const specs = [
-      { id: codexPlusRailNavId, label: "Codex #", iconMarkup: icons.home, withStatus: true, onActivate: openCodexPlusPage },
-      { id: codexPlusRailExtensionsId, label: "拓展", iconMarkup: icons.extensions, withStatus: false, onActivate: openCodexPlusExtensions },
-      { id: codexPlusRailSponsorId, label: "推荐内容", iconMarkup: icons.sponsor, withStatus: false, onActivate: openCodexPlusSponsor },
-    ];
+      railEntries.codex
+        ? { id: codexPlusRailNavId, label: "Codex #", iconMarkup: icons.home, withStatus: true, onActivate: openCodexPlusPage }
+        : null,
+      railEntries.extensions
+        ? { id: codexPlusRailExtensionsId, label: "拓展", iconMarkup: icons.extensions, withStatus: false, onActivate: openCodexPlusExtensions }
+        : null,
+      // 「推荐内容」入口在本 fork 去掉：图标栏只留 Codex # 与拓展两个入口。
+      // codexPlusRailSponsorId 仍保留在 teardown 的清理列表里，升级后能把旧版本
+      // 已经插进原生图标栏的那个入口删掉。
+    ].filter(Boolean);
+    // 关掉的入口要顺手删掉上一次注入留下的按钮，只「这次不建」会让设置看起来没生效。
+    if (!railEntries.codex) document.getElementById(codexPlusRailNavId)?.remove();
+    if (!railEntries.extensions) document.getElementById(codexPlusRailExtensionsId)?.remove();
 
     const anchor = codexPlusRailPrimaryAnchor(rail);
     // 插到锚点所在的父容器里，而不是 nav 顶层：原生按钮可能嵌在 nav 内部的分组 div 中，

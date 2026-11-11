@@ -560,6 +560,14 @@ pub fn hide_official_usage_alert_config(settings: &BackendSettings) -> bool {
     profile.relay_mode == crate::settings::RelayMode::Official && profile.official_mix_api_key
 }
 
+/// 官方 Codex 图标栏里 Codex # / 拓展 两个入口是否显示（管理器「增强 → 外观」可关）。
+pub fn rail_entries_config(settings: &BackendSettings) -> Value {
+    json!({
+        "codex": settings.codex_app_rail_codex_entry,
+        "extensions": settings.codex_app_rail_extensions_entry,
+    })
+}
+
 pub fn force_chinese_locale_config(settings: &BackendSettings) -> Value {
     json!({ "enabled": settings.codex_app_force_chinese_locale, "locale": "zh-CN" })
 }
@@ -644,6 +652,7 @@ pub fn injection_script_with_settings(helper_port: u16, settings: &BackendSettin
     let dream_skin_target_runtime = dream_skin_target_runtime_after_document_ready(settings);
     let paste_fix = paste_fix_enabled_config(settings);
     let force_chinese_locale = force_chinese_locale_config(settings);
+    let rail_entries = rail_entries_config(settings);
     let statsig_overrides = statsig_overrides_config(settings);
     let hide_official_usage_alert = hide_official_usage_alert_config(settings);
     // 原生模块补丁的新文档脚本需要 Page.enable；DOM 增强必须等正常文档就绪，不能访问空的根节点。
@@ -659,7 +668,7 @@ pub fn injection_script_with_settings(helper_port: u16, settings: &BackendSettin
             ""
         };
     format!(
-        "{}window.__CODEX_SESSION_DELETE_HELPER__ = {};\nwindow.__CODEX_PLUS_VERSION__ = {};\nwindow.__CODEX_PLUS_BUILD__ = {};\nwindow.__CODEX_PLUS_EXTERNAL_DREAM_SKIN_RUNTIME__ = true;\nwindow.__CODEX_PLUS_DREAM_SKIN_PLATFORM__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_REVISION__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_ART__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_ART_SIGNATURE__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_THEME__ = {};\nwindow.__CODEX_PLUS_PASTE_FIX__ = {};\nwindow.__CODEX_PLUS_FORCE_CHINESE_LOCALE__ = {};\nwindow.__CODEX_PLUS_STATSIG_OVERRIDES__ = {};\nwindow.__CODEX_PLUS_HIDE_OFFICIAL_USAGE_ALERT__ = {};\n{}\n{}\n{}",
+        "{}window.__CODEX_SESSION_DELETE_HELPER__ = {};\nwindow.__CODEX_PLUS_VERSION__ = {};\nwindow.__CODEX_PLUS_BUILD__ = {};\nwindow.__CODEX_PLUS_EXTERNAL_DREAM_SKIN_RUNTIME__ = true;\nwindow.__CODEX_PLUS_DREAM_SKIN_PLATFORM__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_REVISION__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_ART__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_ART_SIGNATURE__ = {};\nwindow.__CODEX_PLUS_DREAM_SKIN_THEME__ = {};\nwindow.__CODEX_PLUS_PASTE_FIX__ = {};\nwindow.__CODEX_PLUS_FORCE_CHINESE_LOCALE__ = {};\nwindow.__CODEX_PLUS_RAIL_ENTRIES__ = {};\nwindow.__CODEX_PLUS_STATSIG_OVERRIDES__ = {};\nwindow.__CODEX_PLUS_HIDE_OFFICIAL_USAGE_ALERT__ = {};\n{}\n{}\n{}",
         instance_identity,
         serde_json::to_string(&helper_url).expect("helper URL should serialize"),
         serde_json::to_string(crate::version::VERSION).expect("version should serialize"),
@@ -674,6 +683,7 @@ pub fn injection_script_with_settings(helper_port: u16, settings: &BackendSettin
         serde_json::to_string(&paste_fix).expect("paste fix config should serialize"),
         serde_json::to_string(&force_chinese_locale)
             .expect("force Chinese locale config should serialize"),
+        serde_json::to_string(&rail_entries).expect("rail entries config should serialize"),
         serde_json::to_string(&statsig_overrides)
             .expect("statsig overrides config should serialize"),
         serde_json::to_string(&hide_official_usage_alert)

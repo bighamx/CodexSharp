@@ -474,6 +474,8 @@ type BackendSettings = WhaleBalanceSettings & {
   codexAppPath: string;
   /** 自动接管官方 App（与 Rust `codex_app_auto_takeover` 对应）。 */
   codexAppAutoTakeover: boolean;
+  codexAppRailCodexEntry: boolean;
+  codexAppRailExtensionsEntry: boolean;
   codexAppAutoTakeoverWhenActive: string;
   claudeAppExtensions?: boolean;
   claudeDesktopLocal?: ClaudeLocalConfig;
@@ -1576,6 +1578,8 @@ const defaultSettings: BackendSettings = {
   ...defaultWhaleBalanceSettings(),
   codexAppPath: "",
   codexAppAutoTakeover: false,
+  codexAppRailCodexEntry: true,
+  codexAppRailExtensionsEntry: true,
   codexAppAutoTakeoverWhenActive: "defer",
   claudeDesktopLocal: { enabled: false, model: "", localization: true, voiceInput: true, computerUse: false, backgroundMode: false },
   codexExtraArgs: [],
@@ -9354,6 +9358,16 @@ function EnhanceScreen({
         {managerBuiltinGroups().map((group) => (
           <FeatureGroup key={group.id} id={enhancementGroupAnchorId(group)} title={t(group.title)} detail={t(group.description ?? "")} hidden={groupHidden(group.id)}>
             {managerBuiltinCards(group.id, enhancementPlatform).map(renderBuiltin)}
+            {group.id === "appearance" ? (
+              <CxCard>
+                <SettingRow description={t("官方 Codex 左侧图标栏里 Codex # 自己的入口，可以单独关掉；改完下次启动 Codex 生效。")} title={t("侧栏入口")}>
+                  <Switch disabled={!masterEnabled} label={t("侧栏显示 Codex # 入口")} on={form.codexAppRailCodexEntry !== false} onToggle={() => onFormChange({ ...form, codexAppRailCodexEntry: form.codexAppRailCodexEntry === false })} />
+                </SettingRow>
+                <SettingRow description={t("图标栏上的「拓展」入口（脚本与拓展包列表）。关掉后拓展照常工作，只是不显示这项入口。")} title={t("侧栏显示「拓展」入口")}>
+                  <Switch disabled={!masterEnabled} label={t("侧栏显示「拓展」入口")} on={form.codexAppRailExtensionsEntry !== false} onToggle={() => onFormChange({ ...form, codexAppRailExtensionsEntry: form.codexAppRailExtensionsEntry === false })} />
+                </SettingRow>
+              </CxCard>
+            ) : null}
           </FeatureGroup>
         ))}
         {masterEnabled ? <StandaloneModeGroup hidden={groupHidden(managerStandaloneGroup().id)} renderBuiltin={renderBuiltin} /> : null}

@@ -4297,6 +4297,11 @@ export const EN_BACKEND: Record<string, string> = {
   // 从上游同步上下文窗口 / 思考等级（#2807）
   "这类供应商的模型接口不提供上下文窗口和思考等级，请手动填写": "This provider's model endpoint does not report context windows or reasoning levels; fill them in manually",
   "模型资料不是有效的 JSON，请先在「思考等级」里修正": "The model metadata is not valid JSON; fix it under Reasoning levels first",
+  "侧栏入口": "Sidebar entry",
+  "官方 Codex 左侧图标栏里 Codex # 自己的入口，可以单独关掉；改完下次启动 Codex 生效。": "Codex #'s own entry in the official Codex icon rail. Turn it off independently; changes apply the next time Codex starts.",
+  "侧栏显示 Codex # 入口": "Show the Codex # entry in the sidebar",
+  "图标栏上的「拓展」入口（脚本与拓展包列表）。关掉后拓展照常工作，只是不显示这项入口。": "The “Extensions” entry in the icon rail (scripts and extension packages). Turning it off only hides the entry; extensions keep working.",
+  "侧栏显示「拓展」入口": "Show the “Extensions” entry in the sidebar",
 };
 
 // Pattern-based backend translations: [regex, replacement template].

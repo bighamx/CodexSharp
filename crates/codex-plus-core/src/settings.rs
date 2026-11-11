@@ -1322,6 +1322,12 @@ pub struct BackendSettings {
     // 若默认开启等于替他们重新打开一个从没同意过的行为。要开请显式勾选。
     #[serde(rename = "codexAppForceChineseLocale", default)]
     pub codex_app_force_chinese_locale: bool,
+    /// 官方 Codex 左侧图标栏是否显示 Codex # 入口（默认显示，可在「增强 → 外观」关掉）。
+    #[serde(rename = "codexAppRailCodexEntry", default = "default_true")]
+    pub codex_app_rail_codex_entry: bool,
+    /// 官方 Codex 左侧图标栏是否显示「拓展」入口（默认显示）。
+    #[serde(rename = "codexAppRailExtensionsEntry", default = "default_true")]
+    pub codex_app_rail_extensions_entry: bool,
     #[serde(
         rename = "codexAppTypingEffect",
         default = "default_typing_effect",
@@ -1659,6 +1665,8 @@ impl Default for BackendSettings {
             computer_use_pip: true,
             codex_app_paste_fix: false,
             codex_app_force_chinese_locale: false,
+            codex_app_rail_codex_entry: true,
+            codex_app_rail_extensions_entry: true,
             codex_app_typing_effect: default_typing_effect(),
             codex_app_thread_id_badge: false,
             codex_app_conversation_view: false,
@@ -3107,6 +3115,8 @@ fn merge_known_setting_fields(target: &mut Map<String, Value>, source: &Map<Stri
     merge_bool_setting(target, source, "codexAppProxyRequestStatus");
     merge_bool_setting(target, source, "codexAppPasteFix");
     merge_bool_setting(target, source, "codexAppForceChineseLocale");
+    merge_bool_setting(target, source, "codexAppRailCodexEntry");
+    merge_bool_setting(target, source, "codexAppRailExtensionsEntry");
     if let Some(value @ ("off" | "rainbow" | "fireworks" | "stars")) =
         source.get("codexAppTypingEffect").and_then(Value::as_str)
     {
