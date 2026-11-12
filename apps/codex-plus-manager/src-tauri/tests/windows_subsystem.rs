@@ -10,6 +10,24 @@ fn manager_binary_uses_windows_gui_subsystem_in_debug_and_release() {
     );
 }
 
+/// ClaudeMom 与 Codex # 共用 main.rs：入口必须先标记变体再进共用 main，
+/// 自己也要声明 GUI 子系统（main.rs 作为子模块时那条 crate 属性不生效）。
+#[test]
+fn claude_mom_binary_marks_flavor_before_shared_main() {
+    let entry = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/claude_mom.rs"))
+        .expect("read claude_mom.rs");
+    assert!(entry.starts_with("#![cfg_attr(windows, windows_subsystem = \"windows\")]"));
+    assert!(entry.contains("#[path = \"main.rs\"]"));
+    let init = entry.find("flavor::init_claude_mom()").expect("init_claude_mom");
+    let shared = entry.find("codex_plus_main::main()").expect("shared main");
+    assert!(init < shared, "变体标记必须在共用 main 之前");
+
+    let cargo_toml = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/Cargo.toml"))
+        .expect("read manager Cargo.toml");
+    assert!(cargo_toml.contains("name = \"claude-mom\""));
+    assert!(cargo_toml.contains("default-run = \"codex-plus-plus\""));
+}
+
 #[test]
 fn manager_release_binary_uses_embedded_frontend_assets() {
     let cargo_toml = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/Cargo.toml"))
@@ -94,7 +112,8 @@ fn manager_lightweight_mode_destroys_and_rebuilds_the_main_window() {
     assert!(lib_rs.contains("lightweight::cancel_pending_release();"));
     // 打开入口统一走 show_main_window → ensure_main_window，窗口不在就按原配置重建。
     assert!(lib_rs.contains("fn ensure_main_window"));
-    assert!(lib_rs.contains("build_main_window(app_handle, MAIN_WINDOW_URL, false)"));
+    // 重建时按产品变体加载各自的页面（Codex # 的 index.html / ClaudeMom 的 claude-mom.html）。
+    assert!(lib_rs.contains("build_main_window(app_handle, flavor::main_window().url, false)"));
     assert_eq!(
         lib_rs.matches("tauri::WebviewWindowBuilder::new(").count(),
         1
@@ -136,7 +155,11 @@ fn manager_keeps_a_visible_brand_tray_and_click_menu_when_hiding_the_macos_dock_
     assert!(lib_rs.contains(".icon_as_template(true)"));
     assert!(lib_rs.contains("tauri::include_image!(\"icons/icon.png\")"));
     assert!(lib_rs.contains(".show_menu_on_left_click(true)"));
-    assert!(lib_rs.contains(".tooltip(\"Codex #\")"));
+    // 托盘提示随产品变体：Codex++ / ClaudeMom（见 flavor.rs）。
+    assert!(lib_rs.contains(".tooltip(flavor::app_name())"));
+    let flavor_rs = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/flavor.rs"))
+        .expect("read manager flavor.rs");
+    assert!(flavor_rs.contains("Flavor::CodexPlusPlus => \"Codex #\""));
 }
 
 // 返回 needle 之前文本最近的 #[cfg(...)] 属性。前提是设置语句与其平台门控
@@ -336,13 +359,16 @@ fn github_release_workflow_builds_one_universal_macos_dmg() {
         .join(".github/workflows/release-assets.yml");
     let workflow = std::fs::read_to_string(&workflow).expect("read release assets workflow");
 
-    // 通用包：单个 job 在两个 target 上各编一遍，由 build-universal.sh
-    // 用 lipo 合并。两个架构的 std 都要装。
-    assert!(workflow.contains("macos-14"));
-    assert!(workflow.contains("x86_64-apple-darwin,aarch64-apple-darwin"));
+    // 两个 target 分别编译并上传，再由通用包 job 合并。
+    assert!(workflow.contains("target: [x86_64-apple-darwin, aarch64-apple-darwin]"));
+    assert!(workflow.contains("name: macos-bin-${{ matrix.target }}"));
+    assert!(workflow.contains("needs: [prepare, macos-build]"));
+    assert!(workflow.contains("name: macos-bin-x86_64-apple-darwin"));
+    assert!(workflow.contains("name: macos-bin-aarch64-apple-darwin"));
+    assert!(workflow.contains("UNIVERSAL_SKIP_BUILD: \"1\""));
     assert!(workflow.contains("build-universal.sh \"$VERSION\""));
 
-    // 分架构的 matrix 形态不应再出现，否则会回到「用户自己挑架构」的老问题。
+    // 发布产物仍是单个通用包，不应恢复分架构安装包。
     assert!(!workflow.contains("matrix.arch"));
     assert!(!workflow.contains("macos-15-intel"));
 }
@@ -474,8 +500,11 @@ fn manager_window_and_relay_detail_header_stay_usable() {
     assert!(styles.contains(".relay-detail-body"));
     assert!(styles.contains("flex-shrink: 0"));
     assert!(styles.contains("overflow-y: auto"));
-    assert!(lib_rs.contains(".inner_size(1180.0, 820.0)"));
-    assert!(lib_rs.contains(".min_inner_size(960.0, 720.0)"));
+    // 尺寸按产品变体取（flavor.rs）：Codex # 仍是 1180×820、最小 960×720。
+    assert!(lib_rs.contains(".inner_size(flavor::main_window().size.0, flavor::main_window().size.1)"));
+    let flavor_rs = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/flavor.rs"))
+        .expect("read manager flavor.rs");
+    assert!(flavor_rs.contains("url: \"/index.html\",\n            size: (1180.0, 820.0),\n            min_size: (960.0, 720.0),"));
     assert!(tauri_conf.contains("\"width\": 1180"));
     assert!(tauri_conf.contains("\"height\": 820"));
     assert!(tauri_conf.contains("\"minWidth\": 960"));

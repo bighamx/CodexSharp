@@ -128,7 +128,13 @@ pub fn stop_windows_main_codex_processes_with_args_and_wait(
         Duration::from_millis(super::RESTART_STOP_WAIT_TIMEOUT_MS),
         || std::thread::sleep(Duration::from_millis(super::RESTART_STOP_WAIT_INTERVAL_MS)),
     )?;
-    ensure_no_live_targets(candidates()?, VerifiedStopProcess::capture, &context)?;
+    ensure_no_live_targets(
+        candidates()?,
+        VerifiedStopProcess::capture,
+        &context,
+        Duration::from_millis(super::RESTART_STOP_WAIT_TIMEOUT_MS),
+        || std::thread::sleep(Duration::from_millis(super::RESTART_STOP_WAIT_INTERVAL_MS)),
+    )?;
     if let Some(listener) = listener {
         anyhow::ensure!(!listener.is_alive()?, "已接管的 Codex 原监听进程尚未退出");
     }
@@ -151,9 +157,9 @@ fn ensure_listener_matches(facts: &ProcessFacts, context: &StopContext) -> Resul
         TargetClassification::Child => {
             anyhow::bail!("已接管的 Codex 监听进程是 Chromium 子进程而非主实例，未结束任何进程")
         }
-        TargetClassification::Irrelevant => {
-            anyhow::bail!("已接管的 Codex 监听进程不属于当前入口或用户会话，未结束任何进程")
-        }
+        TargetClassification::Irrelevant(reason) => anyhow::bail!(
+            "已接管的 Codex 监听进程与当前停止上下文不一致（{reason}），未结束任何进程"
+        )
     }
 }
 
@@ -287,7 +293,7 @@ fn capture_and_stop<P: HeldMainProcess>(
             continue;
         };
         match classify_target(&facts, context)? {
-            TargetClassification::Irrelevant | TargetClassification::Child => continue,
+            TargetClassification::Irrelevant(_) | TargetClassification::Child => continue,
             TargetClassification::Mismatch(reason) => {
                 if process.alive()? {
                     reject_skipped_owned_session(&facts, context)?;
@@ -446,14 +452,27 @@ fn ensure_no_live_targets<P: HeldMainProcess>(
     ids: impl IntoIterator<Item = u32>,
     mut capture: impl FnMut(u32, bool) -> Result<Option<P>>,
     context: &StopContext,
+    timeout: Duration,
+    mut wait: impl FnMut(),
 ) -> Result<()> {
+    let deadline = Instant::now() + timeout;
     for id in ids {
         let Some(process) =
             capture(id, false).with_context(|| format!("无法复核 Codex 候选 PID {id}"))?
         else {
             continue;
         };
-        let Some(facts) = candidate_facts(&process, context)? else {
+        // 刚结束的主进程的子进程可能还在退出：句柄未 signaled、映像却已读不到（#3040）。
+        // 用同一个句柄有限等它退出；到期仍存活且读不到才 fail closed。
+        let facts = loop {
+            match candidate_facts(&process, context) {
+                Ok(facts) => break facts,
+                Err(_) if !process.alive()? => break None,
+                Err(error) if Instant::now() >= deadline => return Err(error),
+                Err(_) => wait(),
+            }
+        };
+        let Some(facts) = facts else {
             continue;
         };
         if !process.alive()? {
@@ -498,7 +517,7 @@ fn target_matches(facts: &ProcessFacts, context: &StopContext) -> Result<bool> {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum TargetClassification {
-    Irrelevant,
+    Irrelevant(&'static str),
     Child,
     Mismatch(&'static str),
     Main,
@@ -507,8 +526,19 @@ enum TargetClassification {
 fn classify_target(facts: &ProcessFacts, context: &StopContext) -> Result<TargetClassification> {
     anyhow::ensure!(facts.birth != 0, "缺少 Codex 进程创建身份");
     let image = normalized_path(&facts.image)?;
-    if !image_matches(&context.executable, &image) || facts.owner != context.owner {
-        return Ok(TargetClassification::Irrelevant);
+    if !image_matches(&context.executable, &image) {
+        return Ok(TargetClassification::Irrelevant("Codex 入口（可执行文件映像）"));
+    }
+    if facts.owner.user_sid != context.owner.user_sid {
+        return Ok(TargetClassification::Irrelevant("用户账户（SID）"));
+    }
+    if facts.owner.session_id != context.owner.session_id {
+        return Ok(TargetClassification::Irrelevant("Windows 会话"));
+    }
+    if facts.owner != context.owner {
+        return Ok(TargetClassification::Irrelevant(
+            "登录会话（authentication id）",
+        ));
     }
     let environment = &facts.environment;
     let app_data = environment
@@ -753,6 +783,8 @@ mod tests {
         window_present: bool,
         close_requests: Cell<usize>,
         events: Rc<RefCell<Vec<u32>>>,
+        /// 正在退出：读映像一直失败，`alive()` 再返回这么多次 true 后变为 false。
+        exiting_after_alive_checks: Option<Cell<u32>>,
     }
 
     impl HeldMainProcess for FakeProcess {
@@ -761,10 +793,16 @@ mod tests {
         }
 
         fn alive(&self) -> Result<bool> {
+            if let Some(remaining) = &self.0.exiting_after_alive_checks {
+                let left = remaining.get();
+                remaining.set(left.saturating_sub(1));
+                return Ok(left > 0);
+            }
             Ok(!self.0.terminated.get() || self.0.stubborn)
         }
 
         fn possible_target(&self, context: &StopContext) -> Result<Option<bool>> {
+            anyhow::ensure!(self.0.exiting_after_alive_checks.is_none(), "模拟映像已读不到");
             let facts = &self.0.facts[0];
             let image = normalized_path(&facts.image)?;
             if !image_matches(&context.executable, &image) {
@@ -815,6 +853,7 @@ mod tests {
             window_present: false,
             close_requests: Cell::new(0),
             events: events.clone(),
+            exiting_after_alive_checks: None,
         }))
     }
 
@@ -960,10 +999,54 @@ mod tests {
     fn post_stop_snapshot_rejects_a_new_matching_main_process() {
         let events = Rc::new(RefCell::new(Vec::new()));
         let replacement = fake(3, vec![facts(&[])], &events);
-        let result =
-            ensure_no_live_targets([3], |_, _| Ok(Some(replacement.clone())), &context(None));
+        let result = ensure_no_live_targets(
+            [3],
+            |_, _| Ok(Some(replacement.clone())),
+            &context(None),
+            Duration::ZERO,
+            || panic!("零超时测试不应等待"),
+        );
         assert!(result.is_err());
         assert!(events.borrow().is_empty());
+    }
+
+    fn exiting(id: u32, alive_checks: u32, events: &Rc<RefCell<Vec<u32>>>) -> FakeProcess {
+        let process = fake(id, vec![facts(&[])], events);
+        let mut state = Rc::try_unwrap(process.0).ok().unwrap();
+        state.exiting_after_alive_checks = Some(Cell::new(alive_checks));
+        FakeProcess(Rc::new(state))
+    }
+
+    /// #3040：停止后复扫时，正在退出的子进程映像读不到，不能误报「未确认退出」。
+    #[test]
+    fn post_stop_rescan_waits_out_an_exiting_child() {
+        let events = Rc::new(RefCell::new(Vec::new()));
+        let child = exiting(7, 3, &events);
+        let mut waits = 0;
+        let result = ensure_no_live_targets(
+            [7],
+            |_, _| Ok(Some(child.clone())),
+            &context(None),
+            Duration::from_secs(5),
+            || waits += 1,
+        );
+        assert!(result.is_ok(), "{result:?}");
+        assert!(waits >= 1);
+        assert!(events.borrow().is_empty());
+    }
+
+    #[test]
+    fn post_stop_rescan_fails_closed_for_a_live_unreadable_process() {
+        let events = Rc::new(RefCell::new(Vec::new()));
+        let stuck = exiting(8, u32::MAX, &events);
+        let result = ensure_no_live_targets(
+            [8],
+            |_, _| Ok(Some(stuck.clone())),
+            &context(None),
+            Duration::ZERO,
+            || panic!("零超时测试不应等待"),
+        );
+        assert!(result.is_err());
     }
 
     #[test]
@@ -1001,11 +1084,24 @@ mod tests {
         let message = format!("{error:#}");
         assert!(message.contains("子进程"), "{message}");
 
-        let mut unrelated = facts(&[]);
-        unrelated.owner.user_sid.push(9);
-        let error = ensure_listener_matches(&unrelated, &context(None)).unwrap_err();
+        let mut other_user = facts(&[]);
+        other_user.owner.user_sid.push(9);
+        let error = ensure_listener_matches(&other_user, &context(None)).unwrap_err();
         let message = format!("{error:#}");
-        assert!(message.contains("入口或用户会话"), "{message}");
+        // #3010：入口/会话不一致也要指出具体是哪一项，用户才能把信息报给我们。
+        assert!(message.contains("用户账户"), "{message}");
+
+        let mut other_session = facts(&[]);
+        other_session.owner.session_id += 1;
+        let error = ensure_listener_matches(&other_session, &context(None)).unwrap_err();
+        let message = format!("{error:#}");
+        assert!(message.contains("Windows 会话"), "{message}");
+
+        let mut other_logon = facts(&[]);
+        other_logon.owner.authentication_id = (7, 8);
+        let error = ensure_listener_matches(&other_logon, &context(None)).unwrap_err();
+        let message = format!("{error:#}");
+        assert!(message.contains("登录会话"), "{message}");
 
         ensure_listener_matches(&facts(&[]), &context(None)).unwrap();
     }
