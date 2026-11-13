@@ -694,7 +694,8 @@ pub async fn copilot_models(token: &CopilotToken, proxy: Option<&str>) -> Vec<St
 }
 
 pub fn parse_copilot_models(value: &Value) -> Vec<String> {
-    let mut models = Vec::new();
+    let mut picked = Vec::new();
+    let mut chat_models = Vec::new();
     for model in value
         .get("data")
         .and_then(Value::as_array)
@@ -708,15 +709,27 @@ pub fn parse_copilot_models(value: &Value) -> Vec<String> {
             .pointer("/capabilities/type")
             .and_then(Value::as_str)
             .is_none_or(|kind| kind == "chat");
+        if !chat || chat_models.iter().any(|known: &String| known == id) {
+            continue;
+        }
+        chat_models.push(id.to_string());
         let picker = model
             .get("model_picker_enabled")
             .and_then(Value::as_bool)
             .unwrap_or(true);
-        if chat && picker && !models.iter().any(|known: &String| known == id) {
-            models.push(id.to_string());
+        if picker {
+            picked.push(id.to_string());
         }
     }
-    models
+    // 教育额度 / 新版按量计费的账号会整份返回 `model_picker_enabled: false`
+    // （GitHub 把选择器收起来了，VS Code 里同样选不了模型），但其中老模型
+    // （gpt-4o、gpt-4.1 等）仍然可以正常调用。此时退回「所有 chat 模型」，
+    // 否则面板只会显示「上游没有返回模型」，什么也选不了。
+    if picked.is_empty() {
+        chat_models
+    } else {
+        picked
+    }
 }
 
 /// Copilot 供应商：Chat Completions 协议，地址是 Copilot 的 API（`#` 表示不再补 `/v1`），Key 是短期 token。
@@ -2387,6 +2400,17 @@ mod tests {
             ..RelayProfile::default()
         };
         assert_eq!(prepare_relay(&plain).await.unwrap().api_key, "sk");
+    }
+
+    /// 教育额度 / 按量计费账号：整份 `model_picker_enabled: false`，退回全部 chat 模型。
+    #[test]
+    fn copilot_models_fall_back_when_picker_is_disabled_account_wide() {
+        let value = json!({ "data": [
+            { "id": "gpt-4o", "capabilities": { "type": "chat" }, "model_picker_enabled": false },
+            { "id": "gpt-4.1", "capabilities": { "type": "chat" }, "model_picker_enabled": false },
+            { "id": "text-embedding-3-small", "capabilities": { "type": "embeddings" }, "model_picker_enabled": false }
+        ]});
+        assert_eq!(parse_copilot_models(&value), vec!["gpt-4o", "gpt-4.1"]);
     }
 
     #[test]
