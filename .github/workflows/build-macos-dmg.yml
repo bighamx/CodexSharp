@@ -9,7 +9,7 @@ on:
       version:
         description: "版本号，写进 DMG 文件名（不带 v）"
         required: true
-        default: "2.6.6"
+        default: "2.6.7"
       publish_release:
         description: "编好后上传到 Release（需要填 tag）"
         type: boolean

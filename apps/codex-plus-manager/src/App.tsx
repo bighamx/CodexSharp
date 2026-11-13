@@ -5003,7 +5003,7 @@ export function App() {
         void navigate(issue.includes("供应商池是空的") ? "gatewayProviders" : "gateway");
         return;
       }
-      const result = await invoke<GatewayResult>("save_gateway_binding", { agent: "codex", binding: { ...bindingFromDraft(draft, previous), enabled: true } });
+      const result = await invoke<GatewayResult>("save_gateway_binding", { agent: "codex", binding: { ...bindingFromDraft(draft, previous), enabled: true }, reconnect: true });
       publishGatewayPayload(result);
       await refreshSettings(true);
       await showNotice(t("切换到网关"), result.message, isSuccessStatus(result.status as Status) ? "ok" : "failed");
@@ -16346,12 +16346,18 @@ type ClaudeLocalConfig = {
   voiceInput: boolean;
   computerUse: boolean;
   backgroundMode: boolean;
+  /** 无视 Claude 对后台模式的 macOS 版本上限（默认关）。 */
+  forceBackgroundMode?: boolean;
   displayName?: string;
   email?: string;
   plan?: string;
   sessionSync?: boolean;
   listAllModels?: boolean;
   hideUnroutedModels?: boolean;
+  /** Code 页签是否和命令行共用 ~/.claude；不写按默认（共用）。 */
+  codeShareHome?: boolean;
+  /** 启动前把命令行建的会话加进 Desktop 的会话列表；不写按默认（开）。 */
+  importCliSessions?: boolean;
 };
 
 type ClaudeLocalStatus = {
@@ -16964,6 +16970,44 @@ function ClaudeLocalizationScreen(
               value={local?.config.plan || "ultra"}
             />
           </CxRow>
+          <CxRow
+            detail={(local?.config.codeShareHome ?? true)
+              ? t("Code 页签和命令行的 Claude Code 共用 ~/.claude：会话、MCP、插件是同一份；~/.claude/settings.json 里的接口地址（env）会优先于网关。从这里启动后生效。")
+              : t("Code 页签用独立目录，请求走 Codex # 网关；平时在命令行 / 3p 模式建的会话要靠会话同步才能打开。")}
+            title={t("和命令行共用 ~/.claude")}
+          >
+            <label className="switch-row compact">
+              <input
+                aria-label={t("和命令行共用 ~/.claude")}
+                checked={local?.config.codeShareHome ?? true}
+                disabled={localDisabled || !local?.supported}
+                onChange={(event) => {
+                  if (local) void configureLocal({ ...local.config, codeShareHome: event.currentTarget.checked });
+                }}
+                type="checkbox"
+              />
+              <span>{(local?.config.codeShareHome ?? true) ? t("已开启") : t("已关闭")}</span>
+              <ToggleVisual />
+            </label>
+          </CxRow>
+          <CxRow
+            detail={t("启动 Claude 前，把终端、BaoCode 等命令行里建的会话加进左侧列表（已在列表里的、删过的不会重复加）。")}
+            title={t("显示命令行会话")}
+          >
+            <label className="switch-row compact">
+              <input
+                aria-label={t("显示命令行会话")}
+                checked={local?.config.importCliSessions ?? true}
+                disabled={localDisabled || !local?.supported}
+                onChange={(event) => {
+                  if (local) void configureLocal({ ...local.config, importCliSessions: event.currentTarget.checked });
+                }}
+                type="checkbox"
+              />
+              <span>{(local?.config.importCliSessions ?? true) ? t("已开启") : t("已关闭")}</span>
+              <ToggleVisual />
+            </label>
+          </CxRow>
           <CxRow detail={t("启动 Claude 前同步 3p 模式与完整功能模式的 Code 会话")} title={t("会话同步")}>
             <div className="claude-l10n-actions">
               <label className="switch-row compact">
@@ -17006,13 +17050,25 @@ function ClaudeLocalizationScreen(
                 ["voiceInput", "原生听写", "本地原生听写"],
                 ["computerUse", "电脑控制", "本地电脑控制"],
                 ["backgroundMode", "后台模式", "本地后台模式"],
+                ["forceBackgroundMode", "新系统也开后台模式", "本地后台模式不限系统版本"],
               ] as const).map(([key, label, ariaLabel]) => (
-                <label className="switch-row compact" key={key}>
+                <label
+                  className="switch-row compact"
+                  key={key}
+                  title={key === "forceBackgroundMode"
+                    ? t("Claude 在较新的 macOS 上会提示「暂不支持后台模式」；打开后不再限制系统版本，未经 Claude 验证，可能不稳定")
+                    : undefined}
+                >
                   <input
                     aria-label={t(ariaLabel)}
-                    checked={local.config[key]}
+                    checked={local.config[key] ?? false}
                     disabled={localDisabled}
-                    onChange={(event) => void configureLocal({ ...local.config, [key]: event.currentTarget.checked })}
+                    onChange={(event) => {
+                      const checked = event.currentTarget.checked;
+                      // 关后台模式时一并关掉「新系统也开」，否则保存时会被它重新打开。
+                      const extra = key === "backgroundMode" && !checked ? { forceBackgroundMode: false } : {};
+                      void configureLocal({ ...local.config, [key]: checked, ...extra });
+                    }}
                     type="checkbox"
                   />
                   <span><strong>{t(label)}</strong></span>
@@ -18251,7 +18307,7 @@ function routeSubtitle(route: Route, soloAgent: string | null = null) {
     pluginMarket: t("检索插件，按需下载并安装到 Codex"),
     recommendations: t("来自 Codex # 广告源的推荐，点卡片在浏览器里打开"),
     agentCache: t("扫描 Codex、Claude 与 Codex # 的已知缓存目录，由你选择清理项目。"),
-    agentCollaboration: t("连接 Codex、DeepSeek Harness 与 Claude Code，派发任务并查看结果。"),
+    agentCollaboration: t("连接 Codex、DeepSeek Harness、Claude Code 与 Google Antigravity，派发任务并查看结果。"),
     computerUse: t("复用 Codex 的 Computer Use，通过 MCP 接给 Claude Code、Claude Desktop 与 Codex。"),
     hub: t("任意 Agent 经 Codex # 接入任意供应商：谁在用、走哪家、是否健康，一屏看全"),
     gateway: t("选择哪些 Agent 经 Codex # 网关接入，以及它们默认用哪个模型"),

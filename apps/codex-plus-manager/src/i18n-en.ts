@@ -1690,6 +1690,15 @@ export const EN_PLAIN: Record<string, string> = {
   "默认让子智能体继承父回合的模型和供应商，避免被悄悄换到别家；打开后按 Codex 实际请求的模型发送，例如 code review 指定了别的模型。": "By default subagents inherit the parent turn's model and provider so nothing silently switches providers. Turn this on to send the model Codex actually requests, e.g. when a code review names another model.",
   "保存子智能体模型策略": "Save subagent model policy",
   "会话同步": "Session sync",
+  "和命令行共用 ~/.claude": "Share ~/.claude with the CLI",
+  "显示命令行会话": "Show CLI sessions",
+  "新系统也开后台模式": "Background mode on newer macOS",
+  "本地后台模式不限系统版本": "Local background mode on any macOS version",
+  "Claude 在较新的 macOS 上会提示「暂不支持后台模式」；打开后不再限制系统版本，未经 Claude 验证，可能不稳定":
+    "Claude says background mode isn't supported on newer macOS. Turning this on lifts the version limit; Claude hasn't validated it there, so it may be unstable.",
+  "启动 Claude 前，把终端、BaoCode 等命令行里建的会话加进左侧列表（已在列表里的、删过的不会重复加）。": "Before launching Claude, add sessions created in the terminal, BaoCode and other CLIs to the sidebar (sessions already listed or deleted are skipped).",
+  "Code 页签和命令行的 Claude Code 共用 ~/.claude：会话、MCP、插件是同一份；~/.claude/settings.json 里的接口地址（env）会优先于网关。从这里启动后生效。": "The Code tab shares ~/.claude with the Claude Code CLI: same sessions, MCP servers and plugins. API settings (env) in ~/.claude/settings.json take precedence over the gateway. Takes effect the next time Claude is launched from here.",
+  "Code 页签用独立目录，请求走 Codex # 网关；平时在命令行 / 3p 模式建的会话要靠会话同步才能打开。": "The Code tab uses its own folder and goes through the Codex # gateway; sessions created in the CLI or 3p mode need session sync to open.",
   "启动 Claude 前同步 3p 模式与完整功能模式的 Code 会话": "Sync Code sessions between 3p mode and the full local mode before launching Claude",
   "立即同步": "Sync now",
   "请先完全退出 Claude 再同步会话": "Quit Claude completely before syncing sessions",
@@ -3009,6 +3018,13 @@ export const EN_PLAIN: Record<string, string> = {
 
   // Skills 面板
   "Skills": "Skills",
+  "共享": "Shared",
+  "本地安装": "Local installation",
+  "Codex # 受控": "Managed by Codex #",
+  "状态未知": "Status unknown",
+  "Codex 状态未知": "Codex status unknown",
+  "同名冲突": "Name conflict",
+  "刷新目录中": "Refreshing catalog",
   "Skills 技能": "Skills",
   "Skills 仓库源": "Skill repositories",
   "从 GitHub 仓库安装 Skill 到 Codex。启用后软链到 ~/.codex/skills/，下次对话即可用。":

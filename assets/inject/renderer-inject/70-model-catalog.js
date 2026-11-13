@@ -936,6 +936,25 @@
     return { requestMethod, threadId, model };
   }
 
+  function codexThreadContextSignature(config) {
+    // 路由别名交给原生 turn/start；只有实际窗口配置变化才需要卸载线程。
+    return JSON.stringify([config.model_context_window, config.model_auto_compact_token_limit]);
+  }
+
+  function codexThreadContextMatches(cached, context) {
+    if (cached === context.signature) return true;
+    try {
+      // 热重注入保留了旧版内存缓存：[modelAlias, config]。
+      const previous = JSON.parse(cached);
+      return Array.isArray(previous) && previous.length === 2
+        && typeof previous[0] === "string" && previous[1]
+        && typeof previous[1] === "object" && !Array.isArray(previous[1])
+        && codexThreadContextSignature(previous[1]) === context.signature;
+    } catch {
+      return false;
+    }
+  }
+
   async function codexThreadRuntimeContext(params) {
     const catalog = await loadCodexModelCatalog(true);
     const runtime = catalog.runtimeContext;
@@ -946,7 +965,7 @@
     if (runtime.status !== "ok") throw new Error(runtime.message || "读取上下文配置失败，请稍后重新发送");
     const model = codexThreadModelRequestState("", params).model || catalog.model;
     const config = runtime.models[model];
-    return config ? { model, config, signature: JSON.stringify([model, config]) } : null;
+    return config ? { model, config, signature: codexThreadContextSignature(config) } : null;
   }
 
   async function prepareCodexThreadContextStart(method, params, hostId) {
@@ -975,7 +994,7 @@
       model_auto_compact_token_limit: params.config.model_auto_compact_token_limit,
     };
     const contexts = window.__codexPlusThreadContexts ||= new Map();
-    contexts.set(state.threadId, JSON.stringify([state.model, config]));
+    contexts.set(state.threadId, codexThreadContextSignature(config));
     if (contexts.size > 256) contexts.delete(contexts.keys().next().value);
   }
 
@@ -994,7 +1013,7 @@
     const context = await codexThreadRuntimeContext(params);
     if (!context) return null;
     const contexts = window.__codexPlusThreadContexts ||= new Map();
-    if (contexts.get(threadId) === context.signature) return null;
+    if (codexThreadContextMatches(contexts.get(threadId), context)) return null;
     if (window.__codexPlusConnectionRecoveryPending?.has(threadId)
         || window.__codexPlusContextRefreshPending?.has(threadId)) {
       throw new Error("此会话正在检查连接，请稍后重新发送");
@@ -1015,7 +1034,12 @@
       // 新建线程的 rollout 要到首轮才写入；仅路径存在不代表可以卸载恢复。
       const turns = await originalSendRequest("thread/turns/list",
         { threadId, limit: 1, itemsView: "notLoaded" }, recoveryOptions);
-      if (turns.data.length === 0) throw new Error("此新会话尚无历史，请重新新建会话以应用上下文配置");
+      // 还没有历史的新线程不能卸载恢复。Codex 26.1106 起侧边聊天用 attachToSource 分叉、不再标 ephemeral（#3062），
+      // 拦下发送会让侧聊完全不可用：放行原生首轮，不记签名，等有了历史后的下一次发送再应用上下文配置。
+      if (turns.data.length === 0) {
+        sendCodexPlusDiagnostic("thread_model_context_refresh_deferred", { threadId, reason: "no_history" });
+        return null;
+      }
       const current = await originalSendRequest("thread/resume", { threadId, excludeTurns: true }, recoveryOptions);
       if (current.thread.status.type !== "idle") throw new Error("请先等待当前回复结束，再应用上下文配置");
       let resumeParams = codexThreadReloadParams(threadId, current, { ...params, model: context.model });
@@ -1094,6 +1118,7 @@
       const connectionParams = await prepareCodexManagedSessionConnection(String(method || ""),
         resumeParams, client.hostId, originalSendRequest);
       const nextParams = await prepareCodexThreadContextStart(String(method || ""), connectionParams, client.hostId);
+      const gatewayGeneration = await prepareCodexGatewayReconnect(String(method || ""), nextParams, client.hostId, originalSendRequest);
       const modelContextRefresh = await refreshCodexThreadModelBeforeTurn(
         client,
         originalSendRequest,
@@ -1106,6 +1131,7 @@
       if (managedTurn) return managedTurn.result;
       const result = await sendAppServerRequestThroughExchange(client, method, nextParams,
         () => originalSendRequest(method, nextParams, options));
+      noteCodexGatewayThreadStart(String(method || ""), nextParams, result, client.hostId, gatewayGeneration);
       verifyCodexPureApiResumeResult(String(method || ""), nextParams, result, client.hostId);
       noteCodexManagedSessionStart(String(method || ""), nextParams, result, client.hostId);
       noteCodexThreadRuntimeContext(String(method || ""), nextParams, result, client.hostId);
@@ -1347,6 +1373,7 @@
       const connectionParams = await prepareCodexManagedSessionConnection(String(method || ""),
         resumeParams, client.hostId, originalSendRequest.bind(client));
       const nextParams = await prepareCodexThreadContextStart(String(method || ""), connectionParams, client.hostId);
+      const gatewayGeneration = await prepareCodexGatewayReconnect(String(method || ""), nextParams, client.hostId, originalSendRequest.bind(client));
       const modelContextRefresh = await refreshCodexThreadModelBeforeTurn(
         client,
         originalSendRequest.bind(client),
@@ -1359,6 +1386,7 @@
       if (managedTurn) return managedTurn.result;
       const result = await sendAppServerRequestThroughExchange(client, method, nextParams,
         () => originalSendRequest.call(client, method, nextParams, options));
+      noteCodexGatewayThreadStart(String(method || ""), nextParams, result, client.hostId, gatewayGeneration);
       verifyCodexPureApiResumeResult(String(method || ""), nextParams, result, client.hostId);
       noteCodexManagedSessionStart(String(method || ""), nextParams, result, client.hostId);
       noteCodexThreadRuntimeContext(String(method || ""), nextParams, result, client.hostId);
@@ -1515,8 +1543,9 @@
       installAppServerModelRequestPatch();
       void installCodexAppServerClientCapture().catch(() => {});
     }
-    // 启动器平时只在模型解锁 / 会话删除开启时捕获客户端类；只有拓展需要时，请它按需补开（每页一次）。
-    if (extensionWantsRequests && !window.__codexPlusAppServerClientClass && !window.__codexPlusExtensionRequestCaptureAsked) {
+    // 网关恢复和拓展需要时，请启动器捕获客户端类（每页一次）。
+    if ((extensionWantsRequests || codexGatewayRecoveryEnabled())
+        && !window.__codexPlusAppServerClientClass && !window.__codexPlusExtensionRequestCaptureAsked) {
       window.__codexPlusExtensionRequestCaptureAsked = true;
       void postJson("/extensions/request-capture", {}).catch(() => {});
     }

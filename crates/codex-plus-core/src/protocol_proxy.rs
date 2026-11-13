@@ -197,43 +197,9 @@ pub(crate) fn is_managed_protocol_proxy_base_url(value: &str) -> bool {
     managed_protocol_proxy_base_urls().iter().any(|url| parsed.as_str() == url)
 }
 
-/// 某个状态目录里持久化的协议代理端口，没有时是默认的 57321。
-/// 用来找另一个进程（ClaudeMom 读 Codex #）的本地网关端口。
-pub fn protocol_proxy_port_in(state_dir: &std::path::Path) -> u16 {
-    read_persisted_protocol_proxy_port(&state_dir.join(PROTOCOL_PROXY_PORT_FILE))
-        .unwrap_or(DEFAULT_PROTOCOL_PROXY_PORT)
-}
-
-/// 给当前状态目录种一个默认协议代理端口：只在还没有持久化端口时写入。
-///
-/// 供独立变体（ClaudeMom）首次启动用：它和 Codex # 能同时运行，不能都抢 57321。
-/// 已有持久化端口（包括 10013 迁移过的）一律不动，之后的迁移逻辑照常生效。
-pub fn seed_default_protocol_proxy_port(port: u16) -> anyhow::Result<()> {
-    seed_protocol_proxy_port_at(&persisted_protocol_proxy_port_path(), port)
-}
-
-fn seed_protocol_proxy_port_at(path: &std::path::Path, port: u16) -> anyhow::Result<()> {
-    if port == 0 || read_persisted_protocol_proxy_port(path).is_some() {
-        return Ok(());
-    }
-    persist_protocol_proxy_port(path, port)
-}
-
 #[cfg(test)]
 mod managed_port_history_tests {
     use super::*;
-
-    #[test]
-    fn seeding_only_applies_to_a_fresh_state_dir() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("nested").join(PROTOCOL_PROXY_PORT_FILE);
-        seed_protocol_proxy_port_at(&path, 57421).unwrap();
-        assert_eq!(read_persisted_protocol_proxy_port(&path), Some(57421));
-        // 已经有端口（比如迁移过）时再种不覆盖。
-        persist_protocol_proxy_port(&path, 58001).unwrap();
-        seed_protocol_proxy_port_at(&path, 57421).unwrap();
-        assert_eq!(read_persisted_protocol_proxy_port(&path), Some(58001));
-    }
 
     #[test]
     fn repeated_port_migrations_keep_every_managed_port() {
@@ -3957,8 +3923,10 @@ async fn open_responses_proxy_request_once(
         };
         // Kimi 官方 Responses 只认 `reasoning.encrypted_content`：Codex 私有的
         // `output.encrypted_content` 会让整包 400（issue #3026），发出前去掉。
+        // 经第三方中转调 Kimi 模型时地址认不出来，按模型名再判一次（#3068）。
         if wire_api == UpstreamWireApi::Responses
-            && crate::relay_config::upstream_is_kimi_official_responses(&relay)
+            && (crate::relay_config::upstream_is_kimi_official_responses(&relay)
+                || request_model_is_kimi(&upstream_body))
         {
             tidy_kimi_include(&mut upstream_body);
         }
@@ -5215,6 +5183,13 @@ fn upstream_rejects_custom_tools(relay: &crate::settings::RelayProfile) -> bool 
 
 /// Kimi 官方 Responses 的 `include` 只认 `reasoning.encrypted_content`（#3026）：
 /// 去掉 Codex 私有的 `output.encrypted_content`，其余项保留；过滤后为空就整个去掉。
+/// 请求的模型名带 `kimi`（如 `kimi-k3.1-pro`、`moonshot/kimi-k2`）：中转站转发的也是 Kimi 的接口（#3068）。
+fn request_model_is_kimi(body: &Value) -> bool {
+    body.get("model")
+        .and_then(Value::as_str)
+        .is_some_and(|model| model.to_ascii_lowercase().contains("kimi"))
+}
+
 fn tidy_kimi_include(body: &mut Value) {
     let Some(object) = body.as_object_mut() else {
         return;
@@ -12130,6 +12105,16 @@ mod kimi_include_tests {
             ..Default::default()
         };
         assert!(!crate::relay_config::upstream_is_kimi_official_responses(&relay));
+    }
+
+    #[test]
+    fn kimi_models_behind_third_party_relays_are_recognized_by_name() {
+        for model in ["kimi-k3.1-pro", "Kimi-K2", "moonshot/kimi-k2-thinking"] {
+            assert!(request_model_is_kimi(&json!({ "model": model })), "{model}");
+        }
+        for body in [json!({ "model": "gpt-6.1-sol" }), json!({ "model": "deepseek-v4-pro" }), json!({})] {
+            assert!(!request_model_is_kimi(&body), "{body}");
+        }
     }
 
     #[test]
