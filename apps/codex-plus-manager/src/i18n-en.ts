@@ -5,6 +5,13 @@
 
 // Plain strings: t("中文") -> EN_PLAIN["中文"].
 export const EN_PLAIN: Record<string, string> = {
+  "重启 Codex 应用登录选择": "Restart Codex to apply sign-in selection",
+  "已写入凭证：": "Saved credentials: ",
+  "更改登录选择后，请关闭所有 Codex 实例并重新启动。": "After changing sign-in selection, close all Codex instances and restart.",
+  "当前直连配置不支持所选登录状态；请先调整连接身份": "The direct connection does not support the selected sign-in state. Change its session identity first.",
+  "Codex 网关连接未启用；登录选择已保存，接入后再应用": "Codex gateway connection is off. Sign-in selection is saved; connect it before applying.",
+  "Codex 配置已由其他工具接管；请先恢复网关连接": "Another tool has taken over the Codex configuration. Restore the gateway connection first.",
+  "WSL 连接不使用官方登录身份；当前选择无法在此连接生效": "The WSL connection does not use official sign-in identity. This selection cannot apply there.",
   "Codex 登录": "Codex sign-in",
   "额度待刷新": "Usage awaiting refresh",
   "待刷新": "Awaiting refresh",
@@ -1201,7 +1208,7 @@ export const EN_PLAIN: Record<string, string> = {
   "清理所选缓存": "Clean selected caches",
   "正在确认或清理缓存…": "Confirming or cleaning caches…",
   "点击扫描查看占用。扫描结果有效期为 10 分钟。": "Scan to see cache sizes. Scan results expire after 10 minutes.",
-  "未发现可识别的缓存目录。": "No recognized cache directories found.",
+  "未发现可统计的缓存目录；如有扫描提示，请查看被跳过的目录。": "No cache directories could be counted. Check any scan warnings for skipped directories.",
   "扫描提示（部分目录可能未统计）": "Scan warnings (some directories may be excluded)",
   "查看清理失败的文件": "View files that could not be cleaned",
   "大小按文件逻辑长度统计，实际释放空间可能不同。缓存可能在应用重启后重新生成。": "Sizes reflect logical file lengths; actual space reclaimed may differ. Caches may be regenerated when apps restart.",
@@ -2560,7 +2567,9 @@ export const EN_PLAIN: Record<string, string> = {
   "接入模式": "Access mode",
   "推荐内容": "Recommendations",
   "提取当前供应商配置": "Extract current provider config",
-  "切换时保留缺失的项目信任设置、通知命令，以及实时配置里改过的 MCP 条目": "When switching, keep missing project trust settings and the notify command, plus MCP entries edited in the live config",
+  "切换时保留实时配置里的改动": "Keep live config edits when switching",
+  "打开后，切换供应商、接入或重写网关、重启 Codex 时：实时 config.toml 里改过的 MCP 服务器（命令、参数、env、超时）以实时文件为准，缺失的项目信任设置和通知命令从实时文件补回。直连和网关都适用。": "When on, switching providers, connecting or rewriting the gateway, and restarting Codex keep MCP servers edited in the live config.toml (command, args, env, timeouts), and restore missing project trust settings and the notify command from the live file. Applies to both direct and gateway mode.",
+  "始终按目标重写的供应商设置：model_provider、model、供应商地址与凭据、模型目录。不论开关都保留：Codex # 没有托管的 MCP / 插件条目、[[skills.config]] 技能启停；网关模式下 developer_instructions 等根级个人设置也会跟着走。": "Provider settings always rewritten for the target: model_provider, model, provider URL and credentials, model catalog. Always kept regardless of this switch: MCP / plugin entries not managed by Codex # and [[skills.config]] skill toggles; in gateway mode, root-level personal settings such as developer_instructions carry over too.",
   "插件": "Plugins",
   "拓展": "Extensions",
   "插件市场解锁": "Plugin marketplace unlock",

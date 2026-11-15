@@ -340,6 +340,7 @@ pub fn codex_binding_models(gateway: &GatewaySettings, binding: &AgentBinding) -
         if !model.is_empty()
             && !is_disabled_group_model(gateway, &model)
             && !unavailable_registered_model(gateway, binding, &model)
+            && !retired_codex_model(gateway, binding, &model)
             && !models
                 .iter()
                 .any(|known| known.eq_ignore_ascii_case(&model))
@@ -584,6 +585,7 @@ pub fn binding_default_model(gateway: &GatewaySettings, binding: &AgentBinding) 
     if !slug.trim().is_empty() {
         let selection_unavailable = unavailable_registered_model(gateway, binding, &slug);
         if selection_unavailable
+            || retired_codex_model(gateway, binding, &slug)
             || is_disabled_group_model(gateway, &slug)
             && !binding.default_model_selection.as_ref().is_some_and(|selection| {
                 slug.eq_ignore_ascii_case(&selection.model_name())
@@ -592,7 +594,8 @@ pub fn binding_default_model(gateway: &GatewaySettings, binding: &AgentBinding) 
             let models = pool_models(gateway, binding);
             if let Some(model) = models
                 .iter()
-                .find(|model| !model_entry_members(gateway, binding, model).is_empty())
+                .find(|model| !retired_codex_model(gateway, binding, model)
+                    && !model_entry_members(gateway, binding, model).is_empty())
             {
                 return model.clone();
             }
@@ -637,6 +640,27 @@ pub fn model_is_routable(gateway: &GatewaySettings, binding: &AgentBinding, mode
         .iter()
         .any(|known| known.eq_ignore_ascii_case(model))
         || qualified_provider(gateway, binding, model).is_some()
+}
+
+/// #2897 的跨供应商回退不能证明历史选择仍有效。
+pub(super) fn codex_model_available(gateway: &GatewaySettings, binding: &AgentBinding, model: &str) -> bool {
+    match selected_provider(gateway, binding, model) {
+        Ok(Some(_)) => true,
+        Err(_) => false,
+        Ok(None) => {
+            if let Some(group) = group_by_model(gateway, model) {
+                return !group.disabled && !expand_group(gateway, binding, group, 0, &mut Vec::new(), false).is_empty();
+            }
+            let relays = binding_pool_relays(gateway, binding);
+            declared_by_any(&relays, model)
+                || qualified_in(&relays, model).is_some()
+        }
+    }
+}
+
+pub(super) fn retired_codex_model(gateway: &GatewaySettings, binding: &AgentBinding, model: &str) -> bool {
+    binding.known_models.contains(&model.to_ascii_lowercase())
+        && !codex_model_available(gateway, binding, model)
 }
 
 /// 暴露给 Agent 的模型：默认模型在前，然后是池里所有能用的模型和路由组，以及绑定里声明的模型。
@@ -1593,6 +1617,7 @@ fn resolve_plan_with(
     let cooldown_off = crate::extension_gateway::builtin_replaced("builtin:key-cooldown");
     let breaker_off = crate::extension_gateway::builtin_replaced("builtin:key-breaker");
     let rate_limit_off = crate::extension_gateway::builtin_replaced("builtin:local-rate-limit");
+    let pinned_key = crate::responses_websocket::pinned_key();
     for (relay, upstream_model) in permitted {
         let provider = gateway.provider(&relay.id);
         let window = provider.and_then(|provider| provider.window_for(&upstream_model));
@@ -1619,9 +1644,15 @@ fn resolve_plan_with(
             limits,
         };
         for key in order.available {
+            if pinned_key.as_ref().is_some_and(|pinned| pinned != &key.key) {
+                continue;
+            }
             candidates.push(candidate(key));
         }
         for key in order.waiting {
+            if pinned_key.as_ref().is_some_and(|pinned| pinned != &key.candidate.key) {
+                continue;
+            }
             let bypass = match key.reason {
                 // 自己在冷却的 Key 可能同时赶上供应商熔断：熔断没关掉时仍按熔断拦着。
                 key_pool::WaitReason::Cooling => {
@@ -3007,6 +3038,46 @@ mod tests {
             routed(&gateway, "ds/private-model"),
             vec![pair("router", "ds/private-model")]
         );
+    }
+
+    #[test]
+    fn known_codex_models_remain_available_when_their_route_still_works() {
+        use crate::gateway::store::DefaultModelSelection;
+
+        let mut gateway = gateway("deepseek-v4-pro");
+        let binding = gateway.bindings.get_mut("claude").unwrap();
+        binding.known_models.extend([
+            "deepseek-v4-pro".into(),
+            "group/fast".into(),
+            "ds/private-model".into(),
+        ]);
+        binding.model_selections.push(DefaultModelSelection {
+            provider_id: "ds".into(),
+            upstream_model: "private-model".into(),
+            provider_source: String::new(),
+            provider_removed: false,
+        });
+        let binding = gateway.binding(&ToolId::Claude).unwrap();
+        assert!(!retired_codex_model(&gateway, binding, "ds/private-model"));
+
+        gateway.providers[0].enabled = false;
+        let binding = gateway.binding(&ToolId::Claude).unwrap();
+        assert!(!retired_codex_model(&gateway, binding, "deepseek-v4-pro"));
+        assert!(!retired_codex_model(&gateway, binding, "group/fast"));
+        assert!(retired_codex_model(&gateway, binding, "ds/private-model"));
+
+        gateway.providers[1].enabled = false;
+        gateway.providers[2].enabled = false;
+        let binding = gateway.binding(&ToolId::Claude).unwrap();
+        assert!(retired_codex_model(&gateway, binding, "deepseek-v4-pro"));
+        assert!(retired_codex_model(&gateway, binding, "group/fast"));
+
+        gateway.providers[0].enabled = true;
+        let binding = gateway.binding(&ToolId::Claude).unwrap();
+        assert!(!retired_codex_model(&gateway, binding, "deepseek-v4-pro"));
+        assert!(!retired_codex_model(&gateway, binding, "group/fast"));
+        assert!(!retired_codex_model(&gateway, binding, "ds/private-model"));
+        assert!(!retired_codex_model(&gateway, binding, "never-published"));
     }
 
     #[test]
