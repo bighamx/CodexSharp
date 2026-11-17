@@ -1122,6 +1122,10 @@ pub struct BackendSettings {
     /// 打开后启动前把容器挪走、项目留在顶层，切回官方登录时再放回。默认关闭。
     #[serde(rename = "keepProjectsWithoutAccount", default)]
     pub keep_projects_without_account: bool,
+    /// 流式请求等上游响应头的上限（秒）。默认 120；首字时间经常超过 120s 的上游
+    /// （长推理模型、慢中转，#3130）可在 settings.json 调大，上限 3600，写小不生效。
+    #[serde(rename = "upstreamStreamHeaderTimeoutSecs", default)]
+    pub upstream_stream_header_timeout_secs: Option<u64>,
     /// 当前 Codex 原生 auth 的显式选择；None 表示旧版本未设置，Some(None) 表示明确不登录。
     #[serde(rename = "nativeAuthSelection", default)]
     pub native_auth_selection: Option<NativeAuthSelection>,
@@ -1221,6 +1225,10 @@ pub struct BackendSettings {
     pub computer_use_pip: bool,
     #[serde(rename = "codexAppPasteFix", default)]
     pub codex_app_paste_fix: bool,
+    /// 发送 /prompts:<名字> 参数 时按 CLI 规则展开 $1…$9、$ARGUMENTS、$名字（Codex 应用原生只把参数拼在正文后）。
+    /// 只在带参数发送已有 prompt 时介入，默认开启。
+    #[serde(rename = "codexAppPromptArgs", default = "default_true")]
+    pub codex_app_prompt_args: bool,
     // 默认关闭：撤下的那版会主动从 settings.json 删掉这个键，老用户升级后读不到，
     // 若默认开启等于替他们重新打开一个从没同意过的行为。要开请显式勾选。
     #[serde(rename = "codexAppForceChineseLocale", default)]
@@ -1265,6 +1273,15 @@ pub struct BackendSettings {
     /// 只改本机界面与超时参数，服务端能力不变。默认关。
     #[serde(rename = "codexAppStatsigOverrides", default)]
     pub codex_app_statsig_overrides: bool,
+    /// Statsig 开关逐项覆盖（Codex 页面 Feature Lab 里设置）：key 是开关 ID（纯数字），
+    /// 值是 "on"（强制开）/ "off"（强制关）/ "native"（不覆盖，用远端原值）。
+    /// 没列出的开关按 assets/statsig-gates.json 的默认处理；只在总开关打开时生效。
+    #[serde(
+        rename = "codexAppStatsigGateOverrides",
+        default,
+        skip_serializing_if = "BTreeMap::is_empty"
+    )]
+    pub codex_app_statsig_gate_overrides: BTreeMap<String, String>,
     /// Codex App 与 CLI 的本地代理响应信任上报用量，不改 usage；旧会话首次响应前仍可能使用原估算。默认关。
     #[serde(rename = "codexAppReportedUsageCompaction", default)]
     pub codex_app_reported_usage_compaction: bool,
@@ -1535,6 +1552,7 @@ impl Default for BackendSettings {
             session_index_repair_enabled: default_session_index_repair_enabled(),
             thread_model_follow_switch_enabled: false,
             keep_projects_without_account: false,
+            upstream_stream_header_timeout_secs: None,
             native_auth_selection: None,
             provider_sync_saved_providers: Vec::new(),
             provider_sync_manual_providers: Vec::new(),
@@ -1567,6 +1585,7 @@ impl Default for BackendSettings {
             computer_use_mode: default_computer_use_mode(),
             computer_use_pip: true,
             codex_app_paste_fix: false,
+            codex_app_prompt_args: true,
             codex_app_force_chinese_locale: false,
             codex_app_rail_codex_entry: true,
             codex_app_rail_extensions_entry: true,
@@ -1582,6 +1601,7 @@ impl Default for BackendSettings {
             codex_app_third_party_reasoning_collapse: false,
             codex_app_offline_auto_review: false,
             codex_app_statsig_overrides: false,
+            codex_app_statsig_gate_overrides: BTreeMap::new(),
             codex_app_reported_usage_compaction: false,
             manager_agent_focus: String::new(),
             codex_app_pet_real_mouse_look: false,
@@ -3018,6 +3038,7 @@ fn merge_known_setting_fields(target: &mut Map<String, Value>, source: &Map<Stri
     merge_bool_setting(target, source, "usageHistoryEnabled");
     merge_bool_setting(target, source, "codexAppProxyRequestStatus");
     merge_bool_setting(target, source, "codexAppPasteFix");
+    merge_bool_setting(target, source, "codexAppPromptArgs");
     merge_bool_setting(target, source, "codexAppForceChineseLocale");
     merge_bool_setting(target, source, "codexAppRailCodexEntry");
     merge_bool_setting(target, source, "codexAppRailExtensionsEntry");
@@ -3040,6 +3061,15 @@ fn merge_known_setting_fields(target: &mut Map<String, Value>, source: &Map<Stri
     merge_bool_setting(target, source, "codexAppThirdPartyReasoningCollapse");
     merge_bool_setting(target, source, "codexAppOfflineAutoReview");
     merge_bool_setting(target, source, "codexAppStatsigOverrides");
+    if let Some(map) = source
+        .get("codexAppStatsigGateOverrides")
+        .and_then(Value::as_object)
+    {
+        target.insert(
+            "codexAppStatsigGateOverrides".to_string(),
+            Value::Object(sanitize_statsig_gate_overrides(map)),
+        );
+    }
     merge_bool_setting(target, source, "codexAppReportedUsageCompaction");
     if let Some(value @ ("" | "codex" | "enhance" | "all")) =
         source.get("managerAgentFocus").and_then(Value::as_str)
@@ -3377,6 +3407,25 @@ fn merge_known_setting_fields(target: &mut Map<String, Value>, source: &Map<Stri
             Value::String(ToolId::parse(value).as_str().to_string()),
         );
     }
+}
+
+/// Statsig 逐项覆盖的上限：清单本身只有十来项，记录页能手动加未知开关，留足余量即可。
+const STATSIG_GATE_OVERRIDE_LIMIT: usize = 200;
+
+/// 只保留「纯数字开关 ID → on/off/native」的条目。页面整份提交，非法条目直接丢弃，
+/// 避免把任意 key 写进设置文件、再原样注入页面。
+pub fn sanitize_statsig_gate_overrides(source: &Map<String, Value>) -> Map<String, Value> {
+    source
+        .iter()
+        .filter_map(|(key, value)| {
+            let id = key.trim();
+            let valid_id = !id.is_empty() && id.len() <= 12 && id.bytes().all(|byte| byte.is_ascii_digit());
+            let choice = value.as_str().map(str::trim)?;
+            (valid_id && matches!(choice, "on" | "off" | "native"))
+                .then(|| (id.to_string(), Value::String(choice.to_string())))
+        })
+        .take(STATSIG_GATE_OVERRIDE_LIMIT)
+        .collect()
 }
 
 fn merge_bool_setting(target: &mut Map<String, Value>, source: &Map<String, Value>, key: &str) {

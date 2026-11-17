@@ -14,7 +14,7 @@ use super::{
 };
 
 #[cfg(target_os = "macos")]
-const LEGACY_MANAGER_BUNDLE_NAME: &str = "Codex # 管理工具.app";
+const LEGACY_MANAGER_BUNDLE_NAME: &str = "Codex++ 管理工具.app";
 
 pub fn build_app_bundle(options: &InstallOptions, _manager: bool) -> MacosAppBundle {
     // 保留 manager 参数供已有调用方使用；安装计划始终只有同一个原生界面 app。

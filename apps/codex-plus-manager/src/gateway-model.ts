@@ -88,6 +88,8 @@ export type GatewayPoolEntry = {
   modelWindows?: Record<string, number>;
   /** 没单独写窗口的模型用的窗口；都没有就用模型自带资料。 */
   contextWindow?: number | null;
+  /** 自动压缩阈值（#3100）：窗口的百分比，按模型 + 默认值；没设时为空，用 Codex 默认。旧版后端没有。 */
+  autoCompact?: { models?: Record<string, number>; fallback?: number | null } | null;
   /** 网关供应商单独走的 HTTP 代理，空串表示不单独走代理。 */
   proxy?: string;
   /** 主动限速：每个 Key 每分钟最多请求数；没有或 null 表示不限。旧版后端没有。 */
@@ -1047,6 +1049,25 @@ export function memberStatus(payload: GatewayPayload | null, relayId: string, no
     const quota = cooling.some((key) => key.lastFailure === "quota_exhausted");
     if (!left) return { state: "cooling", text: quota ? "额度耗尽" : "被限流", args: [] };
     return { state: "cooling", text: quota ? "额度耗尽 · {0} 后恢复" : "被限流 · {0} 后恢复", args: [left] };
+  }
+  // 冷却记录随进程消失；重新查到的官方窗口仍须参与状态，不能退回绿色套餐名。
+  if (entry?.account && entry.quota) {
+    const quota = entry.quota;
+    const maxAge = entry.subscriptionPolicy?.maxAgeSeconds ?? 600;
+    const exhausted = quota.windows.filter(window =>
+      quotaWindowFresh(quota, window, nowMs, maxAge) && window.usedPercent >= 100);
+    if (exhausted.length) {
+      const resets = exhausted.map(window => window.resetsAtMs).filter((reset): reset is number => reset !== null);
+      const left = resets.length === exhausted.length ? formatRemaining(Math.max(...resets) - nowMs) : "";
+      return left
+        ? { state: "cooling", text: "额度耗尽 · {0} 后恢复", args: [left] }
+        : { state: "cooling", text: "额度耗尽", args: [] };
+    }
+    const fresh = quota.updatedAtMs <= nowMs && nowMs - quota.updatedAtMs <= maxAge * 1000;
+    if (fresh && (quota.officialAllowed === false
+      || (quota.officialLimitReached === true && quota.officialAllowed !== true))) {
+      return { state: "cooling", text: "订阅额度受限", args: [] };
+    }
   }
   // 最近 10 分钟内由它回答过的 Agent 请求：显示「Codex 刚用过」。
   const answered = activity

@@ -29,7 +29,7 @@
   <a href="https://github.com/bighamx/CodexSharp/releases"><strong>下载本仓库版本（已去推荐位）↗</strong></a> &nbsp; · &nbsp;
   <a href="#快速上手">快速上手</a> &nbsp; · &nbsp;
   <a href="#功能一览">功能一览</a> &nbsp; · &nbsp;
-  <a href="https://github.com/BigPizzaV3/CodexPlusPlus/issues">反馈问题</a> &nbsp; · &nbsp;
+  <a href="https://github.com/bighamx/CodexSharp/issues">反馈问题</a> &nbsp; · &nbsp;
   <a href="README_EN.md">English</a>
 </p>
 
@@ -272,7 +272,7 @@ Codex # 是 AI 编程 Agent 的统一管理应用，构建于万物皆拓展的�
 
 ## 快速上手
 
-**1. 下载安装包**：前往 [GitHub Releases](https://github.com/BigPizzaV3/CodexPlusPlus/releases)。
+**1. 下载安装包**：前往 [GitHub Releases](https://github.com/bighamx/CodexSharp/releases)。
 
 | 你的设备 | 安装包 |
 | --- | --- |
@@ -420,7 +420,7 @@ cargo build --release
 
 ## Star History
 
-如果 Codex # 对你有帮助，欢迎 [点一颗 Star](https://github.com/BigPizzaV3/CodexPlusPlus)。
+如果 Codex # 对你有帮助，欢迎 [点一颗 Star](https://github.com/bighamx/CodexSharp)。
 
 <p align="center">
   <a href="https://www.star-history.com/#BigPizzaV3/CodexPlusPlus&amp;Date">

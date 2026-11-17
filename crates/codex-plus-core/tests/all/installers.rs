@@ -437,7 +437,7 @@ mod macos_install {
                 .join("Codex++.app/Contents/MacOS/codex-plus-plus")
                 .exists()
         );
-        assert!(!root.path().join("Codex # 管理工具.app").exists());
+        assert!(!root.path().join("Codex++ 管理工具.app").exists());
     }
 
     #[test]
@@ -474,7 +474,7 @@ mod macos_install {
             .collect::<Vec<_>>();
         assert_eq!(snapshot(&copied), before);
         assert_eq!(snapshot(&files), before);
-        assert!(!target.path().join("Codex # 管理工具.app").exists());
+        assert!(!target.path().join("Codex++ 管理工具.app").exists());
     }
 
     #[test]

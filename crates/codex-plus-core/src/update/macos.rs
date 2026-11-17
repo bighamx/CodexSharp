@@ -46,7 +46,7 @@ fn installed_root_from_executable(executable: &Path) -> anyhow::Result<PathBuf> 
             .and_then(Path::parent)
             .and_then(Path::file_name)
             .and_then(|name| name.to_str());
-        if app_name.is_some_and(|name| name.eq_ignore_ascii_case("Codex # 管理工具.app")) {
+        if app_name.is_some_and(|name| name.eq_ignore_ascii_case("Codex++ 管理工具.app")) {
             bail!("{LEGACY_MIGRATION_MESSAGE}");
         }
         bail!(
@@ -1833,7 +1833,7 @@ mod tests {
             root
         );
         for executable in [executable_path(
-            "Codex # 管理工具.app",
+            "Codex++ 管理工具.app",
             "CodexPlusPlusManager",
         )] {
             let error = installed_root_from_executable(&executable).unwrap_err();
@@ -1874,7 +1874,7 @@ mod tests {
     fn macos_update_leaves_legacy_manager_bundle_in_place() {
         let (_temp, plan, payload) = fixture(true);
         let legacy = BundleSpec {
-            name: "Codex # 管理工具.app",
+            name: "Codex++ 管理工具.app",
             id: "com.bigpizzav3.codexplusplus.manager",
             executable: "CodexPlusPlusManager",
         };

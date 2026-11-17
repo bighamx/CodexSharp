@@ -51,6 +51,8 @@ pub struct GatewayPoolEntry {
     pub model_windows: std::collections::BTreeMap<String, u64>,
     /// 没单独写窗口的模型用的窗口。
     pub context_window: Option<u64>,
+    /// 自动压缩阈值（窗口的百分比，按模型 + 默认值，#3100）；没设时为空。
+    pub auto_compact: codex_plus_core::gateway::store::ProviderAutoCompact,
     /// 登录得到的账号：`chatgpt` / `copilot` / `grok`；普通供应商为空。
     pub account: String,
     /// 订阅账号的套餐（如「ChatGPT Pro」「Copilot Pro+」）；普通供应商为空。
@@ -248,6 +250,7 @@ fn pool_entry(
         model_prices,
         model_windows: Default::default(),
         context_window: None,
+        auto_compact: Default::default(),
         model_metadata: relay.model_metadata.clone(),
         image_models: codex_plus_core::gateway::images::provider_image_models(relay),
         account: account_kind(relay),
@@ -331,6 +334,7 @@ fn build_payload(settings: &BackendSettings, gateway: GatewaySettings) -> Gatewa
             subscription_block_reason: codex_plus_core::gateway::quota::dispatch_decision(&gateway, &provider.relay).err().map(|blocked| blocked.message),
             model_windows: provider.model_windows.clone(),
             context_window: provider.context_window,
+            auto_compact: provider.auto_compact.clone(),
             key_rpm: provider.key_rpm,
             key_concurrency: provider.key_concurrency,
             ..pool_entry(
@@ -1520,14 +1524,22 @@ pub fn save_gateway_provider_newapi_access(
     )
 }
 
-/// 改供应商的上下文窗口（按模型的和其余模型用的默认值）；窗口写在 Agent 的模型资料里，存完重写 Agent 配置。
+/// 改供应商的上下文窗口（按模型的和其余模型用的默认值）与自动压缩阈值（#3100，可不传）；
+/// 都写在 Agent 的模型资料里，存完重写 Agent 配置。
 #[tauri::command]
 pub fn save_gateway_provider_windows(
     id: String,
     windows: std::collections::BTreeMap<String, u64>,
     fallback: Option<u64>,
+    auto_compact: Option<codex_plus_core::gateway::store::ProviderAutoCompact>,
 ) -> CommandResult<Option<GatewayPayload>> {
-    let result = apply::set_provider_windows(&GatewayStore::default(), &id, windows, fallback)
+    let store = GatewayStore::default();
+    let result = apply::set_provider_windows(&store, &id, windows, fallback)
+        .and_then(|saved| match auto_compact {
+            // 旧界面不传压缩阈值：原样保留（#3100）。
+            Some(auto_compact) => apply::set_provider_auto_compact(&store, &id, auto_compact),
+            None => Ok(saved),
+        })
         .and_then(|saved| {
             apply::refresh_enabled(&context())
                 .context("窗口已保存，但刷新 Agent 配置失败")?;
@@ -3245,4 +3257,73 @@ mod disconnect_preview_tests {
         assert_eq!(value["preview"], serde_json::Value::Null);
         assert!(value.get("preview").is_some());
     }
+}
+
+/// Codex 页面「供应商」页的网关命令分发（core `provider_page::route_gateway` 已做白名单与脱敏）。
+///
+/// 参数名与前端 `invoke` 一致（camelCase）。直接调用上面的命令函数，所以生效（`refresh_agents`）、
+/// 价格填充、额度预取、断开预览 token、`notify_settings_changed` 都与管理器自己的界面完全相同。
+/// 调用方在阻塞线程里（bridge 路由用 `spawn_blocking`），异步命令用 `block_on` 等结果。
+pub fn provider_page_gateway_call(command: &str, args: serde_json::Value) -> serde_json::Value {
+    fn arg<T: serde::de::DeserializeOwned>(args: &serde_json::Value, key: &str) -> Result<T, String> {
+        serde_json::from_value(args.get(key).cloned().unwrap_or(serde_json::Value::Null))
+            .map_err(|error| format!("参数 {key} 不正确：{error}"))
+    }
+    fn to_value<T: Serialize>(result: CommandResult<T>) -> serde_json::Value {
+        serde_json::to_value(result).unwrap_or_else(|error| {
+            serde_json::json!({ "status": "failed", "message": format!("返回结果无法序列化：{error}") })
+        })
+    }
+    let run = || -> Result<serde_json::Value, String> {
+        Ok(match command {
+            "load_gateway" => to_value(tauri::async_runtime::block_on(load_gateway())),
+            "create_gateway_provider" => to_value(create_gateway_provider(
+                arg(&args, "input")?,
+                arg::<Option<String>>(&args, "source")?.unwrap_or_else(|| "custom".to_string()),
+                arg(&args, "skipAgents")?,
+            )),
+            "update_gateway_provider" => to_value(update_gateway_provider(arg(&args, "id")?, arg(&args, "input")?)),
+            "delete_gateway_provider" => to_value(delete_gateway_provider(arg(&args, "id")?)),
+            "set_gateway_provider_enabled" => {
+                to_value(set_gateway_provider_enabled(arg(&args, "id")?, arg(&args, "enabled")?))
+            }
+            "reorder_gateway_providers" => to_value(reorder_gateway_providers(arg(&args, "ids")?)),
+            "add_gateway_provider_key" => to_value(add_gateway_provider_key(arg(&args, "id")?, arg(&args, "key")?)),
+            "replace_gateway_provider_key" => to_value(replace_gateway_provider_key(
+                arg(&args, "id")?,
+                arg(&args, "keyId")?,
+                arg(&args, "key")?,
+            )),
+            "delete_gateway_provider_key" => {
+                to_value(delete_gateway_provider_key(arg(&args, "id")?, arg(&args, "keyId")?))
+            }
+            "test_gateway_provider" => to_value(tauri::async_runtime::block_on(test_gateway_provider(
+                arg(&args, "id")?,
+                arg(&args, "model")?,
+                arg(&args, "keyId")?,
+            ))),
+            "cancel_gateway_provider_test" => to_value(cancel_gateway_provider_test()),
+            "fetch_provider_models" => to_value(tauri::async_runtime::block_on(crate::provider_lookup_commands::fetch_provider_models(
+                arg(&args, "baseUrl")?,
+                arg(&args, "protocol")?,
+                arg::<Option<String>>(&args, "apiKey")?.unwrap_or_default(),
+                arg(&args, "providerId")?,
+            ))),
+            "save_gateway_binding" => to_value(save_gateway_binding(
+                arg(&args, "agent")?,
+                arg(&args, "binding")?,
+                arg(&args, "reconnect")?,
+            )),
+            "preview_gateway_disconnect" => to_value(tauri::async_runtime::block_on(preview_gateway_disconnect(arg(&args, "agent")?))),
+            "disable_gateway_binding" => {
+                to_value(disable_gateway_binding(arg(&args, "agent")?, arg(&args, "previewToken")?))
+            }
+            "disable_gateway_binding_full_switch" => to_value(disable_gateway_binding_full_switch(
+                arg(&args, "agent")?,
+                arg(&args, "previewToken")?,
+            )),
+            other => return Err(format!("不支持的网关命令 {other}")),
+        })
+    };
+    run().unwrap_or_else(|message| serde_json::json!({ "status": "failed", "message": message }))
 }
