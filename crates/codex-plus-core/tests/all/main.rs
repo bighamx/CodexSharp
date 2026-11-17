@@ -26,6 +26,7 @@ mod anthropic_upstream;
 mod api_quota_gate;
 mod auto_takeover_live;
 mod bridge_routes;
+mod chatgpt_websocket_continuation;
 mod builtin_extensions;
 mod bundled_extensions;
 mod bundled_builtins;
