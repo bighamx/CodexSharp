@@ -676,7 +676,11 @@ async fn attempt_pipeline(
             &candidate.upstream_model,
         );
         body["model"] = Value::String(candidate.upstream_model.clone());
-        crate::gateway::chatgpt_backend::adapt_request(&mut body, prompt.as_deref());
+        crate::gateway::chatgpt_backend::adapt_request_for_transport(
+            &mut body,
+            prompt.as_deref(),
+            crate::responses_websocket::active(),
+        );
         let version = crate::gateway::chatgpt_backend::codex_version(&home);
         relay.user_agent = crate::gateway::chatgpt_backend::codex_user_agent(&version);
         for (key, value) in [
@@ -718,7 +722,10 @@ async fn attempt_pipeline(
             .to_string();
     }
     // 后端按 session-id / thread-id 找会话的缓存，键取自 prompt_cache_key。
-    let session_headers = if (chatgpt || chatgpt_api) && !cache_key.is_empty() {
+    let session_headers = if (chatgpt || chatgpt_api)
+        && !crate::responses_websocket::active()
+        && !cache_key.is_empty()
+    {
         ProxySessionHeaders {
             session_id: Some(cache_key.as_str()),
             thread_id: Some(cache_key.as_str()),

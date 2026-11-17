@@ -27,10 +27,23 @@ const MAX_CALL_ID: usize = 64;
 
 /// 整理请求体。`codex_prompt` 是该模型的官方指令（读不到时为 None，保留客户端自己的指令）。
 pub fn adapt_request(body: &mut Value, codex_prompt: Option<&str>) {
+    adapt_request_for_transport(body, codex_prompt, false);
+}
+
+/// WebSocket continuations reference calls and history held on the upstream connection.
+/// HTTP requests carry full history and retain the existing orphan-output repair.
+pub fn adapt_request_for_transport(
+    body: &mut Value,
+    codex_prompt: Option<&str>,
+    websocket: bool,
+) {
     let Some(object) = body.as_object_mut() else {
         return;
     };
     for key in REJECTED_FIELDS {
+        if websocket && *key == "previous_response_id" {
+            continue;
+        }
         object.remove(*key);
     }
     // 只保留 Codex 快速档会发的服务等级。
@@ -48,7 +61,10 @@ pub fn adapt_request(body: &mut Value, codex_prompt: Option<&str>) {
         Some(Value::Array(items)) => items,
         _ => Vec::new(),
     };
-    input = adapt_input(input);
+    let continuation = websocket
+        && object.get("previous_response_id").and_then(Value::as_str)
+            .is_some_and(|id| !id.trim().is_empty());
+    input = adapt_input(input, continuation);
 
     let own = object
         .get("instructions")
@@ -59,7 +75,7 @@ pub fn adapt_request(body: &mut Value, codex_prompt: Option<&str>) {
         .get("prompt_cache_key")
         .and_then(Value::as_str)
         .is_some_and(|key| !key.is_empty());
-    if !has_cache_key && let Some(key) = conversation_key(&own, &input) {
+    if !websocket && !has_cache_key && let Some(key) = conversation_key(&own, &input) {
         object.insert("prompt_cache_key".to_string(), Value::String(key));
     }
 
@@ -142,7 +158,12 @@ pub fn bound_call_id(id: &str) -> String {
 
 /// 整理输入项：不引用已存的项、不带 id（以及跟着 id 的 status）、调用 id 不超长、
 /// 找不到调用的工具输出改成一条说明、`system` 角色改成 `developer`。
-fn adapt_input(input: Vec<Value>) -> Vec<Value> {
+fn adapt_input(input: Vec<Value>, continuation: bool) -> Vec<Value> {
+    // References, item IDs and call IDs belong to the upstream connection.
+    // Rewriting any of them would break links to previously emitted items.
+    if continuation {
+        return input;
+    }
     const CALL_TYPES: &[&str] = &[
         "function_call",
         "function_call_output",
@@ -628,6 +649,48 @@ mod tests {
         let mut untouched = json!({ "reasoning": { "effort": "low" }, "input": "hi" });
         adapt_api_request(&mut untouched);
         assert_eq!(untouched["reasoning"], json!({ "effort": "low" }));
+    }
+
+    #[test]
+    fn websocket_continuations_keep_response_links_and_external_tool_results() {
+        for kind in ["function_call_output", "custom_tool_call_output", "local_shell_call_output"] {
+            let original = json!({
+                "model": "gpt-6.1-sol",
+                "previous_response_id": "resp_previous",
+                "input": [
+                    { "type": kind, "call_id": "c".repeat(80), "output": "result", "id":"output_previous" },
+                    { "type": "message", "role":"assistant", "id":"msg_previous", "status":"completed", "content":[] },
+                    { "type": "item_reference", "id": "msg_previous" }
+                ],
+                "temperature": 0.2
+            });
+            let mut ws = original.clone();
+            adapt_request_for_transport(&mut ws, None, true);
+            assert_eq!(ws["previous_response_id"], "resp_previous");
+            assert_eq!(ws["input"], original["input"]);
+            assert!(ws.get("temperature").is_none());
+
+            let mut http = original;
+            adapt_request(&mut http, None);
+            assert!(http.get("previous_response_id").is_none());
+            assert_eq!(http["input"].as_array().unwrap().len(), 2);
+            assert_eq!(http["input"][0]["type"], "message");
+        }
+        let mut standalone = json!({"input": [{"type":"custom_tool_call_output", "call_id":"missing", "output":"result"}]});
+        adapt_request_for_transport(&mut standalone, None, true);
+        assert_eq!(standalone["input"][0]["type"], "message");
+    }
+
+    #[test]
+    fn websocket_shaping_does_not_invent_per_request_cache_identity() {
+        for input in [json!("first task"), json!([]), json!("next task")] {
+            let mut body = json!({"input":input});
+            adapt_request_for_transport(&mut body, None, true);
+            assert!(body.get("prompt_cache_key").is_none());
+        }
+        let mut body = json!({"input":[], "prompt_cache_key":"client_identity"});
+        adapt_request_for_transport(&mut body, None, true);
+        assert_eq!(body["prompt_cache_key"], "client_identity");
     }
 
     #[test]
