@@ -179,3 +179,79 @@ async fn market_package_request_validates_and_discards_in_the_shared_store() {
     assert_eq!(discarded["status"], "ok");
     assert!(!staged.exists());
 }
+
+/// 运行时扫描结果合并进「精选」：同 id / 同仓库不重复，上游条目优先。
+#[test]
+fn scanned_packages_merge_into_the_market_list() {
+    let sha = "b".repeat(40);
+    let mut manifest = parse_market_manifest(json!({
+        "version": 2,
+        "packages": [{
+            "id": "word-count",
+            "name": "字数统计",
+            "repo": "BigPizzaV3/codexpp-word-count",
+            "sha": sha,
+            "official": true
+        }]
+    }))
+    .unwrap();
+    let scanned = vec![
+        codex_plus_core::script_market::MarketPackage {
+            id: "session-context-bars".into(),
+            name: "会话上下文进度条".into(),
+            description: String::new(),
+            version: "0.1.0".into(),
+            author: "bighamx".into(),
+            tags: Vec::new(),
+            homepage: "https://github.com/bighamx/codexpp-session-context-bars".into(),
+            icon: String::new(),
+            updated_at: "2026-11-18".into(),
+            repo: "bighamx/codexpp-session-context-bars".into(),
+            tag: None,
+            sha: "802b0b24a5e6954c2fddb7b50f84b45cdab9fe87".into(),
+            official_claimed: false,
+        },
+        // 上游清单里已经有这个仓库：不能再出现一次。
+        codex_plus_core::script_market::MarketPackage {
+            id: "word-count-duplicate".into(),
+            name: "重复".into(),
+            description: String::new(),
+            version: "1.0.0".into(),
+            author: "bighamx".into(),
+            tags: Vec::new(),
+            homepage: String::new(),
+            icon: String::new(),
+            updated_at: String::new(),
+            repo: "bigpizzav3/codexpp-word-count".into(),
+            tag: None,
+            sha: sha.clone(),
+            official_claimed: false,
+        },
+    ];
+    codex_plus_core::script_market::merge_scanned_packages(&mut manifest.packages, scanned);
+
+    let ids: Vec<&str> = manifest.packages.iter().map(|item| item.id.as_str()).collect();
+    assert_eq!(ids, ["word-count", "session-context-bars"], "重复仓库不追加、上游排在前");
+    let scanned_entry = manifest
+        .packages
+        .iter()
+        .find(|item| item.id == "session-context-bars")
+        .unwrap();
+    assert!(!scanned_entry.is_official(), "扫描来的条目不能冒充官方");
+    assert_eq!(scanned_entry.sha.len(), 40, "扫描结果按提交锁定，安装只认它");
+}
+
+/// 真实打 GitHub 的扫描：CI 不跑（要联网），发布前手动 `--ignored` 验一次。
+#[tokio::test]
+#[ignore = "需要联网访问 GitHub"]
+async fn live_scan_lists_owner_extensions() {
+    let scanned = codex_plus_core::script_market::scan_owner_curated_packages("bighamx").await;
+    let entry = scanned
+        .iter()
+        .find(|item| item.id == "session-context-bars")
+        .expect("扫描结果里应当有会话上下文进度条");
+    assert_eq!(entry.repo, "bighamx/codexpp-session-context-bars");
+    assert_eq!(entry.sha.len(), 40);
+    assert!(entry.version.starts_with("0."), "版本取自 codexpp.json：{}", entry.version);
+    assert!(!entry.is_official(), "扫描条目不能冒充官方");
+}

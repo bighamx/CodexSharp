@@ -7,6 +7,12 @@ use crate::user_scripts::UserScriptManager;
 pub const DEFAULT_MARKET_INDEX_URL: &str =
     "https://raw.githubusercontent.com/BigPizzaV3/CodexPlusPlusScriptMarket/main/index.json";
 
+/// 运行时扫描的仓库所有者：他名下带 `codexpp-extension` 话题的仓库都直接列进「精选」，
+/// 不用改上游市场仓库，新发一个拓展也不必重新发 Codex #。
+pub const CURATED_SCAN_OWNER: &str = "bighamx";
+/// 扫描结果缓存：跟清单一样 10 分钟，避免每次开页面都打 GitHub。
+const CURATED_SCAN_TTL: std::time::Duration = std::time::Duration::from_secs(600);
+
 /// 官方拓展的仓库所有者。精选清单里标了 `official` 的条目，仓库也必须属于这里列出的账号或组织，
 /// 才显示「官方」：清单写错或被误改时，别人的仓库也拿不到官方徽章。
 pub const OFFICIAL_OWNERS: &[&str] = &["BigPizzaV3"];
@@ -401,6 +407,147 @@ fn parse_market_package(raw: &Value) -> Option<MarketPackage> {
     })
 }
 
+/// 扫描结果合并进清单：同 id 或同仓库以上游清单为准，避免同一个包出现两次。
+pub fn merge_scanned_packages(packages: &mut Vec<MarketPackage>, scanned: Vec<MarketPackage>) {
+    for item in scanned {
+        let known = packages
+            .iter()
+            .any(|known| known.id == item.id || known.repo.eq_ignore_ascii_case(&item.repo));
+        if !known {
+            packages.push(item);
+        }
+    }
+}
+
+/// 运行时扫描某个账号名下的拓展仓库：GitHub 搜索 `user:<owner> topic:codexpp-extension`，
+/// 逐个读 `codexpp.json` 并把默认分支的头提交当安装版本。任何一步失败都只是少几条，
+/// 不影响上游精选清单本身。
+pub async fn scan_owner_curated_packages(owner: &str) -> Vec<MarketPackage> {
+    let owner = owner.trim();
+    if owner.is_empty() {
+        return Vec::new();
+    }
+    let token = std::env::var("GITHUB_TOKEN")
+        .or_else(|_| std::env::var("GH_TOKEN"))
+        .ok()
+        .map(|token| token.trim().to_string())
+        .filter(|token| !token.is_empty());
+    let query = format!("https://api.github.com/search/repositories?q=user%3A{owner}+topic%3Acodexpp-extension&per_page=100&sort=updated");
+    let Ok(search) = github_json(&query, token.as_deref()).await else {
+        return Vec::new();
+    };
+    let mut found = Vec::new();
+    for item in search
+        .get("items")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+    {
+        let Some(repo) = item.get("full_name").and_then(Value::as_str) else {
+            continue;
+        };
+        if item.get("archived").and_then(Value::as_bool).unwrap_or(false) {
+            continue;
+        }
+        let branch = item
+            .get("default_branch")
+            .and_then(Value::as_str)
+            .unwrap_or("main");
+        let manifest_url = format!("https://raw.githubusercontent.com/{repo}/{branch}/codexpp.json");
+        let Ok(manifest) = github_json(&manifest_url, None).await else {
+            continue;
+        };
+        // 只认 Codex # 拓展清单：`engines.codexpp` 必须存在。
+        if manifest.get("engines").and_then(|engines| engines.get("codexpp")).is_none() {
+            continue;
+        }
+        let Some(sha) = default_branch_sha(repo, branch, token.as_deref()).await else {
+            continue;
+        };
+        let text = |key: &str| {
+            manifest
+                .get(key)
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(str::to_string)
+        };
+        let id = text("id").unwrap_or_else(|| repo.rsplit('/').next().unwrap_or(repo).to_string());
+        found.push(MarketPackage {
+            name: text("name").unwrap_or_else(|| id.clone()),
+            description: text("description").unwrap_or_default(),
+            version: text("version").unwrap_or_default(),
+            author: owner.to_string(),
+            tags: manifest
+                .get("keywords")
+                .and_then(Value::as_array)
+                .map(|items| items.iter().filter_map(Value::as_str).map(str::to_string).collect())
+                .unwrap_or_default(),
+            homepage: item
+                .get("html_url")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
+            icon: String::new(),
+            updated_at: item
+                .get("pushed_at")
+                .and_then(Value::as_str)
+                .map(|at| at.chars().take(10).collect())
+                .unwrap_or_default(),
+            repo: repo.to_string(),
+            tag: None,
+            sha,
+            official_claimed: false,
+            id,
+        });
+    }
+    found
+}
+
+/// 带 10 分钟缓存地取扫描结果；失败时退回上一次的结果。
+async fn cached_scanned_packages(owner: &str) -> Vec<MarketPackage> {
+    static SCAN_CACHE: std::sync::Mutex<Option<(std::time::Instant, Vec<MarketPackage>)>> =
+        std::sync::Mutex::new(None);
+    if let Some((at, packages)) = SCAN_CACHE.lock().unwrap_or_else(|poisoned| poisoned.into_inner()).as_ref()
+        && at.elapsed() < CURATED_SCAN_TTL
+    {
+        return packages.clone();
+    }
+    let packages = scan_owner_curated_packages(owner).await;
+    if !packages.is_empty() {
+        *SCAN_CACHE.lock().unwrap_or_else(|poisoned| poisoned.into_inner()) =
+            Some((std::time::Instant::now(), packages.clone()));
+        return packages;
+    }
+    SCAN_CACHE
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .as_ref()
+        .map(|(_, packages)| packages.clone())
+        .unwrap_or_default()
+}
+
+async fn github_json(url: &str, token: Option<&str>) -> anyhow::Result<Value> {
+    let client = market_http_client(url)?;
+    let mut request = client
+        .get(url)
+        .header("Accept", "application/vnd.github+json")
+        .header("X-GitHub-Api-Version", "2022-11-28");
+    if let Some(token) = token {
+        request = request.header("Authorization", format!("Bearer {token}"));
+    }
+    let response = request.send().await?;
+    anyhow::ensure!(response.status().is_success(), "GitHub 返回 {}", response.status());
+    Ok(response.json().await?)
+}
+
+async fn default_branch_sha(repo: &str, branch: &str, token: Option<&str>) -> Option<String> {
+    let url = format!("https://api.github.com/repos/{repo}/commits/{branch}");
+    let raw = github_json(&url, token).await.ok()?;
+    let sha = raw.get("sha").and_then(Value::as_str)?.to_lowercase();
+    (sha.len() == 40 && sha.chars().all(|ch| ch.is_ascii_hexdigit())).then_some(sha)
+}
+
 /// 最近一次成功拉到的清单。精选栏、社区栏的下架过滤都用它；10 分钟内不重复拉，拉失败时退回它。
 static MANIFEST_CACHE: std::sync::Mutex<Option<(std::time::Instant, ScriptMarketManifest)>> = std::sync::Mutex::new(None);
 const MANIFEST_CACHE_TTL: std::time::Duration = std::time::Duration::from_secs(600);
@@ -417,7 +564,17 @@ pub fn remember_published_manifest(manifest: ScriptMarketManifest) {
 }
 
 /// 带缓存地取清单。`force` 时跳过缓存；拉取失败且有旧清单时返回旧清单。
+/// 清单 + 运行时扫描的自家拓展。界面上「精选」看的就是这一份。
 pub async fn cached_market_manifest(force: bool) -> anyhow::Result<ScriptMarketManifest> {
+    let mut manifest = base_market_manifest(force).await?;
+    let scanned = cached_scanned_packages(CURATED_SCAN_OWNER).await;
+    if !scanned.is_empty() {
+        merge_scanned_packages(&mut manifest.packages, scanned);
+    }
+    Ok(manifest)
+}
+
+async fn base_market_manifest(force: bool) -> anyhow::Result<ScriptMarketManifest> {
     if let Some((at, manifest)) = PUBLISHED_MANIFEST.lock().unwrap_or_else(|poisoned| poisoned.into_inner()).as_ref() {
         if at.elapsed() < PUBLISHED_MANIFEST_TTL {
             return Ok(manifest.clone());
