@@ -45,8 +45,8 @@ fn continuation_body() -> (Value, Value) {
 }
 
 #[test]
-fn websocket_continuation_keeps_response_link_and_items_verbatim() {
-    let (mut body, input) = continuation_body();
+fn websocket_continuation_keeps_response_link_and_tool_outputs() {
+    let (mut body, _) = continuation_body();
 
     adapt_request_for_transport(&mut body, None, true);
 
@@ -55,7 +55,16 @@ fn websocket_continuation_keeps_response_link_and_items_verbatim() {
         Some("resp_prev"),
         "WS 续聊必须把 previous_response_id 传给上游，否则上游不知道接哪段历史"
     );
-    assert_eq!(body.get("input"), Some(&input), "WS 续聊的输入项必须原样转发");
+    let items = body["input"].as_array().expect("input 必须是数组");
+    let output = items
+        .iter()
+        .find(|item| item["type"] == "function_call_output")
+        .expect("续聊里的工具输出不能被丢掉或改写成 assistant 说明");
+    assert_eq!(output["output"], "ok");
+    assert_eq!(
+        output["call_id"], body["input"][1]["call_id"],
+        "工具调用与它的输出必须仍然配对"
+    );
     assert!(
         body.get("prompt_cache_key").is_none(),
         "WS 续聊不该凭空造 prompt_cache_key：换 key 会把同一段会话拆成两条缓存"
