@@ -44,6 +44,120 @@ Codex # 是 AI 编程 Agent 的统一管理应用，构建于万物皆拓展的�
 
 此外还有会话管理、Codex 界面增强、Claude Desktop 增强版、跨 Agent 的 Computer Use 与子 Agent 协作。管理器是一个桌面程序的样子：侧栏切 Agent 和页面，顶部页签切分页，齿轮进设置目录；只用 Codex 或只想要增强功能，可以切换使用模式把用不到的页面藏起来。双击打开管理界面，再从界面启动各个应用；它不修改任何官方应用的安装文件。
 
+## 交流与支持
+
+遇到问题请通过 [GitHub Issues](https://github.com/BigPizzaV3/CodexPlusPlus/issues) 提交，附上系统、Codex # 版本、复现步骤与已脱敏的日志。欢迎分享拓展、主题和使用经验。
+
+<p align="center">
+  <a href="https://qm.qq.com/q/5h3pxpxg7S">QQ 交流 4 群 · 1127858981</a> &nbsp; · &nbsp;
+  <a href="https://t.me/CodexPlusPlus">Telegram 频道</a> &nbsp; · &nbsp;
+  <a href="https://linux.do">LINUX DO</a>
+</p>
+
+## 感谢赞助商
+
+感谢以下赞助商对项目的支持。服务范围、价格与活动以各平台官网说明为准。
+
+<p align="center">
+  <a href="https://jojocode.com/">
+    <img src="docs/images/readme-preview/jojo-banner-v3.png" alt="JOJO Code 赞助横幅" width="800">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://jojocode.com/"><strong>JOJO Code</strong></a><br>
+  JOJO Code 提供稳定、价格合理的 API 中转服务，支持 GPT-6.1、GPT-6、Fable 5.1、Claude Opus 5.5 等模型与图像能力，适合日常开发、团队协作和长期项目工作流。
+</p>
+
+<table>
+  <tr>
+    <th width="180">🏆 赞助商 🏆</th>
+    <th>介绍</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://jojocode.com/">
+        <img src="docs/images/readme-preview/jojo-banner-v3.png" alt="JOJO Code" height="80">
+      </a>
+    </td>
+    <td><a href="https://jojocode.com/"><strong>JOJO Code</strong></a><br>JOJO Code 提供稳定、价格合理的 API 中转服务，支持 GPT-6.1、GPT-6、Fable 5.1、Claude Opus 5.5 等模型与图像能力，适合日常开发、团队协作和长期项目工作流。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://apikey.fun/register?aff=CODEX">
+        <img src="docs/images/sponsor-apikey-fun.png" alt="APIKEY.FUN" height="80">
+      </a>
+    </td>
+    <td><a href="https://apikey.fun/register?aff=CODEX"><strong>APIKEY.FUN</strong></a><br>感谢 APIKEY.FUN 赞助了本项目！APIKEY.FUN 是一家致力于提供开放、稳定、高性价比的全球主流大模型的 AI 中转站。平台支持 Claude、OpenAI、Gemini 等热门模型的 API 中转服务，价格低至官方原价的 7%。通过专属链接<a href="https://apikey.fun/register?aff=CODEX">注册 APIKEY</a>，可享受最高充值永久 95 折优惠。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://runapi.host/register?aff=AWJq">
+        <img src="docs/images/sponsor-runapi.png" alt="RunAPI" width="150">
+      </a>
+    </td>
+    <td><a href="https://runapi.host/register?aff=AWJq"><strong>RunAPI</strong></a><br>RunAPI 是高效稳定的 API 聚合平台，一个 API Key 即可访问 OpenAI、Claude、Gemini、DeepSeek、Grok 等 150+ 主流模型，低至 1 折，兼容 Claude Code、OpenClaw 等工具。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://api.fenno.ai/s/ZZM7">
+        <img src="docs/images/sponsor-fenno-ai.png" alt="FennoAI" width="170">
+      </a>
+    </td>
+    <td><a href="https://api.fenno.ai/s/ZZM7"><strong>FennoAI</strong></a><br>FennoAI 是一家稳定、高效的 API 中转服务商，目前主要提供 Codex 中转服务，兼容 OpenAI 及 Anthropic 协议，可灵活接入 Codex、Claude Code、OpenCode 等主流编程工具，稳定支撑千亿 Token/日的企业级调用需求，支持国内及海外主体公对公结算、开票。通过<a href="https://api.fenno.ai/s/ZZM7">专属链接</a>购买订阅，仅需 1.99 美元即可获得价值 50 美元的 Coding Plan 额度；邀请好友购买最高可获得 20% 返佣。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://cn.hb-api.online/register?aff=8KA2ZKWNHND8">
+        <img src="docs/images/sponsor-baikewei-ai.jpg" alt="百可为AI" height="80">
+      </a>
+    </td>
+    <td><a href="https://cn.hb-api.online/register?aff=8KA2ZKWNHND8"><strong>百可为AI</strong></a><br>百可为AI 是面向开发者、团队和 AI 工具用户的一站式大模型 API 服务平台，支持 Claude、OpenAI、Gemini、Codex 等主流模型能力接入。平台提供稳定中转、灵活计费、用量统计、余额管理和多场景 API 调用能力，适合 Claude Code、Codex、AI 生图、自动化脚本和各类智能应用长期使用。新用户注册可领取免费额度，开发者可快速接入、即开即用，让 AI 能力更稳定、更高效、更省心。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://s.qiniu.com/7zUJri">
+        <img src="docs/images/sponsor-qiniu-ai.png" alt="七牛云" width="170">
+      </a>
+    </td>
+    <td><a href="https://s.qiniu.com/7zUJri"><strong>七牛云</strong></a><br>感谢七牛云 AI 赞助本项目！七牛云 AI 是七牛云（02567.HK）旗下企业级大模型 MaaS 平台，可一站式调用全球 150 多个主流模型，兼容全球主流模型厂商协议，覆盖文本、图像、音频、视频、文件处理等全模态能力，服务超过 169 万企业及开发者用户。企业用户可免费领取 1200 万 Token，邀请好友最高可获得百亿 Token。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://agent.tokenmy.ai">
+        <img src="docs/images/sponsor-tokenmy.png" alt="TokenMy" width="96">
+      </a>
+    </td>
+    <td><a href="https://agent.tokenmy.ai"><strong>TokenMy</strong></a><br>感谢 TokenMy 赞助本项目！TokenMy 是面向开发者与团队的统一 AI 模型 API 网关，汇聚 OpenAI、Anthropic、Google、DeepSeek、字节跳动、Suno 等厂商的模型，覆盖 GPT、Claude、Gemini 等对话模型，GPT Image 生图模型，Seedance、Veo 视频模型及 Suno 音乐生成模型。一个 API Key 即可接入多类 AI 能力，配合按量计费、用量监控与账单查询，满足智能体开发、多模态应用与影音内容创作需求。欢迎<a href="https://agent.tokenmy.ai">注册使用</a>，也可申请成为 TokenMy 代理或推广大使，携手拓展 AI 应用市场，享受推广佣金与合作激励。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://apinebula.ai/ref/IiCBg1nu">
+        <img src="docs/images/sponsor-apinebula.png" alt="APINEBULA" width="96">
+      </a>
+    </td>
+    <td><a href="https://apinebula.ai/ref/IiCBg1nu"><strong>APINEBULA</strong></a><br>感谢 APINEBULA 赞助本项目！APINEBULA 是银河录像局旗下的企业级 AI 聚合平台，背靠大平台资源，面向开发者、团队与企业用户提供稳定、高性价比的大模型 API 接入服务。平台聚合 Claude、GPT、Gemini 等主流满血模型，一个接口接入全球顶尖 AI 大模型，各大模型价格低至 1 折起，支持企业级高并发、正式合同、对公打款与开票服务，适合 AI 编程、Agent 开发、业务系统集成等多种场景！<a href="https://apinebula.ai/ref/IiCBg1nu">使用此链接注册</a>并在充值时填写「PLUSPLUS」优惠码可享九折优惠！</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://dzhsmartai.com/register?promo=CODEXPLUSPLUS">
+        <img src="docs/images/sponsor-dzhsmartai.jpg" alt="ccccccAPI" width="96">
+      </a>
+    </td>
+    <td><a href="https://dzhsmartai.com/register?promo=CODEXPLUSPLUS"><strong>ccccccAPI</strong></a><br>感谢 ccccccAPI 赞助本项目！ccccccAPI 量贩式中转站 —— 实惠 Token，一站式接入。ccccccAPI 是一家专注服务开发者与企业的 AI API 中转站，主打「量贩式」定价：ChatGPT、Claude、Kimi、Grok、Gemini 等主流模型基本全覆盖，一个 API Key、一套兼容 OpenAI 的接口，改一行 base_url 就能自由切换，不用再分别注册、分别充值。目标很朴素：让更多人用上实惠的 Token——用 ccccccAPI，不烧钱、不烧心。通过<a href="https://dzhsmartai.com/register?promo=CODEXPLUSPLUS">此链接注册</a>，即得 1 美元使用额度。</td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://vegaapi.com/">
+        <img src="docs/images/sponsor-vegaapi.png" alt="VegaAPI" width="96">
+      </a>
+    </td>
+    <td><a href="https://vegaapi.com/"><strong>VegaAPI</strong></a><br>感谢 VegaAPI 赞助本项目！VegaAPI 提供稳定高速的 AI API 服务，一个 API Key 即可接入 GPT、Claude、Gemini、Grok 等主流模型，兼容 OpenAI、Anthropic 和 Gemini 接口，改一下 base_url 就能用。按量计费，支持支付宝和微信充值，10 元起充。欢迎<a href="https://vegaapi.com/">注册使用</a>。</td>
+  </tr>
+</table>
+
+想支持项目或展示品牌？[联系维护者](mailto:1727532@qq.com)。
+
 ## 功能一览
 
 | Agent | Codex # 能做什么 |

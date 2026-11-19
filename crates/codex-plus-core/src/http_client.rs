@@ -55,12 +55,23 @@ fn resolve_proxy_choice(proxy_override: Option<&str>, target_url: Option<&str>) 
 }
 
 /// 除 UA 与代理外的 client 构建参数。
+/// 空闲多久打一次 TCP keepalive。代理链路（FlClash 之类的节点、运营商 NAT）会把
+/// 长时间没有字节的 TCP 连接回收，而 Responses 流在模型"思考"阶段可能几十秒不发
+/// 任何数据（实测 45 秒就会被对端 FIN 掉），于是表现为"上游在完成事件前结束了响应流"、
+/// 会话自己停下来。每 30 秒一个 keepalive 包能保住链路状态。
+const UPSTREAM_TCP_KEEPALIVE: std::time::Duration = std::time::Duration::from_secs(30);
+pub fn upstream_tcp_keepalive() -> std::time::Duration {
+    UPSTREAM_TCP_KEEPALIVE
+}
+
 #[derive(Default)]
 struct ClientOptions {
     connect_timeout: Option<std::time::Duration>,
     total_timeout: Option<std::time::Duration>,
     redirect: Option<reqwest::redirect::Policy>,
     pool_idle_timeout: Option<std::time::Duration>,
+    /// 是否给这条连接打开 keepalive：只有上游长连接（SSE / WebSocket 中转）需要。
+    keepalive: bool,
 }
 
 fn build_client_with_proxy_choice(
@@ -85,6 +96,10 @@ fn build_client_with_proxy_choice(
     }
     if let Some(timeout) = options.pool_idle_timeout {
         builder = builder.pool_idle_timeout(timeout);
+    }
+    if options.keepalive {
+        builder = builder
+            .tcp_keepalive(UPSTREAM_TCP_KEEPALIVE);
     }
     match proxy {
         ProxyChoice::Direct => builder = builder.no_proxy(),
@@ -115,6 +130,7 @@ fn build_proxied_client_with_timeouts(
             total_timeout,
             redirect,
             pool_idle_timeout: None,
+            keepalive: false,
         },
     )
 }
@@ -204,6 +220,7 @@ fn cached_relay_client(user_agent: &str, proxy: ProxyChoice) -> anyhow::Result<r
         &key.proxy,
         ClientOptions {
             pool_idle_timeout: Some(RELAY_CLIENT_POOL_IDLE_TIMEOUT),
+            keepalive: true,
             ..ClientOptions::default()
         },
     )?;

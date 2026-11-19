@@ -1721,6 +1721,8 @@ ${key} = ${value}`]);
     quotaWindowFresh: () => quotaWindowFresh,
     quotaWindowLabel: () => quotaWindowLabel,
     relativeTime: () => relativeTime,
+    relayFilterArgs: () => relayFilterArgs,
+    relayFilterFromFocus: () => relayFilterFromFocus,
     rememberAgentNames: () => rememberAgentNames,
     routeNarrative: () => routeNarrative,
     servingProviders: () => servingProviders,
@@ -1960,6 +1962,17 @@ ${key} = ${value}`]);
       apiKeyUrl: "https://agent.tokenmy.ai",
       category: "aggregator",
       baseUrl: "https://agent.tokenmy.ai/v1",
+      protocol: "responses",
+      // 模型留空：添加时「从上游获取」或手填。
+      model: ""
+    },
+    {
+      id: "vegaapi",
+      name: "VegaAPI",
+      websiteUrl: "https://vegaapi.com",
+      apiKeyUrl: "https://vegaapi.com/register",
+      category: "aggregator",
+      baseUrl: "https://vegaapi.com/v1",
       protocol: "responses",
       // 模型留空：添加时「从上游获取」或手填。
       model: ""
@@ -2797,7 +2810,8 @@ ${key} = ${value}`]);
     { id: "runapi", expiresAt: "2026-12-07" },
     { id: "apikeyfun", expiresAt: "2026-11-22" },
     { id: "cccccc-api", expiresAt: "2026-12-01" },
-    { id: "tokenmy", expiresAt: "2026-11-20" }
+    { id: "tokenmy", expiresAt: "2026-11-20" },
+    { id: "vegaapi", expiresAt: "2027-03-18" }
   ];
   function localDay(now) {
     const pad = (value) => String(value).padStart(2, "0");
@@ -2921,6 +2935,13 @@ ${key} = ${value}`]);
     const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     start.setDate(start.getDate() - (days - 1));
     return start.getTime();
+  }
+  function relayFilterFromFocus(focus) {
+    if (focus.relayUnknown) return { id: "", label: focus.relayLabel || "", unknown: true };
+    return focus.relayId ? { id: focus.relayId, label: focus.relayLabel || focus.relayId } : null;
+  }
+  function relayFilterArgs(filter) {
+    return filter?.unknown ? { relayId: null, relayUnknown: true } : { relayId: filter?.id || null, relayUnknown: false };
   }
   function formatRequestCost(cost) {
     if (cost.amount <= 0) return "—";
