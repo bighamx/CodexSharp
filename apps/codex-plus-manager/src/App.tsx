@@ -146,6 +146,7 @@ import { MyPublishedPanel } from "./MyPublishedPanel";
 import { AgentIcon, SectionLabel, Switch } from "./gateway-ui";
 import { MAIN_WINDOW_READY_EVENT, parseTrayRequest, TRAY_REQUEST_EVENT, TRAY_RESULT_EVENT, type TrayRequest, type TrayResult } from "./tray-panel-model";
 import { AppSelect, type AppSelectOption } from "./AppSelect";
+import { DisplaySettings } from "./DisplaySettings";
 import { ExtensionConfigForm, type ExtensionConfigField } from "./extension-config-form";
 import { ExtensionManagerPanel } from "./ExtensionManagerPanel";
 import { AppDialogHost, appAlert, appConfirm, appPrompt } from "./app-dialog";
@@ -441,6 +442,9 @@ import { Puzzle } from "lucide-react";
 import * as AgentCx from "./cx-layout"; // cx-pages:agents：Agent 页面在函数内解构，避免和别的分组的具名导入重名
 
 const isWindowsPlatform = /\bWindows\b/i.test(navigator.userAgent);
+const skinMediaExtensions = /Mac/i.test(navigator.platform)
+  ? ["png", "jpg", "jpeg", "heic", "tif", "tiff", "webp", "mp4", "webm"]
+  : ["png", "jpg", "jpeg", "webp", "gif", "bmp", "mp4", "webm"];
 /// 增强设置项清单按平台过滤（例如桌宠跟随鼠标只在 Windows / macOS 显示）。
 const enhancementPlatform = enhancementPlatformFromUserAgent(navigator.userAgent);
 /// 会话维护页的两条开关与 Codex 设置页共用清单里的文案（#2846 拆开后分别显示）。
@@ -729,6 +733,7 @@ export type RelayProfile = {
   relayMode: RelayMode;
   sessionProvider?: RelaySessionProvider;
   officialMixApiKey: boolean;
+  inactiveMixedApi?: Pick<RelayProfile, "configContents" | "upstreamBaseUrl" | "modelRoutes">;
   officialAccountRef?: string;
   hideOfficialUsageAlert: boolean;
   testModel: string;
@@ -1834,6 +1839,7 @@ export function App() {
   const [overview, setOverview] = useState<OverviewResult | null>(null);
   const [settings, setSettings] = useState<SettingsResult | null>(null);
   const [legacyDisconnectOpen, setLegacyDisconnectOpen] = useState(false);
+  const [addDirectProviderRequested, setAddDirectProviderRequested] = useState(false);
   // 外部改设置时要拿「上次读到的设置」与当前编辑比对，监听回调里读这个 ref 拿最新值。
   const settingsRef = useRef<SettingsResult | null>(null);
   settingsRef.current = settings;
@@ -1928,6 +1934,7 @@ export function App() {
   }, []);
   // 「会话」页默认看所有 Agent；切到 Codex 页签才是带删除 / 归档 / 修复的完整会话管理。
   const [sessionTab, setSessionTab] = useState<SessionTab>("all");
+  const [recoveryRefreshRequest, setRecoveryRefreshRequest] = useState(0);
   /** 请求日志打开时的 Agent 过滤（从 Agent 概览跳过去时设置，用一次就清掉）。 */
   const [requestLogAgentFilter, setRequestLogAgentFilter] = useState<"all" | "codex" | "claude" | "grok">("all");
   const [requestLogFocus, setRequestLogFocus] = useState<RequestLogFocus>({});
@@ -2758,13 +2765,8 @@ export function App() {
       selected = await open({
         directory: false,
         multiple: false,
-        title: t("选择皮肤图片"),
-        filters: [{
-          name: t("图片"),
-          extensions: isWindowsPlatform
-            ? ["png", "jpg", "jpeg", "webp", "gif", "bmp"]
-            : ["png", "jpg", "jpeg", "heic", "tif", "tiff", "webp"],
-        }],
+        title: t("选择皮肤图片或视频"),
+        filters: [{ name: t("图片或视频"), extensions: skinMediaExtensions }],
       });
     } catch (error) {
       showNotice(t("主题库"), tf("打开选择器失败：{0}", [stringifyError(error)]), "failed");
@@ -2791,13 +2793,8 @@ export function App() {
       selected = await open({
         directory: false,
         multiple: false,
-        title: t("选择皮肤图片"),
-        filters: [{
-          name: t("图片"),
-          extensions: isWindowsPlatform
-            ? ["png", "jpg", "jpeg", "webp", "gif", "bmp"]
-            : ["png", "jpg", "jpeg", "heic", "tif", "tiff", "webp"],
-        }],
+        title: t("选择皮肤图片或视频"),
+        filters: [{ name: t("图片或视频"), extensions: skinMediaExtensions }],
       });
     } catch (error) {
       showNotice(t("主题库"), tf("打开选择器失败：{0}", [stringifyError(error)]), "failed");
@@ -3147,8 +3144,12 @@ export function App() {
       if (!navigation) return false;
       const destination = managerNavigationDestination(navigation);
       await refreshSettings(true);
-      if (destination.route === "enhance" || destination.route === "pluginMarket" || destination.route === "weixin") {
+      if (destination.route === "enhance" || destination.route === "pluginMarket" || destination.route === "weixin" || destination.route === "sessions") {
         setActiveTool("codex");
+      }
+      if (destination.route === "sessions") {
+        setSessionTab("codex");
+        setRecoveryRefreshRequest(current => current + 1);
       }
       setRoute(destination.route);
       if (destination.route === "weixin") await refreshWeixinStatus(true);
@@ -4478,6 +4479,11 @@ export function App() {
   trayRequestHandlerRef.current = async (request: TrayRequest): Promise<TrayResult> => {
     const revealMainWindow = () => void invoke("tray_panel_action", { action: "open" }).catch(() => {});
     if (request.kind === "navigate") {
+      if (request.route === "addDirectProvider") {
+        setAddDirectProviderRequested(true);
+        await switchTool("codex", "relay");
+        return { id: request.id, ok: true };
+      }
       if (request.route === "sessions" || request.route === "requestLog") setActiveTool("codex");
       await navigate(request.route);
       return { id: request.id, ok: true };
@@ -4526,7 +4532,7 @@ export function App() {
       setProviderSyncProgress((current) => current.active ? current : ({ active: false, percent: 0, message: result.message, result }));
     }).catch(() => {});
     return () => { disposed = true; };
-  }, [route]);
+  }, [route, recoveryRefreshRequest]);
 
   useEffect(() => {
     if (route !== "sessions") return;
@@ -5316,6 +5322,7 @@ export function App() {
             }
           }}
           onClose={() => setLegacyDisconnectOpen(false)}
+          onAddDirectProvider={() => setAddDirectProviderRequested(true)}
         />
       ) : null}
       {tourOpen && !agentFocusOpen ? <OnboardingTour focus={agentFocus} onClose={closeTour} /> : null}
@@ -5369,6 +5376,8 @@ export function App() {
               旧入口 relayEnvironment 打开同一页并展开「高级」。 */}
           {route === "relay" || route === "relayEnvironment" ? (
             <RelayScreen
+              addDirectProviderRequested={addDirectProviderRequested}
+              onRequestedProviderOpened={() => setAddDirectProviderRequested(false)}
               settings={settings}
               relayFiles={relayFiles}
               envConflicts={envConflicts}
@@ -5559,7 +5568,10 @@ export function App() {
               }
               codexRun={codexRun}
               notify={actions.showMessage}
-              onOpenCodexProviderSettings={() => { void switchTool("codex", "relay"); }}
+              onOpenCodexProviderSettings={(addDirectProvider) => {
+                if (addDirectProvider) setAddDirectProviderRequested(true);
+                void switchTool("codex", "relay");
+              }}
               onTabChange={(tab) => void navigate(gatewayRouteByTab[tab])}
               tab={gatewayTabByRoute[route]}
             />
@@ -7937,6 +7949,8 @@ function PoolLinkControl({ link, profileId }: { link: CodexPoolLink; profileId: 
 }
 
 function RelayScreen({
+  addDirectProviderRequested,
+  onRequestedProviderOpened,
   settings,
   relayFiles,
   envConflicts,
@@ -7948,6 +7962,8 @@ function RelayScreen({
   advancedOpen = false,
   onOpenGateway,
 }: {
+  addDirectProviderRequested: boolean;
+  onRequestedProviderOpened: () => void;
   settings: SettingsResult | null;
   relayFiles: RelayFilesResult | null;
   envConflicts: EnvConflictsResult | null;
@@ -7978,6 +7994,13 @@ function RelayScreen({
   const [detailProfileId, setDetailProfileId] = useState<string | null>(null);
   const [newProfileDraft, setNewProfileDraft] = useState<RelayProfile | null>(null);
   const [providerCatalogOpen, setProviderCatalogOpen] = useState(false);
+  useEffect(() => {
+    if (!addDirectProviderRequested) return;
+    setNewProfileDraft(null);
+    setDetailProfileId(null);
+    setProviderCatalogOpen(true);
+    onRequestedProviderOpened();
+  }, [addDirectProviderRequested, onRequestedProviderOpened]);
   // 目录页的搜索词放在这里：从模板进入编辑页再返回时，目录页会重新挂载，搜索不能丢。
   const [providerCatalogQuery, setProviderCatalogQuery] = useState("");
   // 进入时停在当前供应商所在的分区；找不到当前供应商时，没有直连项就展示协议转换分区。
@@ -8334,12 +8357,10 @@ function RelayScreen({
                 </div>
               ) : null}
             </div>
-            {takenOverByGateway ? null : (
-              <button className="cx-primary" onClick={() => { setNewProfileDraft(null); setDetailProfileId(null); setProviderCatalogOpen(true); }} type="button">
+              <button className="cx-primary" onClick={openCatalog} type="button">
                 <Plus />
-                {t("添加供应商")}
+                {takenOverByGateway ? t("添加直连供应商") : t("添加供应商")}
               </button>
-            )}
           </>
         )}
       />
@@ -8359,17 +8380,19 @@ function RelayScreen({
           <button className="cx-primary" onClick={() => void saveRelaySettings({ ...normalized, relayProfilesEnabled: true })} type="button">{t("打开配置切换")}</button>
         </CxBanner>
       ) : null}
-      {/* Codex 被网关接管：直连供应商整块隐藏，只留一行说明被谁接管、怎么回到直连。
-          直连供应商在接入期间不生效，改它们会让「断开并还原」出错；要编辑、删除去「多开」页，
-          要迁到网关去「供应商池」→「添加供应商 → 导入」。 */}
       {normalized.relayProfilesEnabled && takenOverByGateway ? (
         <CxCard className="cx-takeover">
           <CxEmpty
-            detail={tf("{0} 个直连供应商在接入网关期间不生效，已隐藏。点上方「直连」断开网关后恢复；要把它们加进供应商池，去「供应商池」→「添加供应商」→「导入」。", [directProfiles.length])}
+            detail={t("可以先添加或编辑直连档案。保存后继续使用网关，点上方「直连」预览并确认还原。")}
             title={t("Codex 正由 Codex # 网关接管")}
           >
             {onOpenGateway ? <button className="cx-secondary" onClick={onOpenGateway} type="button">{t("打开供应商池")}</button> : null}
           </CxEmpty>
+          {directProfiles.map((profile) => (
+            <CxRow key={profile.id} title={profile.name || t("未命名供应商")} detail={relayProfileModeLabel(profile)}>
+              <button className="cx-secondary" onClick={() => void editRelayProfile(profile.id)} type="button">{t("编辑档案")}</button>
+            </CxRow>
+          ))}
         </CxCard>
       ) : null}
       {/* 总开关关闭时供应商切换不会写入 Codex：分页和列表都没有意义，整块隐藏，只留上方提示条。 */}
@@ -9145,6 +9168,14 @@ function EnhancementSettingControl({
   );
 }
 
+function DreamSkinPreview({ path, src, label, className, controls = false }: {
+  path: string; src: string; label: string; className?: string; controls?: boolean;
+}) {
+  return /\.(mp4|webm)$/i.test(path)
+    ? <video aria-label={label} className={className} controls={controls} muted playsInline preload="metadata" src={src} />
+    : <img alt={label} className={className} loading="lazy" src={src} />;
+}
+
 function DreamSkinScreen({
   form,
   launchPending,
@@ -9337,7 +9368,7 @@ function DreamSkinScreen({
           badges={<CxBadge tone={dirty ? "warn" : "neutral"}>{draftStateLabel}</CxBadge>}
           className="dream-skin-selected-row"
           detail={<span role="status">{currentThemeLabel}：{currentThemeName} · {stateLabel}</span>}
-          icon={<CxStatusIcon tone={stateDot}><img alt={t("Dream Skin 图片预览")} className="dream-skin-selected-thumb" src={previewUrl} /></CxStatusIcon>}
+          icon={<CxStatusIcon tone={stateDot}><DreamSkinPreview label={theme.name} className="dream-skin-selected-thumb" path={customImagePath} src={previewUrl} /></CxStatusIcon>}
           title={<span title={theme.name}>{theme.name || t("未命名主题")}</span>}
         >
           <button className="cx-primary" disabled={!masterEnabled || !draft} onClick={() => void actions.activateDreamSkinTheme()} title={!masterEnabled ? t("请先在 Codex增强 页面开启总开关。") : t("保存并应用主题（皮肤没开时会一起打开）；需要重启时只会标记为待应用")} type="button">
@@ -9412,7 +9443,7 @@ function DreamSkinScreen({
           </button>
           <button className="cx-primary" onClick={() => void actions.createDreamSkinTheme()} type="button">
             <ImagePlus className="h-4 w-4" />
-            {t("从图片创建")}
+            {t("从图片或视频创建")}
           </button>
         </CxToolbar>
       ) : null}
@@ -9497,7 +9528,7 @@ function DreamSkinScreen({
                       type="button"
                     >
                       <span className="dream-skin-theme-image">
-                        <img alt={item.name} loading="lazy" src={cardPreview} />
+                        <DreamSkinPreview label={item.name} path={item.previewPath} src={cardPreview} />
                         {currentRunning || pendingApplication ? (
                           <span className="dream-skin-theme-badges">
                             {currentRunning ? <b>{currentThemeLabel}</b> : null}
@@ -9582,14 +9613,14 @@ function DreamSkinScreen({
                     className="dream-skin-preview"
                     style={isWindowsPlatform ? undefined : { backgroundColor: themeColors.background }}
                   >
-                    <img alt={t("Dream Skin 图片预览")} src={previewUrl} />
+                    <DreamSkinPreview controls label={theme.name} path={customImagePath} src={previewUrl} />
                     <span style={isWindowsPlatform ? undefined : { backgroundColor: themeColors.panel, color: themeColors.text }}>
                       <strong>{theme.name}</strong>
-                      <small style={isWindowsPlatform ? undefined : { color: themeColors.muted }}>{customImagePath ? t("自定义托管图片") : t("目标项目默认图片")}</small>
+                      <small style={isWindowsPlatform ? undefined : { color: themeColors.muted }}>{customImagePath ? t("本地素材") : t("目标项目默认图片")}</small>
                     </span>
                   </div>
-                  <RelayFold className="relay-config-section dream-skin-image-info" title={t("图片信息")}>
-                    <Field label={t("托管图片路径")}>
+                  <RelayFold className="relay-config-section dream-skin-image-info" title={t("素材信息")}>
+                    <Field label={t("素材路径")}>
                       <Input
                         readOnly
                         placeholder={t("使用目标项目默认图片")}
@@ -9600,7 +9631,7 @@ function DreamSkinScreen({
                   <Toolbar>
                     <Button variant="secondary" onClick={() => void actions.chooseDreamSkinImagePath()}>
                       <Camera className="h-4 w-4" />
-                      {t("导入图片")}
+                      {t("导入图片或视频")}
                     </Button>
                     <Button
                       disabled={!customImagePath}
@@ -11449,6 +11480,7 @@ function GlobalSettingsScreen({
             >
               <AppSelect ariaLabel={t("界面主题")} className="cx-set-select" onChange={(value) => actions.setThemePreference(value)} options={themeOptions} size="sm" value={themePreference} />
             </CxRow>
+            <DisplaySettings />
           </CxCard>
         </CxSection>
         <CxSection title={t("窗口与托盘")}>
