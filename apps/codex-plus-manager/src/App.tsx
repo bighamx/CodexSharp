@@ -109,6 +109,7 @@ import {
 } from "lucide-react";
 import { createPresetPatch } from "@/components/ProviderPresetSelector";
 import { PRESETS, type ProviderPreset } from "./presets";
+import { setSponsorAds, useSponsorPresets } from "./sponsor-store";
 import { createPortal } from "react-dom";
 import { managerExtensionPages, managerNavPages, managerPageOverrides, type ManagerExtensionPage, type ManagerNavGroup, type ManagerPageSummary } from "./extension-manager-pages";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
@@ -246,6 +247,7 @@ import {
   requestCompatibilityEnabled,
   stripImageGenerationToolEnabled,
   stripResponsesImageDetailEnabled,
+  stripResponsesOutputEncryptedContentEnabled,
   pureApiImageGenerationEnabled,
   findRelayModelRouteIssue,
   modelRouteSaveRequiresRestart,
@@ -770,6 +772,8 @@ export type RelayProfile = {
   stripImageGenerationTool?: boolean;
   /** #2870：转发前移除 Responses 图片 `detail`，默认关闭。 */
   stripResponsesImageDetail?: boolean;
+  /** 转发前移除 Responses `include` 里的 `output.encrypted_content`，默认关闭。 */
+  stripResponsesOutputEncryptedContent?: boolean;
   /** #2868：不向上游发送 tool_search，默认关闭。 */
   disableToolSearch?: boolean;
   /** #1433：纯 API 下让 Codex 注册原生生图工具，生图请求经本地代理发给本供应商，默认关闭。 */
@@ -3834,6 +3838,7 @@ export function App() {
     const result = await run(() => call<AdsResult>("load_ads"));
     if (result) {
       setAds(result);
+      setSponsorAds(result);
       if (!silent) showResultNotice(t("推荐内容"), result, { silentSuccess: true });
     }
   };
@@ -5450,6 +5455,19 @@ export function App() {
               onDeleteMany={actions.deleteLocalSessions}
               onArchiveMany={actions.archiveLocalSessions}
               onListProjectSessions={actions.listProjectSessions}
+              onPickFolder={async (title) => {
+                try {
+                  const selected = await open({ directory: true, multiple: false, title });
+                  return typeof selected === "string" && selected.trim() ? selected : null;
+                } catch (error) {
+                  showNotice(t("移动会话"), stringifyError(error), "failed");
+                  return null;
+                }
+              }}
+              onRelocated={async (message, ok) => {
+                showNotice(t("移动会话"), message, ok ? "ok" : "failed");
+                await actions.refreshLocalSessions(true, localSessions?.offset ?? 0);
+              }}
               repairPanel={<SessionRepairPanel dirty={settingsDirty} form={settingsForm} providerSyncProgress={providerSyncProgress}
                 sessionIndexRepairActive={sessionIndexRepairActive} sessionIndexRepairReport={sessionIndexRepairReport}
                 sessionIndexRepairReportError={sessionIndexRepairReportError} providerSyncTargets={providerSyncTargets}
@@ -8760,7 +8778,10 @@ function ProviderCatalogScreen({
     { id: "aggregator", label: t("聚合/中转") },
     { id: "third_party", label: t("第三方平台") },
   ];
-  const filteredPresets = PRESETS.filter((preset) => {
+  // 赞助商排在「聚合/中转」最前面。
+  const sponsors = useSponsorPresets();
+  const sponsorIds = new Set(sponsors.map((preset) => preset.id));
+  const filteredPresets = [...sponsors, ...PRESETS.filter((preset) => !sponsorIds.has(preset.id))].filter((preset) => {
     const haystack = `${preset.name} ${preset.baseUrl} ${preset.model}`.toLowerCase();
     return !query.trim() || haystack.includes(query.trim().toLowerCase());
   });
@@ -12430,6 +12451,7 @@ function RelayProfileEditor({
     profile.strictResponsesReasoning === true,
     profile.stripImageGenerationTool === true,
     profile.stripResponsesImageDetail === true,
+    profile.stripResponsesOutputEncryptedContent === true,
     profile.disableToolSearch === true,
     profile.pureApiImageGeneration === true,
   ].filter(Boolean).length;
@@ -14024,6 +14046,10 @@ function RelayProfileEditor({
                   <label className="switch-row compact relay-switch-row relay-field-strip-responses-image-detail">
                     <input type="checkbox" checked={profile.stripResponsesImageDetail === true} onChange={(event) => updateDraft({ stripResponsesImageDetail: event.currentTarget.checked })} />
                     <span><strong>{t("移除 Responses 图片 detail 字段")}</strong><small>{t("部分 Responses 上游不认 OpenAI 的 input_image.detail，只会返回泛化的参数错误。开启后转发前从普通消息和工具输出里的图片块删除 detail，请求改走本地代理。默认关闭。")}</small></span><ToggleVisual />
+                  </label>
+                  <label className="switch-row compact relay-switch-row relay-field-strip-responses-output-encrypted-content">
+                    <input type="checkbox" checked={profile.stripResponsesOutputEncryptedContent === true} onChange={(event) => updateDraft({ stripResponsesOutputEncryptedContent: event.currentTarget.checked })} />
+                    <span><strong>{t("不发送 output.encrypted_content（上游不支持时开启）")}</strong><small>{t("部分严格 Responses 上游不接受 Codex 请求 include 里的 output.encrypted_content，会整条返回 400。开启后只删除这一项，保留 reasoning.encrypted_content 和其他项，请求改走本地代理。Kimi 地址或模型名会自动处理。默认关闭。")}</small></span><ToggleVisual />
                   </label>
                   <label className="switch-row compact relay-switch-row relay-field-disable-tool-search">
                     <input type="checkbox" checked={profile.disableToolSearch === true} onChange={(event) => updateDraft({ disableToolSearch: event.currentTarget.checked })} />
@@ -15863,7 +15889,16 @@ type ClaudeLocalConfig = {
   codeShareHome?: boolean;
   /** 启动前把命令行建的会话加进 Desktop 的会话列表；不写按默认（开）。 */
   importCliSessions?: boolean;
+  /** Cowork 总开关；不写按默认（开）。 */
+  cowork?: boolean;
+  /** 合并式主页（Claude 的实验布局）；不写按默认（关）。 */
+  hubHome?: boolean;
+  /** 界面用哪个录制版本（build id）；空串按最新的。 */
+  template?: string;
 };
+
+/** 内嵌的一个录制版本；builtAt 是该版本前端的构建时间（秒）。 */
+type ClaudeTemplateVersion = { build: string; builtAt?: number | null };
 
 type ClaudeLocalStatus = {
   supported: boolean;
@@ -15877,6 +15912,11 @@ type ClaudeLocalStatus = {
   port?: number | null;
   caReady: boolean;
   caTrusted: boolean;
+  /** 系统级根证书（Cowork 虚拟机用）：只有 Windows 支持。 */
+  caMachineSupported?: boolean;
+  caMachineTrusted?: boolean;
+  /** 内嵌的录制版本，新的在前。 */
+  templates?: ClaudeTemplateVersion[];
   nodeAvailable: boolean;
   dictationReady: boolean;
   config: ClaudeLocalConfig;
@@ -15899,6 +15939,14 @@ const CLAUDE_DEFAULT_CONTEXT_WINDOW = 200_000;
 function formatContextWindow(value: number | null | undefined): string {
   if (value == null || !Number.isFinite(value) || value <= 0) return "";
   return formatTokens(value).replace(/K$/, "k");
+}
+
+/** 录制版本的显示：前端构建日期 + build id，例如「2026-11-14 · a4ced7f85b」；没有构建时间时只显示 build id。 */
+function claudeTemplateLabel(template: ClaudeTemplateVersion): string {
+  if (!template.builtAt) return template.build;
+  const date = new Date(template.builtAt * 1000);
+  const day = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return `${day} · ${template.build}`;
 }
 
 /**
@@ -16058,7 +16106,7 @@ function ClaudeLocalizationScreen(
     claudeLocalMemo.autoDetected = true;
     void refreshLocal();
   }, []);
-  const localAction = async (action: "launch" | "stop" | "trust" | "untrust" | "prepare" | "sync_sessions") => {
+  const localAction = async (action: "launch" | "stop" | "trust" | "untrust" | "trust_machine" | "prepare" | "sync_sessions") => {
     if (localPending.current || pending.current) return;
     localPending.current = true;
     localGeneration.current++;
@@ -16327,6 +16375,7 @@ function ClaudeLocalizationScreen(
   const localTone = local?.connected ? "ok" : local?.config.enabled && local?.claudeRunning ? "warn" : "neutral";
   const canLaunchOriginal = Boolean(local?.supported && (!local.config.enabled || local.nodeAvailable));
   const localDisabled = localBusy !== null || busy !== null;
+  const localTemplates = local?.templates ?? [];
   const localDetail = local
     ? (local.supported ? `${t("原版版本")} ${local.version || t("未检测到")}` : t("未检测到支持的 Claude Desktop"))
       + ` · ${local.contextWindow != null && local.contextWindow > 0
@@ -16546,27 +16595,60 @@ function ClaudeLocalizationScreen(
                   )}
                 </div>
               </CxRow>
+              {/* Cowork 虚拟机以系统服务运行，只读系统级根证书：只有 Windows 需要，Cowork 关着时用不上。 */}
+              {(local.config.cowork ?? true) && local.caMachineSupported ? (
+                <CxRow
+                  badges={<CxBadge tone={local.caMachineTrusted ? "ok" : "neutral"}>{local.caMachineTrusted ? t("已安装") : t("未安装")}</CxBadge>}
+                  detail={t("Cowork 虚拟机以系统服务运行，只读取系统级根证书；安装需要管理员授权。")}
+                  title={t("系统证书")}
+                >
+                  {!local.caMachineTrusted ? (
+                    <div className="claude-l10n-actions">
+                      <button className="cx-secondary" disabled={localDisabled} onClick={() => void localAction("trust_machine")} type="button"><ShieldCheck />{t("安装系统证书")}</button>
+                    </div>
+                  ) : null}
+                </CxRow>
+              ) : null}
               <CxRow badges={<CxBadge tone={local.dictationReady ? "ok" : "neutral"}>{local.dictationReady ? t("已就绪") : t("未就绪")}</CxBadge>} title={t("语音识别")} />
               <CxRow badges={<CxBadge tone={local.nodeAvailable ? "ok" : "warn"}>{local.nodeAvailable ? t("已就绪") : t("缺少 Node.js")}</CxBadge>} title={t("运行环境")} />
+              {localTemplates.length > 1 ? (
+                <CxRow
+                  detail={t("录制 claude.ai 界面时的版本。新版本有问题时可以换回旧的；前端代码按所选版本从 Anthropic 下载。")}
+                  title={t("界面版本")}
+                >
+                  <AppSelect
+                    ariaLabel={t("界面版本")}
+                    disabled={localDisabled}
+                    menuWidth={300}
+                    onChange={(next) => void configureLocal({ ...local.config, template: next })}
+                    options={[
+                      { value: "", label: tf("最新（{0}）", [claudeTemplateLabel(localTemplates[0])]) },
+                      ...localTemplates.map((template) => ({ value: template.build, label: claudeTemplateLabel(template) })),
+                    ]}
+                    value={localTemplates.some((template) => template.build === local.config.template) ? local.config.template ?? "" : ""}
+                  />
+                </CxRow>
+              ) : null}
             </CxCard>
             <CxCard className="claude-l10n-feature-grid">
               {([
-                ["localization", "界面汉化", "本地界面汉化"],
-                ["voiceInput", "原生听写", "本地原生听写"],
-                ["computerUse", "电脑控制", "本地电脑控制"],
-                ["backgroundMode", "后台模式", "本地后台模式"],
-                ["forceBackgroundMode", "新系统也开后台模式", "本地后台模式不限系统版本"],
-              ] as const).map(([key, label, ariaLabel]) => (
+                ["localization", "界面汉化", "本地界面汉化", ""],
+                ["voiceInput", "原生听写", "本地原生听写", ""],
+                ["computerUse", "电脑控制", "本地电脑控制", ""],
+                ["backgroundMode", "后台模式", "本地后台模式", ""],
+                ["forceBackgroundMode", "新系统也开后台模式", "本地后台模式不限系统版本", "Claude 在较新的 macOS 上会提示「暂不支持后台模式」；打开后不再限制系统版本，未经 Claude 验证，可能不稳定"],
+                ["cowork", "Cowork", "本地 Cowork", "关掉后按 Claude 自己的开关，新版 Claude 通常只剩 Chat / Code。系统条件（Windows 需商店版、虚拟化可用）仍由 Claude 检查"],
+                ["hubHome", "合并式主页（实验）", "本地合并式主页", "Claude 正在小范围试验的主页布局：对话和 Cowork 合在一个输入框里，没有「对话 | Cowork」切换。关着时用有切换的经典主页"],
+              ] as const).map(([key, label, ariaLabel, hint]) => (
                 <label
                   className="switch-row compact"
                   key={key}
-                  title={key === "forceBackgroundMode"
-                    ? t("Claude 在较新的 macOS 上会提示「暂不支持后台模式」；打开后不再限制系统版本，未经 Claude 验证，可能不稳定")
-                    : undefined}
+                  title={hint ? t(hint) : undefined}
                 >
                   <input
                     aria-label={t(ariaLabel)}
-                    checked={local.config[key] ?? false}
+                    // 只有 Cowork 默认是开的。
+                    checked={local.config[key] ?? key === "cowork"}
                     disabled={localDisabled}
                     onChange={(event) => {
                       const checked = event.currentTarget.checked;

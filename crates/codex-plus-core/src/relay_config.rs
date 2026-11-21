@@ -2035,6 +2035,7 @@ fn recognized_managed_proxy_endpoint(profile: &RelayProfile, config: &str) -> bo
         || profile.strips_image_generation_tool()
         || profile.enables_pure_api_image_generation()
         || profile.strips_responses_image_detail()
+        || profile.strips_responses_output_encrypted_content()
         || profile.relay_mode == RelayMode::Aggregate;
     let saved_endpoint_matches = provider_string_from_config(&profile.config_contents, "base_url")
         .is_some_and(|saved| {
@@ -3834,6 +3835,10 @@ fn preserve_live_app_settings(home: &Path, config_text: &str) -> anyhow::Result<
     // `[memories]`（记忆的提取/整合模型等）同样是用户在 Codex 里的本机设置，
     // 切换供应商或重启时不能被模板冲掉（#2021）。
     preserve_missing_table_keys(&mut target_doc, &live_doc, "memories");
+    // `[permissions.<名字>]` 权限档由用户自己维护，模板和通用配置都不管理它（#3016）。
+    // 切入的供应商快照里没有这张表、或只有通用配置里的旧副本时，档会整条消失或丢键，
+    // 根上的 `default_permissions` 却还指着它。live 有而目标缺的档整条补回，同名档只补缺的键。
+    preserve_missing_permission_profiles(&mut target_doc, &live_doc);
     // hooks 的定义部分（除 state 外的键）同样由用户/桌面端管理，模板里没有时
     // 从 live 补回，否则切换供应商会把定义整段丢掉，只剩 hooks.state。
     preserve_live_hook_definitions(&mut target_doc, &live_doc);
@@ -3874,6 +3879,19 @@ fn preserve_missing_table_keys(
             target_table.insert(key, value.clone());
         }
     }
+}
+
+fn preserve_missing_permission_profiles(target_doc: &mut DocumentMut, live_doc: &DocumentMut) {
+    let Some(live_profiles) = live_doc.get("permissions").filter(|item| item.is_table_like()) else {
+        return;
+    };
+    if target_doc.get("permissions").and_then(Item::as_table_like).is_none() {
+        // 只有 `[permissions.<名字>]` 子表，不单独写一行空的 `[permissions]`。
+        let mut profiles = toml_edit::Table::new();
+        profiles.set_implicit(true);
+        target_doc["permissions"] = Item::Table(profiles);
+    }
+    fill_missing_toml_item(&mut target_doc["permissions"], live_profiles);
 }
 
 /// 多开实例（#3144）：`[windows]`（Windows 沙箱实现 elevated / unelevated 等）以主实例
@@ -6155,13 +6173,45 @@ fn sync_profile_mode_from_backfilled_live(profile: &mut RelayProfile) {
     }
 }
 
+/// 切到官方登录（含「官方 + API 混合」）供应商时要写进 live 的 auth.json。
+///
+/// 供应商里存的登录是上次回填时的快照。Codex 运行中会刷新登录并轮换 refresh token，所以同一个
+/// 账号在 live 里的那份比快照新，旧快照里的 refresh token 已经作废。几个供应商各存着同一账号的
+/// 旧快照时，照快照写回去，Codex 重开就要求重新登录（#3129）。
+/// 因此：live 里是同一个账号就沿用 live（快照的 `last_refresh` 更晚时除外，那是用户刚换上的）；
+/// live 是别的账号、没有登录或读不出来，照旧以快照为准。
 fn official_profile_auth_for_switch(home: &Path, auth_contents: &str) -> anyhow::Result<String> {
+    let live = read_optional_text(&home.join("auth.json"));
     let source = if auth_contents.trim().is_empty() {
-        read_optional_text(&home.join("auth.json"))?
+        live?
     } else {
-        auth_contents.to_string()
+        match live {
+            Ok(live)
+                if crate::native_auth::same_account(&live, auth_contents)
+                    && !login_was_refreshed_later(auth_contents, &live) =>
+            {
+                live
+            }
+            _ => auth_contents.to_string(),
+        }
     };
     remove_openai_api_key_from_auth_contents(&source)
+}
+
+/// 两份 auth.json 都带 `last_refresh` 且 `login` 的更晚（RFC 3339 的 UTC 时间戳按字面比较即可）。
+fn login_was_refreshed_later(login: &str, than: &str) -> bool {
+    let last_refresh = |contents: &str| {
+        serde_json::from_str::<Value>(contents)
+            .ok()?
+            .get("last_refresh")?
+            .as_str()
+            .map(|stamp| stamp.trim().to_string())
+            .filter(|stamp| !stamp.is_empty())
+    };
+    match (last_refresh(login), last_refresh(than)) {
+        (Some(login), Some(than)) => login > than,
+        _ => false,
+    }
 }
 
 /// 生成写入 live 的 auth.json 内容：把本地代理的 bearer token 放进 `OPENAI_API_KEY`，
@@ -6430,6 +6480,7 @@ pub fn relay_profile_base_url(profile: &RelayProfile) -> String {
         || profile.strips_image_generation_tool()
         || profile.enables_pure_api_image_generation()
         || profile.strips_responses_image_detail()
+        || profile.strips_responses_output_encrypted_content()
         || has_managed_proxy_config
     {
         if !profile.upstream_base_url.trim().is_empty() {
@@ -6813,6 +6864,7 @@ fn complete_relay_profile_config_with_proxy_port(
         || profile.strips_image_generation_tool()
         || profile.enables_pure_api_image_generation()
         || profile.strips_responses_image_detail()
+        || profile.strips_responses_output_encrypted_content()
     {
         crate::protocol_proxy::local_responses_proxy_base_url(proxy_port)
     } else {

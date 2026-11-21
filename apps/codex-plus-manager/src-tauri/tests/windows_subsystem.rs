@@ -499,16 +499,17 @@ fn relay_preview_deduplicates_root_keys_when_merging_common_config() {
     assert!(app_tsx.contains("joinTomlSectionsRootFirst"));
 }
 
+/// 赞助商预设只来自远端推荐清单（上游已把内置赞助商从 presets.ts 移走）。
+/// 这里钉住新契约：仍有 sponsorPresets 汇总入口，内置列表不再夹带赞助商条目。
 #[test]
-fn provider_presets_include_runapi() {
+fn provider_presets_come_from_the_remote_sponsor_list() {
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     let presets = manifest_dir.parent().unwrap().join("src/presets.ts");
     let presets = std::fs::read_to_string(&presets).expect("read manager presets.ts");
 
-    assert!(presets.contains("id: \"runapi\""));
-    assert!(presets.contains("name: \"RunAPI\""));
-    assert!(presets.contains("category: \"aggregator\""));
-    assert!(presets.contains("baseUrl: \"https://runapi.host/v1\""));
+    assert!(presets.contains("export function sponsorPresets"));
+    assert!(!presets.contains("id: \"runapi\""), "内置预设里不应再有赞助商条目");
+    assert!(!presets.contains("section: \"sponsor\""), "赞助商分组由远端清单生成");
 }
 
 #[test]
