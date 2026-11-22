@@ -113,6 +113,32 @@ fn asset_selection_prefers_current_platform_artifacts() {
 }
 
 #[test]
+fn asset_selection_accepts_codexsharp_fork_names() {
+    // 本仓库（Codex # fork）的安装包叫 CodexSharp-*，上游叫 CodexPlusPlus-*。
+    // 资产名过滤必须两套都认，否则换到本仓库的 release 后检查更新挑不到资产。
+    let assets = vec![
+        (
+            "CodexSharp-2.9.0-windows-x64-setup.exe".to_string(),
+            "https://example.test/sharp-setup.exe".to_string(),
+        ),
+        (
+            "CodexSharp-2.9.0-macos-universal.dmg".to_string(),
+            "https://example.test/sharp.dmg".to_string(),
+        ),
+    ];
+
+    if cfg!(windows) {
+        let selected = select_update_asset(&assets).unwrap();
+        assert_eq!(selected.name, "CodexSharp-2.9.0-windows-x64-setup.exe");
+    } else if cfg!(target_os = "macos") {
+        let selected = select_update_asset(&assets).unwrap();
+        assert_eq!(selected.name, "CodexSharp-2.9.0-macos-universal.dmg");
+    } else {
+        assert!(select_update_asset(&assets).is_none());
+    }
+}
+
+#[test]
 fn asset_selection_distinguishes_x64_and_arm64_macos_dmgs() {
     // Regression test for the bug where an x86_64 Mac user could be handed
     // the arm64 DMG (or vice versa) because `is_macos_installer_asset` did

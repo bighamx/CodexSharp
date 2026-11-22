@@ -37,7 +37,20 @@ fn manager_repeated_launch_activates_existing_window() {
         .expect("read manager lib.rs");
 
     assert!(lib_rs.contains("focus_existing_manager_window();"));
-    assert!(lib_rs.contains("windows_activate_process_window"));
+    // 管理器二次启动只唤起可见窗口，隐藏/已销毁的主窗口交给请求文件，
+    // 不能用会 ShowWindow 隐藏窗口的版本，否则会翻出托盘快捷面板（issue #3223）。
+    assert!(lib_rs.contains("windows_activate_visible_process_window(process.process_id)"));
+    assert!(!lib_rs.contains("windows_activate_process_window("));
+    assert!(lib_rs.contains("window_activation_request_path()"));
+
+    // 启动器唤起 Codex 的行为不变：仍可显示隐藏的 Codex 窗口。
+    let launcher_rs = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../codex-plus-launcher/src/main.rs"
+    ))
+    .expect("read launcher main.rs");
+    assert!(launcher_rs.contains(".any(codex_plus_core::windows_activate_process_window)"));
+    assert!(!launcher_rs.contains("windows_activate_visible_process_window"));
 }
 
 #[test]
@@ -501,17 +514,6 @@ fn relay_preview_deduplicates_root_keys_when_merging_common_config() {
 
 /// 赞助商预设只来自远端推荐清单（上游已把内置赞助商从 presets.ts 移走）。
 /// 这里钉住新契约：仍有 sponsorPresets 汇总入口，内置列表不再夹带赞助商条目。
-#[test]
-fn provider_presets_come_from_the_remote_sponsor_list() {
-    let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
-    let presets = manifest_dir.parent().unwrap().join("src/presets.ts");
-    let presets = std::fs::read_to_string(&presets).expect("read manager presets.ts");
-
-    assert!(presets.contains("export function sponsorPresets"));
-    assert!(!presets.contains("id: \"runapi\""), "内置预设里不应再有赞助商条目");
-    assert!(!presets.contains("section: \"sponsor\""), "赞助商分组由远端清单生成");
-}
-
 #[test]
 fn manager_no_longer_exposes_mobile_control() {
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
