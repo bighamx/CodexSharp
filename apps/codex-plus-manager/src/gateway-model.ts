@@ -341,6 +341,10 @@ export type GatewayPayload = {
   /** 能在网关里登录的私有接口订阅（Cursor、Kiro 等）；旧版后端没有。 */
   subscriptions?: SubscriptionView[];
   claudeProviders: Array<{ id: string; name: string }>;
+  /** CC Switch 里的 Claude / Claude Desktop 供应商（旧后端没有这一项）。 */
+  ccSwitchClaude?: Array<{ id: string; name: string }>;
+  /** ClaudeMom 的上游（旧后端没有这一项）。 */
+  claudeMomProfiles?: Array<{ id: string; name: string }>;
   grokProfiles: Array<{ id: string; name: string }>;
   /** OpenCode 里保存的 OpenCode Go / Zen Key。 */
   opencodeKeys?: Array<{ id: string; name: string }>;
@@ -639,7 +643,7 @@ export function modelRoutable(payload: GatewayPayload | null, model: string, exc
 /** 表单校验：返回错误文案（中文原文，界面再翻译），没问题返回 null。 */
 export function validateDraft(draft: BindingDraft, payload: GatewayPayload | null, retainedModel?: string, retainedSelection?: DefaultModelSelection | null): string | null {
   if (payload) {
-    if (!agentPoolProviders(payload, draft.poolExclude).length) return "供应商池是空的，先到「供应商」里添加";
+    if (!agentPoolProviders(payload, draft.poolExclude).length) return "供应商池是空的，先在「供应商池」里添加供应商";
     const model = draft.model.trim();
     const retainedDisabledModel = draft.model === retainedModel && disabledGroup(payload, model);
     const retainedProvider = retainedSelection && payload.pool.find((entry) => entry.id === retainedSelection.providerId);
@@ -1726,6 +1730,11 @@ function maskEmailsIn(text: string): string {
   return text.replace(EMAIL_PATTERN, (_match, lead: string, email: string) => lead + maskEmail(email));
 }
 
+/** 供应商名的短写法：`·` 前那段（「ChatGPT Pro · 邮箱」→「ChatGPT Pro」），完整名放在悬停提示里。 */
+export function shortProviderName(name: string): string {
+  return name.split("·")[0].trim() || name;
+}
+
 /**
  * 订阅账号的显示名打码：「ChatGPT Pro · me@example.com」「Copilot · octocat」这类名字里的账号部分只露头尾，
  * 名字里出现的邮箱也一样。只在显示时处理，存储的名字不变；普通供应商名不受影响。
@@ -1766,7 +1775,7 @@ function maskToken(value: string): string {
 
 /* —————————————— 从直连模式导入 —————————————— */
 
-export type ImportSource = "codex" | "claude" | "grok" | "opencode" | "aggregate";
+export type ImportSource = "codex" | "claude" | "ccswitch" | "claudemom" | "grok" | "opencode" | "aggregate";
 export type ImportCandidate = { source: ImportSource; id: string; name: string; imported: boolean };
 
 /** 能导入网关的供应商（不含官方登录账号）：已导入过的标 `imported`。 */
@@ -1778,6 +1787,8 @@ export function importCandidates(payload: GatewayPayload | null): ImportCandidat
     ...plain("codex", payload?.codexProviders),
     ...(payload?.codexAggregates ?? []).map((item) => ({ source: "aggregate" as const, id: item.id, name: item.name, imported: item.imported })),
     ...plain("claude", payload?.claudeProviders),
+    ...plain("ccswitch", payload?.ccSwitchClaude),
+    ...plain("claudemom", payload?.claudeMomProfiles),
     ...plain("grok", payload?.grokProfiles),
     ...plain("opencode", payload?.opencodeKeys),
   ];

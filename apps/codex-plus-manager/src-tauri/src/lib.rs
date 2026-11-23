@@ -3,6 +3,7 @@ mod extension_creator_commands;
 mod agent_launch_commands;
 mod agent_mcp_commands;
 mod auto_takeover;
+mod claude_auto_takeover;
 pub mod commands;
 mod computer_use_commands;
 mod config_doctor_commands;
@@ -22,6 +23,7 @@ mod skill_backup_usage;
 mod tray_panel;
 mod shutdown_watchdog;
 pub mod weixin_connect_bridge;
+pub mod dream_skin_bridge;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -43,6 +45,8 @@ const SHUTDOWN_WATCHDOG: u64 = 10;
 const TRAY_MENU_SHOW: &str = "tray_show_main";
 const TRAY_MENU_QUIT: &str = "tray_quit_app";
 const MANAGER_NAVIGATION_EVENT: &str = "manager-navigation-requested";
+/// 网页链接存下待确认的供应商导入 / 一键换肤后通知界面读取。
+const PENDING_IMPORT_CHANGED_EVENT: &str = "manager-pending-import-changed";
 
 pub(crate) fn app_is_exiting() -> bool {
     APP_EXITING.load(Ordering::SeqCst)
@@ -210,7 +214,7 @@ pub fn run_computer_use_cli(args: &[std::ffi::OsString]) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Codex 拓展页的「社区 / 我发布的 / dsh 插件」分栏、Codex 里的「微信连接」页：实现在管理器里，
+/// Codex 拓展页的「社区 / 我发布的 / dsh 插件」分栏、Codex 里的「微信连接」页与「皮肤」分区：实现在管理器里，
 /// 经 helper 桥接分发给页面。helper 跑在本进程里，登记一次即可。
 fn register_codex_bridge_routes() {
     use codex_plus_core::routes::{HostRouteHandler, register_host_route};
@@ -223,6 +227,9 @@ fn register_codex_bridge_routes() {
     register_host_route("/extension-market/published", published);
     register_host_route("/extension-market/dsh", dsh);
     register_host_route(codex_plus_core::connect::page::BRIDGE_ROUTE, weixin);
+    // 皮肤只在 Codex 里有界面：主题库、市场、激活、恢复都调管理器原来的命令函数。
+    let dream_skin: HostRouteHandler = std::sync::Arc::new(|payload| Box::pin(dream_skin_bridge::bridge_request(payload)));
+    register_host_route("/dream-skin", dream_skin);
 }
 
 pub fn run() {
@@ -324,9 +331,6 @@ pub fn run() {
     let app_result = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .setup(move |app| {
-            if let Some(state_dir) = codex_plus_core::paths::state_dir_override() {
-                app.asset_protocol_scope().allow_directory(state_dir.join("dream-skin"), true)?;
-            }
             let url = if show_update {
                 "/index.html?showUpdate=1"
             } else {
@@ -376,6 +380,8 @@ pub fn run() {
             gateway_commands::start_model_watch();
             // 自动接管官方 App（默认关闭）：设置里开着才起守护线程。
             auto_takeover::start_supervisor();
+            // Claude 自动接管（默认关闭，只在完整功能模式下动作）：同上，开着才起守护线程。
+            claude_auto_takeover::start_supervisor();
             if let Err(error) = global_dictation::apply_config() {
                 let _ = codex_plus_core::diagnostic_log::append_diagnostic_log(
                     "dictation.global_hotkey_start_failed",
@@ -425,6 +431,16 @@ pub fn run() {
             commands::claude_localization_set_localization,
             commands::claude_localization_set_computer_use,
             commands::claude_localization_set_bash_timeout,
+            commands::claude_enhance_status,
+            commands::claude_enhance_set_delivery,
+            commands::claude_enhance_set_bash_timeout,
+            commands::claude_page_extensions,
+            commands::claude_page_extension_enable,
+            commands::claude_page_extension_import,
+            commands::claude_page_extension_remove,
+            commands::claude_page_extension_open_folder,
+            commands::claude_page_extension_market,
+            commands::claude_page_extension_install,
             computer_use_commands::computer_use_status,
             computer_use_commands::computer_use_install,
             computer_use_commands::computer_use_uninstall,
@@ -493,7 +509,6 @@ pub fn run() {
             gateway_commands::consume_gateway_reset_card,
             gateway_commands::abandon_gateway_reset_operation,
             gateway_commands::delete_gateway_provider,
-            gateway_commands::check_gateway_provider_models,
             gateway_commands::preview_gateway_provider_models_sync,
             gateway_commands::apply_gateway_provider_models_sync,
             gateway_commands::preview_gateway_provider_meta_sync,
@@ -552,28 +567,11 @@ pub fn run() {
             commands::find_desktop_codex_cli,
             commands::query_builtin_model_metadata,
             commands::builtin_model_metadata_index,
-            commands::dream_skin_status,
-            commands::import_dream_skin_image,
-            commands::reset_dream_skin_image,
-            commands::reset_dream_skin_theme,
-            commands::apply_dream_skin,
             commands::restore_dream_skin,
-            commands::verify_dream_skin,
-            commands::list_dream_skin_themes,
-            commands::refresh_dream_skin_market,
-            commands::refresh_dream_skin_community,
             commands::load_pending_dream_skin_community,
             commands::confirm_pending_dream_skin_community,
             commands::dismiss_pending_dream_skin_community,
-            commands::install_dream_skin_market_theme,
-            commands::install_dream_skin_community_theme,
-            commands::import_dream_skin_theme_package,
-            commands::load_dream_skin_theme,
-            commands::create_dream_skin_theme,
-            commands::save_dream_skin_theme,
-            commands::rename_dream_skin_theme,
-            commands::delete_dream_skin_theme,
-            commands::activate_dream_skin_theme,
+            dream_skin_bridge::activate_installed_dream_skin_theme,
             commands::load_ccs_providers,
             commands::import_ccs_providers,
             commands::load_pending_provider_import,
@@ -582,6 +580,8 @@ pub fn run() {
             commands::list_local_sessions,
             commands::list_project_sessions,
             commands::delete_local_session,
+            commands::delete_local_sessions,
+            commands::undo_delete_local_sessions,
             commands::archive_local_sessions,
             commands::preview_session_relocation,
             commands::apply_session_relocation,
@@ -654,6 +654,7 @@ pub fn run() {
             commands::set_watcher_start_codex,
             commands::set_watcher_start_codex_on_open,
             commands::load_relay_proxy,
+            commands::load_relay_proxies,
             commands::set_relay_proxy,
             commands::load_relay_feature,
             commands::set_relay_feature,
@@ -662,6 +663,11 @@ pub fn run() {
             commands::load_auto_takeover_state,
             commands::take_over_codex_now,
             commands::pause_auto_takeover_for_instance,
+            // Claude 自动接管：同样只能靠这里注册（契约测试会守）。
+            commands::load_claude_auto_takeover_state,
+            commands::set_claude_auto_takeover,
+            commands::take_over_claude_now,
+            commands::pause_claude_auto_takeover_for_instance,
             commands::read_latest_logs,
             commands::clear_logs,
             commands::scan_agent_cache,
@@ -684,6 +690,7 @@ pub fn run() {
             commands::read_live_context_entries,
             commands::sync_live_context_entries,
             commands::upsert_context_entry,
+            commands::apply_context_entry,
             commands::delete_context_entry,
             commands::parse_mcp_entry,
             commands::inspect_mcp_startup,
@@ -740,6 +747,7 @@ pub fn run() {
                 record_shutdown_entry("app.exit_requested", detail);
                 if start_shutdown {
                     auto_takeover::stop_supervisor();
+                    claude_auto_takeover::stop_supervisor();
                     let app = app_handle.clone();
                     tauri::async_runtime::spawn_blocking(move || {
                         // 退出前先等待自有 CLI 任务清理，避免进程退出后遗留执行器。
@@ -770,6 +778,8 @@ pub fn run() {
                     for url in urls {
                         if handle_dream_skin_url(url.as_str()) || handle_provider_import_url(url.as_str()) {
                             show_main_window(app_handle);
+                            // 界面收到后读一次待确认导入 / 一键换肤并弹确认框（不再轮询）。
+                            let _ = app_handle.emit(PENDING_IMPORT_CHANGED_EVENT, ());
                         }
                     }
                 }
@@ -793,8 +803,9 @@ pub fn run() {
     }
 }
 
-/// 网页导入链接（codexplusplus://v1/import/provider?…）：存为待确认导入，界面轮询到后弹出确认框。
-/// Windows 从启动参数传进来，macOS 由系统的「打开 URL」事件送达（应用已在运行时也走这里）。
+/// 网页导入链接（codexplusplus://v1/import/provider?…）：存为待确认导入，界面读到后弹出确认框。
+/// Windows 从启动参数传进来（新进程存好后唤起已有窗口，界面在窗口获得焦点时读取），
+/// macOS 由系统的「打开 URL」事件送达（应用已在运行时也走这里，随后发 `PENDING_IMPORT_CHANGED_EVENT`）。
 pub fn handle_provider_import_url(url: &str) -> bool {
     if !url.starts_with("codexplusplus://") {
         return false;

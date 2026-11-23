@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import ts from "typescript";
+import { readAppSource } from "./app-source.test-helper.ts";
 import { EN_BACKEND, EN_PLAIN, EN_TEMPLATE } from "./i18n-en.ts";
 import { tourSteps } from "./onboarding-model.ts";
 
@@ -56,9 +57,9 @@ test("模式问卷与入门清单的所有状态、按钮和错误均有英文",
   checkKeys(keys);
 });
 
-test("全部、单 Agent 和增强模式的实际导览步骤均有英文且保留占位符", () => {
+test("全部、单 Agent、增强模式和未用网关时的实际导览步骤均有英文且保留占位符", () => {
   const keys = emptyKeys();
-  for (const steps of [tourSteps(null), tourSteps("Codex"), tourSteps(null, true)]) {
+  for (const steps of [tourSteps(null), tourSteps("Codex"), tourSteps(null, true), tourSteps(null, false, false), tourSteps("Codex", false, false)]) {
     for (const step of steps) {
       (step.args && !step.plainTitle ? keys.template : keys.plain).add(step.title);
       (step.args ? keys.template : keys.plain).add(step.body);
@@ -68,7 +69,7 @@ test("全部、单 Agent 和增强模式的实际导览步骤均有英文且保�
 });
 
 test("App 的模式影响说明、事务保存提示和重新打开引导说明均有英文", () => {
-  const tree = source("./App.tsx");
+  const tree = ts.createSourceFile("App.tsx", readAppSource(), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const keys = emptyKeys();
   const visit = (node: ts.Node) => {
     if (ts.isFunctionDeclaration(node) && node.name?.text === "agentFocusDescription") collectCalls(node, keys);

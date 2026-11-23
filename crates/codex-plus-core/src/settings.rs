@@ -1219,6 +1219,10 @@ pub struct BackendSettings {
     /// 原版 Claude 的本地兼容服务，与增强副本的开关独立，默认不接管启动。
     #[serde(rename = "claudeDesktopLocal", default)]
     pub claude_desktop_local: ClaudeLocalSettings,
+    /// Claude Desktop 自动接管（默认关闭）：启动模式是完整功能模式时，用户自己打开的官方 Claude
+    /// 会被退出、再经本地服务重开。3p 模式和补丁副本不接管，见 `claude_auto_takeover`。
+    #[serde(rename = "claudeAppAutoTakeover", default)]
+    pub claude_app_auto_takeover: bool,
     // 默认开启：只在受管副本的页面里加一个语音入口，识别走 Codex # 自己的听写服务，
     // 不改官方应用、不动输入框已有内容；关掉只是没有入口，已运行的副本需重启才生效。
     #[serde(rename = "claudeAppVoiceInput", default = "default_true")]
@@ -1236,6 +1240,10 @@ pub struct BackendSettings {
     pub claude_app_computer_use: bool,
     #[serde(rename = "claudeAppBashTimeout", default)]
     pub claude_app_bash_timeout: ClaudeBashTimeoutSettings,
+    /// Claude 增强的生效方式：`full`（完整功能模式，本地服务注入）或 `copy`（补丁副本，启动时注入）。
+    /// 没写过时按现状推断，见 `claude_localization::enhance_delivery`。
+    #[serde(rename = "claudeEnhanceDelivery", default, skip_serializing_if = "Option::is_none")]
+    pub claude_enhance_delivery: Option<String>,
     /// Codex # Computer Use 的审批策略。
     ///
     /// - `auto`（默认）：代理就地放行，只留痕。适合信任调用方、只想少弹窗的场景。
@@ -1439,6 +1447,16 @@ pub struct BackendSettings {
     pub codex_app_dream_skin_theme_config: DreamSkinThemeConfig,
     #[serde(rename = "codexAppDreamSkinImagePath", default)]
     pub codex_app_dream_skin_image_path: String,
+    /// 皮肤面板透出壁纸的百分比（0–100，#3233）。是用户偏好，不写进主题包：
+    /// 注入时作为 `userTransparency` 并进交给上游渲染器的主题配置。
+    /// None 表示跟随主题（主题配色自带透明度就用它，否则上游默认透出 30%）。
+    #[serde(
+        rename = "codexAppDreamSkinUserTransparency",
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_dream_skin_user_transparency"
+    )]
+    pub codex_app_dream_skin_user_transparency: Option<u8>,
     #[serde(rename = "codexGoalsEnabled", default)]
     pub codex_goals_enabled: bool,
     #[serde(rename = "weixinConnectEnabled", default)]
@@ -1623,11 +1641,13 @@ impl Default for BackendSettings {
             usage_history_enabled: false,
             codex_app_proxy_request_status: true,
             claude_desktop_local: ClaudeLocalSettings::default(),
+            claude_app_auto_takeover: false,
             claude_app_voice_input: true,
             claude_app_localization: true,
             claude_app_extensions: false,
             claude_app_computer_use: false,
             claude_app_bash_timeout: ClaudeBashTimeoutSettings::default(),
+            claude_enhance_delivery: None,
             computer_use_approval: default_computer_use_approval(),
             computer_use_mode: default_computer_use_mode(),
             computer_use_pip: true,
@@ -1683,6 +1703,7 @@ impl Default for BackendSettings {
             codex_app_dream_skin_theme: default_dream_skin_theme(),
             codex_app_dream_skin_theme_config: DreamSkinThemeConfig::default(),
             codex_app_dream_skin_image_path: String::new(),
+            codex_app_dream_skin_user_transparency: None,
             codex_goals_enabled: false,
             weixin_connect_enabled: false,
             weixin_connect_base_url: default_weixin_connect_base_url(),
@@ -2398,6 +2419,20 @@ where
         .unwrap_or_else(default_dream_skin_theme))
 }
 
+/// 皮肤「壁纸透出」偏好：数字取整并限制在 0–100；null 或不是数字都算跟随主题（None）。
+pub fn normalize_dream_skin_user_transparency(value: &Value) -> Option<u8> {
+    let number = value.as_f64().filter(|number| number.is_finite())?;
+    Some(number.round().clamp(0.0, 100.0) as u8)
+}
+
+/// 手改坏的值不能让整份设置读不出来：读不懂就当跟随主题。
+fn deserialize_dream_skin_user_transparency<'de, D>(deserializer: D) -> Result<Option<u8>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Ok(normalize_dream_skin_user_transparency(&Value::deserialize(deserializer)?))
+}
+
 fn deserialize_stepwise_max_items<'de, D>(deserializer: D) -> Result<u8, D::Error>
 where
     D: serde::Deserializer<'de>,
@@ -2963,6 +2998,7 @@ fn merge_known_setting_fields(target: &mut Map<String, Value>, source: &Map<Stri
         target.insert("dictation".to_string(), Value::Object(dictation));
     }
     merge_bool_setting(target, source, "claudeAppExtensions");
+    merge_bool_setting(target, source, "claudeAppAutoTakeover");
     merge_bool_setting(target, source, "relayPreserveNonproviderSettings");
     target.remove("codexAppPluginAutoExpand");
     target.remove("computerUseGuardEnabled");
@@ -3363,6 +3399,21 @@ fn merge_known_setting_fields(target: &mut Map<String, Value>, source: &Map<Stri
             "codexAppDreamSkinImagePath".to_string(),
             Value::String(value.trim().to_string()),
         );
+    }
+    // null 清回「跟随主题」；数字按 0–100 归一；其它值不动原设置。
+    match source.get("codexAppDreamSkinUserTransparency") {
+        Some(Value::Null) => {
+            target.remove("codexAppDreamSkinUserTransparency");
+        }
+        Some(value) => {
+            if let Some(percent) = normalize_dream_skin_user_transparency(value) {
+                target.insert(
+                    "codexAppDreamSkinUserTransparency".to_string(),
+                    Value::from(percent),
+                );
+            }
+        }
+        None => {}
     }
     if let Some(value) = source.get("codexGoalsEnabled").and_then(Value::as_bool) {
         target.insert("codexGoalsEnabled".to_string(), Value::Bool(value));
@@ -6373,6 +6424,25 @@ experimental_bearer_token = "sk-existing""#
         let reloaded = store.load().unwrap();
         assert!(reloaded.codex_app_auto_takeover);
         assert_eq!(reloaded.codex_app_auto_takeover_when_active, "immediate");
+    }
+
+    // Claude 的自动接管开关：默认关闭，老配置缺键按关闭，经 update 能写进同一份 settings.json。
+    #[test]
+    fn claude_auto_takeover_setting_is_off_by_default_and_round_trips() {
+        let temp = tempfile::tempdir().unwrap();
+        let store = SettingsStore::new(temp.path().join("settings.json"));
+        assert!(!BackendSettings::default().claude_app_auto_takeover);
+        store.save(&BackendSettings::default()).unwrap();
+        let mut raw: Value = serde_json::from_slice(&std::fs::read(temp.path().join("settings.json")).unwrap()).unwrap();
+        raw.as_object_mut().unwrap().remove("claudeAppAutoTakeover");
+        let legacy: BackendSettings = serde_json::from_value(raw).unwrap();
+        assert!(!legacy.claude_app_auto_takeover, "缺键时必须按关闭处理");
+
+        let updated = store.update(json!({ "claudeAppAutoTakeover": true })).unwrap();
+        assert!(updated.claude_app_auto_takeover);
+        assert!(store.load().unwrap().claude_app_auto_takeover);
+        // 不影响 Codex 的开关。
+        assert!(!store.load().unwrap().codex_app_auto_takeover);
     }
 
     #[test]

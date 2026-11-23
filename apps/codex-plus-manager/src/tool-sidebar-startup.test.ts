@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { it } from "node:test";
+import { readAppSource } from "./app-source.test-helper.ts";
 
-it("启动流程不再拉广告源，工具列表照常加载", async () => {
-  const source = await readFile(new URL("./App.tsx", import.meta.url), "utf8");
+it("启动流程不拉广告源：工具列表、设置等本地加载照常完成并释放隐藏窗口", async () => {
+  const source = readAppSource();
   const effect = source.slice(source.indexOf("    void refreshTools(true);"));
   const startup = effect.slice(0, effect.indexOf("  }, []);"));
   const events: string[] = [];
@@ -18,18 +19,25 @@ it("启动流程不再拉广告源，工具列表照常加载", async () => {
     setRoute: noOp,
     checkUpdate: noOp,
     refreshOverview: noOp,
-    refreshSettings: noOp,
-    refreshRelay: noOp,
+    refreshSettings: async () => { events.push("settings"); return null; },
+    agentFocusChecking: false,
+    resolveAgentFocusPrompt: async () => false,
+    setAgentFocusOpen: noOp,
+    setAgentFocusChecking: noOp,
+    setSettingsFocus: noOp,
     refreshEnvConflicts: noOp,
     refreshProviderSyncTargets: noOp,
     refreshPendingProviderImport: noOp,
     refreshPendingDreamSkinCommunity: noOp,
-    releaseMainWindowWhenHidden: () => {},
+    releaseMainWindowWhenHidden: () => { events.push("release"); },
   };
   // 仅去掉 TS 泛型，让实际启动 effect 在受控异步依赖中运行；引用了未提供的依赖会直接抛 ReferenceError。
   new Function(...Object.keys(dependencies), startup.replace(/call<StartupResult>/g, "call"))(
     ...Object.values(dependencies),
   );
   await new Promise((resolve) => setImmediate(resolve));
+  assert.ok(!events.includes("ads"), "启动流程不应请求广告源");
   assert.ok(events.includes("tools"), "工具列表应在启动时加载");
+  assert.ok(events.includes("settings"), "设置也应在启动时加载");
+  assert.ok(events.includes("release"), "启动流程走完就按轻量模式释放隐藏窗口");
 });

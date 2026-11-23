@@ -5314,6 +5314,17 @@ pub(crate) fn apply_model_metadata_overrides(
             }
             model_object.insert(key.clone(), value.clone());
         }
+        // 用户只写了 `service_tiers` 时，Fast 两档要一起生效：空数组表示这家不支持
+        // Fast，`additional_speed_tiers` 也得跟着清掉，否则选择器里按钮变灰、目录里
+        // 却还宣称支持 fast，两处自相矛盾。只在用户没显式写 additional 时推导。
+        if let Some(tiers) = user_override.get("service_tiers").and_then(Value::as_array)
+            && user_override.get("additional_speed_tiers").is_none()
+            && !tiers
+                .iter()
+                .any(|tier| crate::model_suffix::model_speed_tier_is(tier, "priority"))
+        {
+            model_object.insert("additional_speed_tiers".into(), json!([]));
+        }
         if user_override.get("codex_plus_reasoning_parameters").and_then(Value::as_str) == Some("omit") {
             model["supported_reasoning_levels"] = json!([]);
             model["default_reasoning_level"] = Value::Null;

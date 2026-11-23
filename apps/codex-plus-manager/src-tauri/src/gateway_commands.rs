@@ -188,6 +188,10 @@ pub struct GatewayPayload {
     /// 能在网关里登录的私有接口订阅（Cursor、Kiro 等）。
     pub subscriptions: Vec<codex_plus_core::gateway::subscriptions::SubscriptionView>,
     pub claude_providers: Vec<GatewaySourceEntry>,
+    /// CC Switch 里的 Claude / Claude Desktop 供应商（Anthropic 或 OpenAI Chat 格式），可以复制进网关。
+    pub cc_switch_claude: Vec<GatewaySourceEntry>,
+    /// ClaudeMom 的上游，可以复制进网关。
+    pub claude_mom_profiles: Vec<GatewaySourceEntry>,
     pub grok_profiles: Vec<GatewaySourceEntry>,
     /// OpenCode 自己保存的 OpenCode Go / Zen Key（不含 Key 本身）。
     pub opencode_keys: Vec<GatewaySourceEntry>,
@@ -502,6 +506,8 @@ fn build_payload(settings: &BackendSettings, gateway: GatewaySettings) -> Gatewa
         codex_providers,
         subscriptions: codex_plus_core::gateway::subscriptions::views(),
         claude_providers,
+        cc_switch_claude: source_entries(codex_plus_core::claude_provider_sources::cc_switch_entries()),
+        claude_mom_profiles: source_entries(codex_plus_core::claude_provider_sources::claude_mom_entries()),
         grok_profiles,
         opencode_keys: codex_plus_core::gateway::opencode::load_stored_keys()
             .into_iter()
@@ -1633,25 +1639,6 @@ pub fn save_gateway_provider_windows(
     )
 }
 
-/// 用存下的凭据重新拉一个供应商的模型，和现有列表比较（不改列表，只记下差异供界面提示）。
-#[tauri::command]
-pub async fn check_gateway_provider_models(
-    id: String,
-) -> CommandResult<Option<model_sync::ModelDiff>> {
-    match model_sync::check_provider(&GatewayStore::default(), &id).await {
-        Ok(diff) => ok(
-            &format!(
-                "上游有 {} 个模型：新增 {} 个，已下架 {} 个。",
-                diff.upstream.len(),
-                diff.added.len(),
-                diff.removed.len()
-            ),
-            Some(diff),
-        ),
-        Err(error) => failed(&format!("获取模型列表失败：{error:#}"), None),
-    }
-}
-
 /// 供应商详情里「从上游同步」的第一步（#2785）：拉上游模型，返回和现有列表的差异供用户勾选，
 /// 不改任何数据。拉取失败或上游返回空列表时报错。
 #[tauri::command]
@@ -2214,9 +2201,15 @@ pub async fn import_gateway_providers(
     }
 }
 
-/// 从直连模式复制一项进池：`codex` / `claude` / `grok`。
+fn source_entries(entries: Vec<codex_plus_core::claude_provider_sources::SourceEntry>) -> Vec<GatewaySourceEntry> {
+    entries.into_iter().map(|entry| GatewaySourceEntry { id: entry.id, name: entry.name }).collect()
+}
+
+/// 从直连模式复制一项进池：`codex` / `claude` / `grok`，以及 CC Switch、ClaudeMom 里的 Claude 供应商。
 fn import_from_direct(source: &str, id: &str, skip: Option<&[String]>) -> anyhow::Result<String> {
     let relay = match source {
+        "ccswitch" => codex_plus_core::claude_provider_sources::cc_switch_relay(id)?,
+        "claudemom" => codex_plus_core::claude_provider_sources::claude_mom_relay(id)?,
         "codex" => apply::copy_codex_provider(&SettingsStore::default().load()?, id)?,
         "claude" => {
             let provider = claude::load(&ClaudeContext::default_paths())?
@@ -2659,12 +2652,21 @@ mod tests {
 }
 
 /// 用量汇总。`range`：`today` / `7d` / `30d` / `all`。
+/// 用量页、托盘和 Agent 概览都会轮询：读用量文件放到阻塞线程池里，不卡界面线程。
 #[tauri::command]
-pub fn load_gateway_usage(
+pub async fn load_gateway_usage(
     range: String,
 ) -> CommandResult<Option<codex_plus_core::gateway::usage::UsageSummary>> {
+    tauri::async_runtime::spawn_blocking(move || load_gateway_usage_blocking(&range))
+        .await
+        .unwrap_or_else(|error| failed(&format!("读取用量失败：{error}"), None))
+}
+
+fn load_gateway_usage_blocking(
+    range: &str,
+) -> CommandResult<Option<codex_plus_core::gateway::usage::UsageSummary>> {
     use codex_plus_core::gateway::usage::{UsageStore, local_day};
-    let days = match range.as_str() {
+    let days = match range {
         "today" => Some(1),
         "7d" => Some(7),
         "all" => None,
@@ -2780,7 +2782,16 @@ pub struct DeletedSession {
 
 /// 删除 Claude Code（含 Claude Desktop 里的）/ Grok 的一个本地会话：移进废纸篓，可以找回。Codex 的会话走 `delete_local_session`。
 #[tauri::command]
-pub fn delete_agent_session(agent: String, id: String) -> CommandResult<DeletedSession> {
+pub async fn delete_agent_session(agent: String, id: String) -> CommandResult<DeletedSession> {
+    // 移动文件、检查 Desktop 进程都是阻塞操作，放到后台线程。
+    tauri::async_runtime::spawn_blocking(move || delete_agent_session_blocking(agent, id))
+        .await
+        .unwrap_or_else(|error| {
+            failed(&format!("删除失败：{error}"), DeletedSession::default())
+        })
+}
+
+fn delete_agent_session_blocking(agent: String, id: String) -> CommandResult<DeletedSession> {
     use codex_plus_core::gateway::sessions;
     let trash = sessions::default_trash_dir();
     let desktop = agent == "claude" && id.starts_with("local_");
