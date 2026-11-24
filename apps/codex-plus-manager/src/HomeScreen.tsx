@@ -17,12 +17,11 @@ import { AgentGlyph, useGatewayPayload, useTodayUsage } from "./hub-shared";
 import { Suspense } from "react";
 import { lazyNamed } from "./lazy-page";
 import { ClaudeAutoTakeoverRow } from "./ClaudeAutoTakeover";
-import { providersHidden, type AgentFocus } from "./agent-focus-model";
 import { t, tf } from "@/i18n";
 import { CxCard, CxRow, CxSection, CxStatusIcon } from "./cx-layout";
 import type { Actions, AutoTakeoverResult, ToolEntry } from "./app-types";
 import { autoTakeoverView, enhancementPlatform, StatusBadge, ToggleVisual } from "./app-shared";
-import { type Route, routeVisible, type ToolId } from "./routes";
+import { type Route, type ToolId } from "./routes";
 
 // 拓扑卡在网关总览模块里（和网关页共用大量代码），按需加载：首页静态常驻，但不把整块网关代码带进主包。
 const HubTopologyCard = lazyNamed(() => import("./HubOverview"), "HubTopologyCard");
@@ -31,7 +30,6 @@ const HubTopologyCard = lazyNamed(() => import("./HubOverview"), "HubTopologyCar
 export function HomeScreen({
   actions,
   tools,
-  focus,
   codexRunning,
   launchPending,
   onLaunchCodex,
@@ -43,7 +41,6 @@ export function HomeScreen({
 }: {
   actions: Actions;
   tools: ToolEntry[];
-  focus: AgentFocus;
   codexRunning: boolean;
   launchPending: boolean;
   onLaunchCodex: () => void;
@@ -56,7 +53,6 @@ export function HomeScreen({
 }) {
   const gateway = useGatewayPayload(10_000);
   const usage = useTodayUsage();
-  const enhanceOnly = providersHidden(focus);
   const connected = new Set((gateway?.agents ?? []).filter((agent) => agent.enabled).map((agent) => agent.agent as string));
   // 和侧栏一样：没有 Agent 接入网关时不显示网关那一行，也不催其他 Agent 接入。
   const gatewayInUse = connected.size > 0;
@@ -108,7 +104,7 @@ export function HomeScreen({
   const agentRow = (tool: ToolEntry) => {
     const viaGateway = connected.has(tool.id);
     if (tool.id === "codex") {
-      const mode = viaGateway ? t("经网关") : tool.activeRelayName ? tf("直连 · {0}", [tool.activeRelayName]) : t("直连");
+      const mode = viaGateway ? t("经共享供应商") : tool.activeRelayName ? tf("直连 · {0}", [tool.activeRelayName]) : t("直连");
       return [
         <CxRow
           detail={`${codexRunning ? t("运行中") : t("未运行")} · ${mode}`}
@@ -127,13 +123,13 @@ export function HomeScreen({
     }
     const row = (
       <CxRow
-        detail={viaGateway ? t("已经通过 Codex # 网关接入") : gatewayInUse ? t("未接入网关") : t("直连")}
+        detail={viaGateway ? t("已经通过 Codex # 本地服务接入") : gatewayInUse ? t("未接入本地服务") : t("直连")}
         icon={<CxStatusIcon tone={viaGateway ? "ok" : "off"}><AgentGlyph agent={tool.id} className="home-agent-glyph" /></CxStatusIcon>}
         key={tool.id}
         onClick={() => onOpenAgent(tool.id)}
         title={tool.name}
       >
-        {viaGateway || enhanceOnly || !gatewayInUse ? <ChevronRight aria-hidden="true" className="cx-set-chevron" /> : (
+        {viaGateway || !gatewayInUse ? <ChevronRight aria-hidden="true" className="cx-set-chevron" /> : (
           <button className="cx-secondary" onClick={(event) => { event.stopPropagation(); onNavigate("gateway"); }} type="button">{t("接入")}</button>
         )}
       </CxRow>
@@ -151,19 +147,19 @@ export function HomeScreen({
         tf("{0} 个 Agent 已接入", [connected.size]),
         usage ? tf("今日 {0} 次调用", [usage.totals.calls]) : "",
       ].filter(Boolean).join(" · ")
-    : t("网关未运行");
+    : t("本地服务未运行");
 
   return (
     <div className="tp-page home-page">
       <CxSection title={t("状态")}>
         <CxCard>
           {tools.map(agentRow)}
-          {enhanceOnly || !gatewayInUse ? null : (
+          {!gatewayInUse ? null : (
             <CxRow
               detail={gatewayDetail}
               icon={<CxStatusIcon tone={gateway?.helperRunning ? "ok" : "off"}><Waypoints /></CxStatusIcon>}
-              onClick={() => onNavigate("hub")}
-              title={t("聚合网关")}
+              onClick={() => onNavigate("gateway")}
+              title={t("本地服务")}
             >
               <ChevronRight aria-hidden="true" className="cx-set-chevron" />
             </CxRow>
@@ -183,7 +179,7 @@ export function HomeScreen({
 
       <CxSection title={t("常用")}>
         <div className="home-shortcuts">
-          {shortcuts.filter((item) => routeVisible(focus, item.route)).map((item) => {
+          {shortcuts.map((item) => {
             const Icon = item.icon;
             return (
               <button className="home-shortcut" key={item.route} onClick={() => (item.agent ? onOpenAgent(item.agent, item.route) : onNavigate(item.route))} type="button">
