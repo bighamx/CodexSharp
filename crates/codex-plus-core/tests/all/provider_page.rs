@@ -431,6 +431,24 @@ fn gateway_commands_are_whitelisted_and_codex_only() {
         assert!(gateway_command_allowed(command, &json!({ "agent": "claude" })).is_err(), "{command}");
         assert!(gateway_command_allowed(command, &json!({})).is_err(), "{command}");
     }
+    // 聚合时每家的开关只能改 Codex 自己用哪些供应商。
+    assert!(gateway_command_allowed("set_gateway_pool_member", &json!({ "agents": ["codex"], "id": "p", "used": true })).is_ok());
+    for agents in [json!(["claude"]), json!(["codex", "claude"]), json!([]), Value::Null] {
+        assert!(gateway_command_allowed("set_gateway_pool_member", &json!({ "agents": agents, "id": "p", "used": true })).is_err());
+    }
+    // Codex 登录身份和管理器同一个命令。
+    assert!(gateway_command_allowed("get_native_auth_state", &json!({})).is_ok());
+    // 多个账号：设置随便改，登录只能加进已有的一家。
+    for command in ["set_gateway_provider_rotation", "set_gateway_credential_settings", "remove_gateway_provider_account", "cancel_gateway_login"] {
+        assert!(gateway_command_allowed(command, &json!({ "id": "p" })).is_ok(), "{command}");
+    }
+    for command in ["login_gateway_chatgpt", "login_gateway_chatgpt_api", "login_gateway_grok"] {
+        assert!(gateway_command_allowed(command, &json!({ "providerId": "login-chatgpt" })).is_ok(), "{command}");
+        assert!(gateway_command_allowed(command, &json!({})).is_err(), "{command}");
+        assert!(gateway_command_allowed(command, &json!({ "providerId": " " })).is_err(), "{command}");
+    }
+    assert!(gateway_command_allowed("finish_gateway_copilot_login", &json!({ "providerId": "p" })).is_err());
+    assert!(gateway_command_allowed("set_codex_login_identity", &json!({ "kind": "local" })).is_ok());
     // 拒绝发生在找宿主之前：未注册宿主时白名单外命令也报「不支持」，不会碰管理器。
     let error = route_gateway(&json!({ "command": "save_gateway_group", "args": {} })).unwrap_err();
     assert!(error.to_string().contains("不支持"), "{error}");

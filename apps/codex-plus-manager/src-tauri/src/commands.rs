@@ -29,6 +29,61 @@ pub fn dictation_local_model_status() -> Value {
     codex_plus_core::dictation::local_model_status()
 }
 
+/// 听写当前用着（或配好了 Key 的）远程服务：换成本地 SenseVoice 会覆盖它的地址和模型，要先问用户。
+fn dictation_has_remote_setup(dictation: &codex_plus_core::settings::DictationSettings) -> bool {
+    dictation.provider != codex_plus_core::settings::DictationProvider::SenseVoice
+        && (dictation.enabled
+            || !dictation.api_key.trim().is_empty()
+            || !dictation.api_key_env.trim().is_empty())
+}
+
+/// 在 Claude Desktop 页面内启用共享的离线语音服务；只更新听写字段，不覆盖其它设置。
+/// 已在用远程语音服务时不直接覆盖：返回 `needsReplaceConfirm`，用户确认后带 `replaceRemote` 再调。
+#[tauri::command]
+pub fn enable_local_sensevoice_for_claude(replace_remote: Option<bool>) -> CommandResult<Value> {
+    match SettingsStore::default().load() {
+        Ok(settings) if !settings.enhancements_enabled => {
+            return failed(
+                "请先在 Codex # 设置中启用增强总开关，再准备共享语音服务。",
+                json!({}),
+            );
+        }
+        Ok(settings)
+            if dictation_has_remote_setup(&settings.dictation) && replace_remote != Some(true) =>
+        {
+            return failed(
+                "语音识别当前用的是远程服务，换成本地 SenseVoice 会替换它的地址和模型。",
+                json!({ "needsReplaceConfirm": true, "model": settings.dictation.model }),
+            );
+        }
+        Ok(_) => {}
+        Err(error) => return failed(&format!("读取 Codex # 设置失败：{error}"), json!({})),
+    }
+    match SettingsStore::default().update(json!({
+        "dictation": {
+            "enabled": true,
+            "provider": "sensevoice",
+            "baseUrl": "local://sensevoice",
+            "model": "SenseVoiceSmall (INT8)",
+        }
+    })) {
+        Ok(settings) => {
+            codex_plus_core::settings::notify_external_settings_change();
+            sync_resident_helper();
+            ok(
+                "已启用本地 SenseVoice 语音服务。",
+                json!({
+                    "enabled": settings.dictation.enabled,
+                    "provider": settings.dictation.provider,
+                    "baseUrl": settings.dictation.base_url,
+                    "model": settings.dictation.model,
+                }),
+            )
+        }
+        Err(error) => failed(&format!("启用本地 SenseVoice 失败：{error}"), json!({})),
+    }
+}
+
 /// 只注册为管理器命令，不开放给用户脚本或公开 HTTP 路由。
 #[tauri::command]
 pub async fn download_dictation_local_model() -> CommandResult<Value> {
@@ -1742,7 +1797,7 @@ fn launch_codex_multi_instance_blocking(request: CodexMultiLaunchRequest) -> Com
             );
         }
     };
-    let shared_config_home = directories::BaseDirs::new()
+    let shared_config_home = codex_plus_core::user_dirs::BaseDirs::new()
         .map(|dirs| dirs.home_dir().join(".config"))
         .unwrap_or_else(|| PathBuf::from(".config"));
     let mut command = std::process::Command::new(manager_executable);
@@ -3179,7 +3234,7 @@ fn multi_instance_user_data_roots_with(
 }
 
 fn legacy_multi_instance_user_data_dir(slug: &str) -> PathBuf {
-    directories::BaseDirs::new()
+    codex_plus_core::user_dirs::BaseDirs::new()
         .map(|dirs| {
             dirs.data_local_dir()
                 .join("CodexPlusPlus")
@@ -5222,6 +5277,19 @@ pub fn save_settings(
         &settings,
     ) {
         Ok(_) => {
+            // 能共享的 Codex 直连供应商改了：共享供应商里引用它们的连接资料读取时就是现值，
+            // 开着的 Agent 配置里写着的模型列表在后台重写一遍。
+            let shared = |settings: &BackendSettings| {
+                settings
+                    .relay_profiles
+                    .iter()
+                    .filter(|relay| codex_plus_core::gateway::codex_link::linkable(relay))
+                    .cloned()
+                    .collect::<Vec<_>>()
+            };
+            if shared(&previous) != shared(&settings) {
+                crate::gateway_commands::refresh_after_codex_profiles_changed();
+            }
             if !settings.usage_history_enabled {
                 codex_plus_launcher::clear_usage_history();
             }
@@ -8919,7 +8987,7 @@ pub(crate) fn default_skills_manager() -> codex_plus_core::skills::SkillsManager
     ]);
     let shared = std::env::var_os("CODEX_PLUS_SHARED_SKILLS_DIR")
         .map(std::path::PathBuf::from)
-        .or_else(|| directories::BaseDirs::new().map(|dirs| dirs.home_dir().join(".agents").join("skills")));
+        .or_else(|| codex_plus_core::user_dirs::BaseDirs::new().map(|dirs| dirs.home_dir().join(".agents").join("skills")));
     match shared {
         Some(path) => manager.with_shared_skills_dir(path),
         None => manager,
@@ -9464,16 +9532,23 @@ pub fn load_relay_proxies(profile_ids: Vec<String>) -> CommandResult<Value> {
 /// 实时请求流：托盘「流量」页签和总览拓扑图的光点动画每秒轮询它。
 /// 只读日志末尾和进行中的请求，不补会话标题和费用，保持轻量。
 #[tauri::command]
-pub async fn load_request_flow(limit: Option<usize>) -> CommandResult<Value> {
+pub async fn load_request_flow(limit: Option<usize>, include_thread_titles: Option<bool>) -> CommandResult<Value> {
     let limit = limit.unwrap_or(30).clamp(1, 200);
     let result = tauri::async_runtime::spawn_blocking(move || {
-        codex_plus_core::request_log::read_recent_request_logs(limit)
+        let entries = codex_plus_core::request_log::read_recent_request_logs(limit)?;
+        let count = entries.len();
+        let entries = if include_thread_titles.unwrap_or(false) {
+            json!(decorate_request_log_entries(&entries))
+        } else {
+            json!(entries)
+        };
+        Ok::<_, std::io::Error>((count, entries))
     })
     .await
     .unwrap_or_else(|error| Err(std::io::Error::other(error.to_string())));
     match result {
-        Ok(entries) => ok(
-            &format!("已读取 {} 条请求。", entries.len()),
+        Ok((count, entries)) => ok(
+            &format!("已读取 {count} 条请求。"),
             json!({ "entries": entries }),
         ),
         Err(error) => failed(
@@ -10267,9 +10342,20 @@ pub fn switch_relay_profile(
                 }
                 (None, None) => "供应商已切换。".to_string(),
             };
+            // 切到官方登录 / 内置 OpenAI 供应商后本地账号用不了：退回「不登录」并说一声。
+            let (message, settings) = match codex_plus_core::chatgpt_compat_apply::fall_back_when_blocked(&home, &store) {
+                Ok(true) => {
+                    crate::gateway_commands::notify_settings_changed();
+                    (
+                        format!("{message}{}", codex_plus_core::chatgpt_compat_apply::FELL_BACK_NOTICE),
+                        store.load().unwrap_or(result.settings),
+                    )
+                }
+                _ => (message, result.settings),
+            };
             ok(
                 &message,
-                relay_switch_payload(result.settings, status, result.backup_path),
+                relay_switch_payload(settings, status, result.backup_path),
             )
         }
         Err(error) => {
@@ -12443,6 +12529,27 @@ fn default_log_lines() -> usize {
 #[cfg(test)]
 mod tests {
     #[test]
+    fn claude_sensevoice_entry_asks_before_replacing_a_remote_dictation_setup() {
+        use codex_plus_core::settings::{DictationProvider, DictationSettings};
+        // 默认（没开、没 Key）：没有可丢的配置，直接换。
+        let mut dictation = DictationSettings::default();
+        assert!(!super::dictation_has_remote_setup(&dictation));
+        // 开着远程服务，或填过 Key / Key 环境变量：先问。
+        dictation.enabled = true;
+        assert!(super::dictation_has_remote_setup(&dictation));
+        dictation.enabled = false;
+        dictation.api_key = "sk-test".into();
+        assert!(super::dictation_has_remote_setup(&dictation));
+        dictation.api_key.clear();
+        dictation.api_key_env = "GROQ_API_KEY".into();
+        assert!(super::dictation_has_remote_setup(&dictation));
+        // 已经是 SenseVoice：重新校验不用问。
+        dictation.enabled = true;
+        dictation.provider = DictationProvider::SenseVoice;
+        assert!(!super::dictation_has_remote_setup(&dictation));
+    }
+
+    #[test]
     fn multi_instance_user_data_respects_explicit_electron_root() {
         let temp = tempfile::tempdir().unwrap();
         let root = temp.path().join("electron data");
@@ -12506,7 +12613,7 @@ mod tests {
 
     #[test]
     fn multi_instance_user_data_without_override_keeps_default_layout() {
-        let expected = directories::BaseDirs::new()
+        let expected = codex_plus_core::user_dirs::BaseDirs::new()
             .map(|dirs| {
                 dirs.data_local_dir()
                     .join("CodexPlusPlus")

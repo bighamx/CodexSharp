@@ -364,6 +364,8 @@ mod tests {
             .mount(&server)
             .await;
         let provider = crate::gateway::store::GatewayProvider {
+            linked_codex_relay: None,
+            owner: String::new(),
             enabled: true,
             source: String::new(),
             price: None,
@@ -388,6 +390,7 @@ mod tests {
                 ..relay(&server.uri())
             },
             extra: Default::default(),
+            credentials: Default::default(),
         };
         let mut disabled = provider.clone();
         disabled.enabled = false;

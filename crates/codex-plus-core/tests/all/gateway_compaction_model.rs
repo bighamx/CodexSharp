@@ -16,6 +16,8 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 
 fn provider(id: &str, base_url: &str, model: &str, protocol: RelayProtocol) -> GatewayProvider {
     GatewayProvider {
+        linked_codex_relay: None,
+        owner: String::new(),
         enabled: true,
         source: String::new(),
         price: None,
@@ -43,6 +45,7 @@ fn provider(id: &str, base_url: &str, model: &str, protocol: RelayProtocol) -> G
             ..RelayProfile::default()
         },
         extra: Default::default(),
+        credentials: Default::default(),
     }
 }
 
@@ -153,7 +156,6 @@ async fn send(gateway: &GatewaySettings, body: Value) -> Vec<String> {
             user_agent: None,
             session_headers: ProxySessionHeaders::default(),
             live_request_id: None,
-            auto_retry: false,
             is_stream: false,
             upstream_path: "/responses",
             client: None,

@@ -11,6 +11,7 @@
 //! 端口 8000 是桌面鉴权白名单写死的（只有 `localhost` / `localhost:8000` /
 //! `*.openai.com` / `chatgpt.com` 会附带登录 token），不能改。
 
+pub mod plugins;
 mod recordings;
 
 use std::collections::HashMap;
@@ -25,7 +26,117 @@ pub const PORT: u16 = 8000;
 /// 假账号的固定身份。录制里的真实 id 都已替换成这些值。
 pub const ACCOUNT_ID: &str = "acc-local";
 pub const USER_ID: &str = "user-local";
-const EMAIL: &str = "local@codexplus.invalid";
+
+/// 本地账号的展示资料：名字、用户名、邮箱。管理器里可改，没填时用默认值。
+/// 录制里个人资料处是固定占位（名字 `Local`、用户名 `local`、邮箱 `local@codexplus.invalid`），
+/// 应答时按字段换成这里的值；插件、技能这些公开目录数据不动。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Profile {
+    pub name: String,
+    pub username: String,
+    pub email: String,
+}
+
+pub const DEFAULT_NAME: &str = "Local";
+pub const DEFAULT_USERNAME: &str = "local";
+pub const DEFAULT_EMAIL: &str = "local@codexplus.invalid";
+
+impl Default for Profile {
+    fn default() -> Self {
+        Self {
+            name: DEFAULT_NAME.to_string(),
+            username: DEFAULT_USERNAME.to_string(),
+            email: DEFAULT_EMAIL.to_string(),
+        }
+    }
+}
+
+impl Profile {
+    /// 从设置里的三个值得到资料：空白的用默认值。
+    pub fn from_settings(name: &str, username: &str, email: &str) -> Self {
+        let pick = |value: &str, default: &str| {
+            let value = value.trim();
+            if value.is_empty() { default.to_string() } else { value.to_string() }
+        };
+        Self {
+            name: pick(name, DEFAULT_NAME),
+            username: pick(username, DEFAULT_USERNAME),
+            email: pick(email, DEFAULT_EMAIL),
+        }
+    }
+}
+
+/// 服务当前用的资料。设置改了之后由 [`set_profile`] 更新，下一个请求就生效。
+static PROFILE: Mutex<Option<Profile>> = Mutex::new(None);
+
+pub fn set_profile(profile: Profile) {
+    *PROFILE.lock().unwrap_or_else(|error| error.into_inner()) = Some(profile);
+}
+
+fn profile() -> Profile {
+    PROFILE
+        .lock()
+        .unwrap_or_else(|error| error.into_inner())
+        .clone()
+        .unwrap_or_default()
+}
+
+/// 个人资料所在的录制和字段（JSON pointer），值是名字 / 用户名 / 邮箱哪一个。
+const PROFILE_FIELDS: &[(&str, &[(&str, ProfileField)])] = &[
+    ("/backend-api/me", &[("/name", ProfileField::Name), ("/email", ProfileField::Email)]),
+    (
+        "/backend-api/profiles/me",
+        &[
+            ("/profile_details/display_name", ProfileField::Name),
+            ("/profile_details/username", ProfileField::Username),
+        ],
+    ),
+    (
+        "/backend-api/wham/profiles/me",
+        &[("/profile/display_name", ProfileField::Name), ("/profile/username", ProfileField::Username)],
+    ),
+    ("/backend-api/wham/usage", &[("/email", ProfileField::Email)]),
+    ("/backend-api/accounts/optimized/check", &[("/account/name", ProfileField::Name)]),
+    ("/backend-api/wham/accounts/check", &[("/accounts/0/name", ProfileField::Name)]),
+    (
+        "/backend-api/accounts/check/v4-2023-04-27",
+        &[
+            ("/accounts/acc-local/account/name", ProfileField::Name),
+            ("/accounts/default/account/name", ProfileField::Name),
+        ],
+    ),
+];
+
+#[derive(Clone, Copy)]
+enum ProfileField {
+    Name,
+    Username,
+    Email,
+}
+
+/// 把录制里的个人资料占位换成当前资料。没有个人资料的录制原样返回。
+fn personalize(path: &str, body: &'static str) -> String {
+    let Some((_, fields)) = PROFILE_FIELDS.iter().find(|(known, _)| *known == path) else {
+        return body.to_string();
+    };
+    let profile = profile();
+    if profile == Profile::default() {
+        return body.to_string();
+    }
+    let Ok(mut value) = serde_json::from_str::<Value>(body) else {
+        return body.to_string();
+    };
+    for (pointer, field) in *fields {
+        if let Some(slot) = value.pointer_mut(pointer).filter(|slot| slot.is_string()) {
+            *slot = json!(match field {
+                ProfileField::Name => &profile.name,
+                ProfileField::Username => &profile.username,
+                ProfileField::Email => &profile.email,
+            });
+        }
+    }
+    serde_json::to_string(&value).unwrap_or_else(|_| body.to_string())
+}
 
 /// 假登录的套餐。入口的可见性按套餐判断，pro 能看到全部。
 const PLAN: &str = "pro";
@@ -103,7 +214,7 @@ pub fn reply_for(method: &str, path: &str) -> (ReplySource, Reply) {
             Reply {
                 status: recording.status,
                 content_type: JSON,
-                body: recording.body.to_string(),
+                body: personalize(path_only, recording.body),
             },
         );
     }
@@ -157,7 +268,8 @@ fn signed_token(plan: &str) -> String {
         .map(|duration| duration.as_secs() + TOKEN_TTL_SECS)
         .unwrap_or(TOKEN_TTL_SECS);
     let payload = b64(&json!({
-        "email": EMAIL,
+        "email": profile().email,
+        "name": profile().name,
         "exp": exp,
         "https://api.openai.com/auth": {
             "chatgpt_account_id": ACCOUNT_ID,
@@ -169,10 +281,31 @@ fn signed_token(plan: &str) -> String {
     format!("{header}.{payload}.sig")
 }
 
+/// 登录 token 里的邮箱、名字是不是当前资料：改了资料要重写 `auth.json`，桌面才显示新名字。
+pub fn token_matches_profile(token: &str) -> bool {
+    use base64::Engine;
+    let Some(claims) = token
+        .split('.')
+        .nth(1)
+        .and_then(|payload| base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(payload).ok())
+        .and_then(|bytes| serde_json::from_slice::<Value>(&bytes).ok())
+    else {
+        return false;
+    };
+    let profile = profile();
+    claims.get("email").and_then(Value::as_str) == Some(profile.email.as_str())
+        && claims.get("name").and_then(Value::as_str) == Some(profile.name.as_str())
+}
+
 fn b64(value: &Value) -> String {
     use base64::Engine;
     base64::engine::general_purpose::URL_SAFE_NO_PAD
         .encode(serde_json::to_vec(value).unwrap_or_default())
+}
+
+/// `auth.json` 的 `tokens` 是否是本地账号的假登录（[`fake_auth_json`] 写的那份）。
+pub fn is_local_login_tokens(tokens: &Value) -> bool {
+    tokens.get("account_id").and_then(Value::as_str) == Some(ACCOUNT_ID)
 }
 
 /// 写入 `~/.codex/auth.json` 的假登录。保留文件里已有的字段（API Key 等），
@@ -342,7 +475,7 @@ async fn handle_connection(
 ) -> anyhow::Result<()> {
     use tokio::io::AsyncWriteExt;
     let mut stream = stream;
-    let Some(request) = read_headers(&mut stream).await? else {
+    let Some((request, body)) = read_request(&mut stream).await? else {
         return Ok(());
     };
     let mut lines = request.lines();
@@ -350,6 +483,22 @@ async fn handle_connection(
     let mut parts = start.split_whitespace();
     let method = parts.next().unwrap_or("GET").to_string();
     let path = parts.next().unwrap_or("/").to_string();
+    // 插件目录和插件包用 Codex # 的缓存现答（见 [`plugins`]），其余走录制 / 合成应答。
+    if let Some(reply) = plugins::reply(&method, &path, &request, &body).await {
+        write_body(&mut stream, reply.status, reply.content_type, &reply.body).await?;
+        stream.shutdown().await?;
+        let _ = crate::diagnostic_log::append_diagnostic_log(
+            "chatgpt_compat.request",
+            json!({
+                "method": method,
+                // 插件接口的查询串（分页、范围、搜索词）留着，排查 Codex 实际怎么请求时要看。
+                "path": path,
+                "source": "Plugins",
+                "status": reply.status,
+            }),
+        );
+        return Ok(());
+    }
     let (source, reply) = reply_for(&method, &path);
     write_json(&mut stream, reply.status, &reply.body).await?;
     stream.shutdown().await?;
@@ -364,27 +513,54 @@ async fn handle_connection(
     Ok(())
 }
 
-/// 读到请求头为止（以空行分隔）。应答不依赖正文，正文留给客户端自己发完。
-async fn read_headers(
+/// 正文最多读这么多（插件批量查询的 id 列表用得到，别的应答不看正文）。
+const BODY_LIMIT: usize = 1024 * 1024;
+
+/// 读请求头（以空行分隔），再按 `content-length` 读正文（超过上限的不读）。
+async fn read_request(
     stream: &mut tokio_rustls::server::TlsStream<tokio::net::TcpStream>,
-) -> anyhow::Result<Option<String>> {
+) -> anyhow::Result<Option<(String, Vec<u8>)>> {
     use tokio::io::AsyncReadExt;
     let mut buffer = Vec::new();
     let mut chunk = [0u8; 4096];
-    loop {
+    let header_end = loop {
         let read = stream.read(&mut chunk).await?;
         if read == 0 {
-            break;
+            break buffer.len();
         }
         buffer.extend_from_slice(&chunk[..read]);
-        if buffer.windows(4).any(|window| window == b"\r\n\r\n") || buffer.len() >= HEADER_LIMIT {
-            break;
+        if let Some(position) = buffer.windows(4).position(|window| window == b"\r\n\r\n") {
+            break position + 4;
         }
-    }
+        if buffer.len() >= HEADER_LIMIT {
+            break buffer.len();
+        }
+    };
     if buffer.is_empty() {
         return Ok(None);
     }
-    Ok(Some(String::from_utf8_lossy(&buffer).into_owned()))
+    let headers = String::from_utf8_lossy(&buffer[..header_end]).into_owned();
+    let length = headers
+        .lines()
+        .find_map(|line| {
+            let (name, value) = line.split_once(':')?;
+            name.trim().eq_ignore_ascii_case("content-length").then(|| value.trim().parse::<usize>().ok())?
+        })
+        .unwrap_or(0);
+    let mut body = buffer[header_end.min(buffer.len())..].to_vec();
+    if length <= BODY_LIMIT {
+        while body.len() < length {
+            let read = stream.read(&mut chunk).await?;
+            if read == 0 {
+                break;
+            }
+            body.extend_from_slice(&chunk[..read]);
+        }
+        body.truncate(length);
+    } else {
+        body.clear();
+    }
+    Ok(Some((headers, body)))
 }
 
 async fn write_json(
@@ -392,19 +568,32 @@ async fn write_json(
     status: u16,
     body: &str,
 ) -> anyhow::Result<()> {
+    write_body(stream, status, JSON, body.as_bytes()).await
+}
+
+async fn write_body(
+    stream: &mut tokio_rustls::server::TlsStream<tokio::net::TcpStream>,
+    status: u16,
+    content_type: &str,
+    body: &[u8],
+) -> anyhow::Result<()> {
     use tokio::io::AsyncWriteExt;
     let reason = if (200..300).contains(&status) { "OK" } else { "Error" };
-    let response = format!(
-        "HTTP/1.1 {status} {reason}\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{body}",
+    let head = format!(
+        "HTTP/1.1 {status} {reason}\r\ncontent-type: {content_type}\r\ncontent-length: {}\r\nconnection: close\r\n\r\n",
         body.len()
     );
-    stream.write_all(response.as_bytes()).await?;
+    stream.write_all(head.as_bytes()).await?;
+    stream.write_all(body).await?;
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// 资料是进程级的，改它的用例串行。
+    static PROFILE_TEST_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
     #[test]
     fn recordings_are_embedded() {
@@ -502,7 +691,7 @@ mod tests {
             .unwrap();
         let base = format!("https://localhost:{port}");
         let me: Value = client.get(format!("{base}/backend-api/me")).send().await.unwrap().json().await.unwrap();
-        assert_eq!(me["email"], EMAIL);
+        assert_eq!(me["email"], DEFAULT_EMAIL);
         let token: Value = client
             .post(format!("{base}/oauth/token"))
             .body("grant_type=refresh_token")
@@ -526,6 +715,25 @@ mod tests {
             .await
             .unwrap();
         assert!(statsig.len() > 1_000_000);
+    }
+
+    #[test]
+    fn profile_replaces_only_personal_fields() {
+        let _guard = PROFILE_TEST_LOCK.lock().unwrap_or_else(|error| error.into_inner());
+        set_profile(Profile::from_settings("小黄", "  ", "me@example.com"));
+        let (_, me) = reply_for("GET", "/backend-api/me");
+        let me: Value = serde_json::from_str(&me.body).unwrap();
+        assert_eq!(me["name"], "小黄");
+        assert_eq!(me["email"], "me@example.com");
+        let (_, profile) = reply_for("GET", "/backend-api/wham/profiles/me");
+        let profile: Value = serde_json::from_str(&profile.body).unwrap();
+        assert_eq!(profile["profile"]["display_name"], "小黄");
+        assert_eq!(profile["profile"]["username"], DEFAULT_USERNAME);
+        // 插件目录是公开数据，名字不跟着改。
+        let (_, plugins) = reply_for("GET", "/backend-api/ps/plugins/installed");
+        assert!(plugins.body.contains("\"GitHub\""));
+        assert!(!plugins.body.contains("小黄"));
+        set_profile(Profile::default());
     }
 
     #[test]

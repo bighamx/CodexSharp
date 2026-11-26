@@ -109,7 +109,8 @@ test("默认模型带窗口后缀时仍勾选对应供应商，而非同名供�
     const section = elements(render("a/example-model", "example-model")).find((element) => element.props?.["data-section"] === key);
     const heading = elements(section).find((element) => element.props?.className === "gw-mp-heading-toggle");
     assert.ok(heading, key);
-    heading.props.onClick();
+    // 选中的那一组默认已展开（#3263），只点开还折叠着的。
+    if (!heading.props["aria-expanded"]) heading.props.onClick();
   }
   const selected = (model: string, upstreamModel?: string, providerRemoved = false, data = payload, ownModels?: OwnModels) =>
     elements(render(model, upstreamModel, providerRemoved, data, ownModels))
@@ -344,6 +345,7 @@ test("选择模型或修改详情保存失败时保持已保存的显示", async
     CxStatusIcon: "CxStatusIcon", AgentIcon: "AgentIcon", CxBadge: "CxBadge",
     ModelPicker: "ModelPicker", Switch: "Switch", ChevronRight: "ChevronRight",
     ResetModelSelections: "ResetModelSelections",
+    AgentConfigButton: "AgentConfigButton",
     AgentDetail: "AgentDetail", AgentDisconnectDialog: "AgentDisconnectDialog",
   });
   const render = () => {
@@ -408,6 +410,7 @@ test("已接入和已断开的 Agent 都能确认重置历史模型选择", asyn
     CxStatusIcon: "CxStatusIcon", AgentIcon: "AgentIcon", CxBadge: "CxBadge",
     ModelPicker: "ModelPicker", Switch: "Switch", ChevronRight: "ChevronRight",
     AgentDetail: "AgentDetail", AgentDisconnectDialog: "AgentDisconnectDialog", RotateCcw: "RotateCcw",
+    AgentConfigButton: "AgentConfigButton",
   });
   const render = (enabled: boolean, hasBinding = true, busy: string | null = null) => exports.AgentRow({
     agent: { agent: "codex", name: "Codex", enabled },

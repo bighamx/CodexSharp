@@ -1756,6 +1756,10 @@ mod tests {
         use std::os::windows::process::CommandExt;
         use std::process::{Command, Stdio};
 
+        // 父进程已在测试沙箱里：子进程要沿用同一个沙箱，否则沙箱在 ctor 里会把下面
+        // 显式传入的 APPDATA 换成沙箱路径（Windows 上没有 TMP 时还会落到 C:\WINDOWS）。
+        let sandbox_env = std::env::var_os("CODEX_PLUS_TEST_SANDBOX")
+            .zip(std::env::var_os("HOME"));
         for mode in ["default", "environment"] {
             let fixture = tempfile::tempdir().unwrap();
             let app_data = fixture.path().join("appdata");
@@ -1774,6 +1778,9 @@ mod tests {
                 .env("APPDATA", &app_data)
                 .stdin(Stdio::null())
                 .creation_flags(crate::windows_integration::CREATE_NO_WINDOW);
+            if let Some((marker, home)) = &sandbox_env {
+                command.env("CODEX_PLUS_TEST_SANDBOX", marker).env("HOME", home);
+            }
             if mode == "environment" {
                 command.env("CODEX_ELECTRON_USER_DATA_PATH", app_data.join("selected"));
             }
@@ -1862,6 +1869,9 @@ mod tests {
         let executable = fixture.path().join("ChatGPT.exe");
         std::fs::copy(&original, &executable).unwrap();
         let selected = app_data.join("selected");
+        // 这些子进程只当 Codex 进程夹具用：带上沙箱标记，免得沙箱在 ctor 里把 APPDATA 换成沙箱路径。
+        let sandbox_env = std::env::var_os("CODEX_PLUS_TEST_SANDBOX")
+            .zip(std::env::var_os("HOME"));
         let spawn = |user_data: Option<&Path>| {
             let mut command = Command::new(&executable);
             command
@@ -1878,6 +1888,9 @@ mod tests {
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .creation_flags(crate::windows_integration::CREATE_NO_WINDOW);
+            if let Some((marker, home)) = &sandbox_env {
+                command.env("CODEX_PLUS_TEST_SANDBOX", marker).env("HOME", home);
+            }
             if let Some(user_data) = user_data {
                 command.env("CODEX_ELECTRON_USER_DATA_PATH", user_data);
             }

@@ -1,7 +1,8 @@
 //! 网关模式的持久状态：`<状态目录>/gateway.json`。
 //!
-//! 网关模式与原来的直连模式完全独立：共享供应商、路由组都只存在这里，
-//! 不读也不写 `settings.json` 里 Codex / Claude / Grok 各自的供应商。从直连模式「导入」是复制一份，
+//! 共享供应商、路由组都只存在这里，不写 `settings.json` 里 Codex / Claude / Grok 各自的供应商。
+//! 例外是 Codex 的直连供应商：能共享的默认就在共享供应商里，这里只存一条引用记录，连接资料读取时
+//! 从 `settings.json` 现取（见 [`crate::gateway::codex_link`]）。从 Claude / Grok 等「导入」仍是复制一份，
 //! 之后两边互不影响。文件里有上游 Key 和本地 token，新建时只给本人读写。
 
 use std::collections::{BTreeMap, HashMap};
@@ -157,6 +158,16 @@ pub struct GatewayProvider {
     /// 现值和这里一样说明是同步来的，下次同步默认可覆盖；不一样就是用户手动改过的，默认不覆盖。
     #[serde(default, skip_serializing_if = "UpstreamMetaRecord::is_empty")]
     pub upstream_meta: UpstreamMetaRecord,
+    /// 引用的 Codex 直连供应商 id：有值时这一项不是复制品，地址、协议、Key、模型列表、模型资料、窗口
+    /// 每次读取时从 settings.json 现取、不写进 gateway.json，见 [`crate::gateway::codex_link`]。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub linked_codex_relay: Option<String>,
+    /// 从哪个 Agent 的页面添加的（目前只记 `claude`）；空串时按来源推断，见 [`crate::gateway::codex_link::owner_of`]。
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub owner: String,
+    /// 这家的多个 Key / 多个账号怎么轮着用，以及每个凭据单独的设置。没设时沿用全局的 Key 策略。
+    #[serde(default, skip_serializing_if = "ProviderCredentials::is_empty")]
+    pub credentials: ProviderCredentials,
     pub relay: RelayProfile,
     /// 不认识的字段（更新版本写的）原样保留，保存时写回，回滚后再升级不丢数据。
     #[serde(flatten)]
@@ -165,6 +176,112 @@ pub struct GatewayProvider {
 
 fn is_zero(value: &u64) -> bool {
     *value == 0
+}
+
+/// 一家供应商里的多个凭据（多个 Key，或多个登录账号）之间怎么分请求。
+/// 不管哪种，同一个对话都固定在一个凭据上，它答不了（限流、额度用完、失效）才换下一个。
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum CredentialRotation {
+    /// 依次：新对话总从排在前面的可用凭据开始。
+    #[default]
+    InOrder,
+    /// 轮换：新对话轮流分给各个凭据。
+    Rotate,
+    /// 按权重：新对话按权重比例分给各个凭据。
+    Weighted,
+    /// 额度优先：新对话给剩余额度最多的凭据。
+    Usage,
+    /// 用完再换：一直用排在前面的，用完才换下一个；前面的恢复后对话也回到前面。
+    Drain,
+}
+
+impl CredentialRotation {
+    /// 没按供应商设时，由全局的 Key 策略推出。
+    pub fn from_key_mode(mode: KeyRotationMode) -> Self {
+        match mode {
+            KeyRotationMode::Sticky => Self::InOrder,
+            KeyRotationMode::RoundRobin => Self::Rotate,
+        }
+    }
+}
+
+/// 单个凭据（一个 Key 或一个账号）的设置，键是凭据 id（见 `key_pool::KeyRef::key_id`）。
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CredentialSettings {
+    /// 停用：不再分请求给它，凭据本身保留。
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub disabled: bool,
+    /// 「按权重」时的权重；不填当 1。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weight: Option<u32>,
+    /// 只给这些上游模型用；空表示不限。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub models: Vec<String>,
+    /// 账号额度用到这个百分比就先不再用它（任一额度窗口到了就算）；不填表示用到上游拒绝为止。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub used_percent_limit: Option<u8>,
+}
+
+impl CredentialSettings {
+    pub fn is_default(&self) -> bool {
+        *self == Self::default()
+    }
+
+    /// 这个凭据给不给 `upstream_model` 用（忽略大小写）。模型未知（空）时不限制。
+    pub fn allows_model(&self, upstream_model: &str) -> bool {
+        let model = upstream_model.trim();
+        self.models.is_empty()
+            || model.is_empty()
+            || self
+                .models
+                .iter()
+                .any(|allowed| allowed.trim().eq_ignore_ascii_case(model))
+    }
+}
+
+/// 见 [`GatewayProvider::credentials`]。
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProviderCredentials {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rotation: Option<CredentialRotation>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub settings: BTreeMap<String, CredentialSettings>,
+    /// 用户拖出来的先后（凭据 id）：排在前面的先用。没列到的照原来的顺序排在后面；空表示没调过。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub order: Vec<String>,
+}
+
+impl ProviderCredentials {
+    pub fn is_empty(&self) -> bool {
+        self.rotation.is_none() && self.settings.is_empty() && self.order.is_empty()
+    }
+
+    /// 按用户调过的先后排：列在 `order` 里的按它，其余保持原顺序跟在后面。
+    pub fn sort_by_order<T>(&self, items: &mut [T], id: impl Fn(&T) -> &str) {
+        if self.order.is_empty() {
+            return;
+        }
+        let rank = |item: &T| {
+            self.order
+                .iter()
+                .position(|known| known == id(item))
+                .unwrap_or(usize::MAX)
+        };
+        items.sort_by_key(|item| rank(item));
+    }
+
+    /// 这家实际用的分法：按供应商设的优先，否则跟全局的 Key 策略。
+    pub fn rotation_or(&self, global: KeyRotationMode) -> CredentialRotation {
+        self.rotation
+            .unwrap_or_else(|| CredentialRotation::from_key_mode(global))
+    }
+
+    pub fn settings_for(&self, credential_id: &str) -> Option<&CredentialSettings> {
+        self.settings.get(credential_id)
+    }
 }
 
 /// 供应商的自动压缩阈值（#3100），单位是窗口的百分比（如 `85.0` 表示窗口的 85%）。
@@ -224,7 +341,54 @@ pub struct SyncedReasoning {
     pub default_level: Option<String>,
 }
 
+/// `<供应商 id>~<账号 id>` → (供应商 id, 账号 id)；没有分隔符返回 None。
+pub fn split_credential_ref(reference: &str) -> Option<(&str, &str)> {
+    reference
+        .rsplit_once(crate::settings::ACCOUNT_REF_SEPARATOR)
+        .filter(|(provider, account)| !provider.is_empty() && !account.is_empty())
+}
+
 impl GatewayProvider {
+    /// 一份上游配置对应的新供应商：其余设置都是默认（打开、不填价、不单独走代理、不限速）。
+    pub fn new(relay: RelayProfile, source: &str) -> Self {
+        Self {
+            enabled: true,
+            source: source.to_string(),
+            price: None,
+            model_prices: BTreeMap::new(),
+            model_windows: BTreeMap::new(),
+            context_window: None,
+            auto_compact: ProviderAutoCompact::default(),
+            proxy: String::new(),
+            key_rpm: None,
+            key_concurrency: None,
+            upstream_new: Vec::new(),
+            upstream_gone: Vec::new(),
+            models_checked_at_ms: 0,
+            newapi_access: None,
+            subscription_policy: None,
+            upstream_meta: UpstreamMetaRecord::default(),
+            linked_codex_relay: None,
+            owner: String::new(),
+            credentials: ProviderCredentials::default(),
+            relay,
+            extra: Map::new(),
+        }
+    }
+
+    /// 引用 Codex 直连供应商 `relay_id` 的新记录，共享供应商里的 id 是 `id`。连接资料读取时再填进来。
+    pub fn linked(id: &str, relay_id: &str) -> Self {
+        let mut provider = Self::new(
+            RelayProfile {
+                id: id.to_string(),
+                ..RelayProfile::default()
+            },
+            &format!("{}{relay_id}", crate::gateway::codex_link::SOURCE_PREFIX),
+        );
+        provider.linked_codex_relay = Some(relay_id.to_string());
+        provider
+    }
+
     /// 某个上游模型的价格：先按模型找（忽略大小写和 `[1M]` 这类窗口后缀），找不到用默认价。
     pub fn price_for(&self, model: &str) -> Option<&ProviderPrice> {
         let (slug, _) = crate::model_suffix::parse_model_suffix(model.trim());
@@ -797,6 +961,31 @@ impl GatewaySettings {
             .find(|provider| provider.relay.id == id)
     }
 
+    /// 按凭据引用（`<供应商 id>` 或 `<供应商 id>~<账号 id>`，见 [`RelayProfile::credential_ref`]）
+    /// 找到那个账号最新的视图。整个引用本身就是一家供应商的 id 时按供应商算。
+    pub fn credential(&self, reference: &str) -> Option<RelayProfile> {
+        if let Some(provider) = self.provider(reference) {
+            return provider.relay.account_view("");
+        }
+        let (provider_id, account_id) = split_credential_ref(reference)?;
+        self.provider(provider_id)?.relay.account_view(account_id)
+    }
+
+    /// 改凭据引用指向的那个账号的登录凭据；找不到返回 false。
+    pub fn set_credential_auth(&mut self, reference: &str, auth_contents: String) -> bool {
+        let (provider_id, account_id) = match self.provider(reference) {
+            Some(_) => (reference.to_string(), String::new()),
+            None => match split_credential_ref(reference) {
+                Some((provider_id, account_id)) => (provider_id.to_string(), account_id.to_string()),
+                None => return false,
+            },
+        };
+        self.providers
+            .iter_mut()
+            .find(|provider| provider.relay.id == provider_id)
+            .is_some_and(|provider| provider.relay.set_account_auth(&account_id, auth_contents))
+    }
+
     /// 某个 Agent 的生图模型设置（空串是自动）。
     pub fn image_model_for(&self, agent: &ToolId) -> &str {
         self.image_models
@@ -941,26 +1130,7 @@ impl GatewaySettings {
                 model_list: provider.models.join("\n"),
                 ..RelayProfile::default()
             };
-            let entry = GatewayProvider {
-                enabled: true,
-                source: format!("extension:{extension}"),
-                price: None,
-                model_prices: BTreeMap::new(),
-                model_windows: BTreeMap::new(),
-                context_window: None,
-                proxy: String::new(),
-                key_rpm: None,
-                key_concurrency: None,
-                upstream_new: Vec::new(),
-                upstream_gone: Vec::new(),
-                models_checked_at_ms: 0,
-                newapi_access: None,
-                subscription_policy: None,
-                upstream_meta: Default::default(),
-                auto_compact: Default::default(),
-                relay,
-                extra: Map::new(),
-            };
+            let entry = GatewayProvider::new(relay, &format!("extension:{extension}"));
             match existing {
                 Some(index) => self.providers[index] = entry,
                 None => self.providers.push(entry),
@@ -1044,8 +1214,25 @@ impl GatewayStore {
     }
 
     /// 读状态；文件不存在或为空视作全部关闭。
+    ///
+    /// Codex 直连供应商的引用在这里同步（见 [`crate::gateway::codex_link::sync`]）：有新引用、旧复制品转成引用
+    /// 或引用被去掉时顺手写回，id 从此固定。别处正在写这个文件（拿着锁）时不等，交给那次写入一起写。
+    /// 文件还不存在时不为此新建（没用过本地服务的不多出一个文件），引用照样现算。
     pub fn load(&self) -> anyhow::Result<GatewaySettings> {
-        read_store(&self.path)
+        let (settings, report) = read_store(&self.path)?;
+        if report.changed
+            && self.path.is_file()
+            && let Some(guard) = self.try_lock()
+        {
+            let (fresh, report) = read_store(&self.path)?;
+            if report.changed {
+                write_store(&self.path, &fresh)?;
+                forget_removed(&report);
+            }
+            drop(guard);
+            return Ok(fresh);
+        }
+        Ok(settings)
     }
 
     pub fn save(&self, settings: &GatewaySettings) -> anyhow::Result<()> {
@@ -1063,7 +1250,7 @@ impl GatewayStore {
         edit: impl FnOnce(&mut GatewaySettings) -> anyhow::Result<T>,
     ) -> anyhow::Result<(GatewaySettings, T)> {
         let _guard = self.lock();
-        let before = read_store(&self.path)?;
+        let (before, report) = read_store(&self.path)?;
         let mut settings = before.clone();
         let value = edit(&mut settings)?;
         if let Some(previous) = before.active_binding(&ToolId::Codex)
@@ -1079,26 +1266,40 @@ impl GatewayStore {
                 .collect();
             settings.bindings.get_mut(ToolId::Codex.as_str()).unwrap().known_models.extend(retired);
         }
-        if settings != before {
+        // 引用同步出的变化（新引用、转换、去掉）也要写回，哪怕这次编辑本身什么都没改。
+        if settings != before || report.changed {
             write_store(&self.path, &settings)?;
+            forget_removed(&report);
         }
         Ok((settings, value))
     }
 
+    /// 不等待的写锁：别处正拿着时返回 None。
+    fn try_lock(&self) -> Option<std::sync::MutexGuard<'static, ()>> {
+        match self.lock_cell().try_lock() {
+            Ok(guard) => Some(guard),
+            Err(std::sync::TryLockError::Poisoned(poisoned)) => Some(poisoned.into_inner()),
+            Err(std::sync::TryLockError::WouldBlock) => None,
+        }
+    }
+
     /// 这个文件在进程内的写锁。按路径区分，测试里各自的临时文件互不阻塞。
     fn lock(&self) -> std::sync::MutexGuard<'static, ()> {
+        self.lock_cell()
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    fn lock_cell(&self) -> &'static Mutex<()> {
         static LOCKS: OnceLock<Mutex<HashMap<PathBuf, &'static Mutex<()>>>> = OnceLock::new();
-        let lock: &'static Mutex<()> = {
-            let mut locks = LOCKS
-                .get_or_init(Mutex::default)
-                .lock()
-                .unwrap_or_else(|poisoned| poisoned.into_inner());
-            locks
-                .entry(self.path.clone())
-                // 每个路径只泄漏一把锁，进程里用到的 gateway.json 路径屈指可数。
-                .or_insert_with(|| Box::leak(Box::new(Mutex::new(()))))
-        };
-        lock.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+        let mut locks = LOCKS
+            .get_or_init(Mutex::default)
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        locks
+            .entry(self.path.clone())
+            // 每个路径只泄漏一把锁，进程里用到的 gateway.json 路径屈指可数。
+            .or_insert_with(|| Box::leak(Box::new(Mutex::new(()))))
     }
 }
 
@@ -1124,7 +1325,28 @@ impl Drop for GatewayPathTestScope {
     }
 }
 
-fn read_store(path: &Path) -> anyhow::Result<GatewaySettings> {
+/// 引用被去掉后，清掉内存里按 id 记的 Key 健康、额度、速度（id 之后可能被新供应商复用）。
+fn forget_removed(report: &crate::gateway::codex_link::SyncReport) {
+    for id in &report.removed {
+        crate::gateway::key_pool::reset(id);
+        crate::gateway::quota::forget(id);
+        crate::gateway::speed::forget(id);
+    }
+}
+
+/// 读 gateway.json，并按 settings.json 同步 Codex 直连供应商的引用（见 [`crate::gateway::codex_link::sync`]）。
+/// 读 gateway.json 只有这一个入口，所以路由、模型列表、Agent 配置、界面拿到的都是直连供应商的现值。
+fn read_store(path: &Path) -> anyhow::Result<(GatewaySettings, crate::gateway::codex_link::SyncReport)> {
+    let mut settings = parse_store(path)?;
+    let report = match crate::gateway::codex_link::codex_profiles_for(path) {
+        Some(profiles) => crate::gateway::codex_link::sync(&mut settings, &profiles),
+        None => Default::default(),
+    };
+    normalize_providers(&mut settings);
+    Ok((settings, report))
+}
+
+fn parse_store(path: &Path) -> anyhow::Result<GatewaySettings> {
     let text = match fs::read_to_string(path) {
         Ok(text) => text,
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
@@ -1154,6 +1376,10 @@ fn read_store(path: &Path) -> anyhow::Result<GatewaySettings> {
             .entry(ToolId::Codex.as_str().to_string())
             .or_insert(legacy_image);
     }
+    Ok(settings)
+}
+
+fn normalize_providers(settings: &mut GatewaySettings) {
     // 地址、默认模型、Key 落盘时存在 config / auth 文本里，读回来要像 settings.json 一样还原出来。
     for provider in &mut settings.providers {
         let mut normalized = provider.relay.clone();
@@ -1167,7 +1393,6 @@ fn read_store(path: &Path) -> anyhow::Result<GatewaySettings> {
         // 发请求时只认网关自己的代理设置，不按 id 去查直连模式的代理表。
         provider.relay.gateway_proxy = Some(provider.proxy.clone());
     }
-    Ok(settings)
 }
 
 fn write_store(path: &Path, settings: &GatewaySettings) -> anyhow::Result<()> {
@@ -1182,6 +1407,14 @@ fn write_store(path: &Path, settings: &GatewaySettings) -> anyhow::Result<()> {
         .and_then(|text| serde_json::from_str::<Value>(&text).ok())
     {
         preserve_raw_unknowns(&mut value, &old);
+    }
+    // 引用 Codex 直连供应商的只写引用本身：连接资料归直连供应商，不在这里存第二份。
+    if let Some(providers) = value.get_mut("providers").and_then(Value::as_array_mut) {
+        for provider in providers {
+            if provider.get("linkedCodexRelay").is_some_and(Value::is_string) {
+                crate::gateway::codex_link::strip_for_storage(provider);
+            }
+        }
     }
     let mut text = serde_json::to_string_pretty(&value)?;
     text.push('\n');
@@ -1452,6 +1685,8 @@ mod tests {
         assert_eq!(settings.unique_slug(" 哈基米 国模 ", false), "哈基米-国模");
         assert_eq!(settings.unique_slug("Group", false), "group-provider");
         settings.providers.push(GatewayProvider {
+            linked_codex_relay: None,
+            owner: String::new(),
             enabled: true,
             source: String::new(),
             price: None,
@@ -1473,6 +1708,7 @@ mod tests {
                 ..RelayProfile::default()
             },
             extra: Default::default(),
+            credentials: Default::default(),
         });
         assert_eq!(settings.unique_slug("DeepSeek", false), "deepseek-2");
         assert_eq!(settings.unique_slug("", true), "unnamed");

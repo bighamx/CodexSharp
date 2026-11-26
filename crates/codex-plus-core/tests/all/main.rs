@@ -70,9 +70,12 @@ mod gateway_agents;
 mod gateway_apply;
 mod gateway_auto_compact;
 mod gateway_breaker;
+mod gateway_claude_direct;
 mod gateway_codex_identity;
+mod gateway_codex_link;
 mod gateway_coding_plan_quota;
 mod gateway_compaction_model;
+mod gateway_credentials;
 mod gateway_custom_headers;
 mod gateway_diagnostics;
 mod gateway_forced_relay;
@@ -88,6 +91,7 @@ mod gateway_provider_probe;
 mod gateway_rate_limit;
 mod gateway_restore;
 mod helper_body_limit_settings;
+mod upstream_header_timeout_settings;
 mod history_turn_recovery;
 mod hooks_editor;
 mod installers;
@@ -136,7 +140,6 @@ mod protocol_proxy;
 mod protocol_safety;
 mod provider_page;
 mod provider_switch_isolation;
-mod proxy_auto_retry_settings;
 mod pure_api_provider_auth;
 mod real_catalog_probe;
 mod relay_config;
@@ -159,6 +162,7 @@ mod ssh_remote_loopback;
 mod standalone_quota_settings;
 mod statsig_overrides;
 mod task_board;
+mod test_sandbox;
 mod tool_shards;
 mod typing_effect_settings;
 mod ui_issue_regressions;
@@ -175,3 +179,9 @@ mod weixin_connect_page;
 mod whale_settings;
 mod windows_console_spawn;
 mod zed_remote;
+
+/// 测试不许碰用户的真实目录：main 之前进家目录沙箱（见 `codex_plus_core::test_sandbox`）。
+#[ctor::ctor]
+fn enter_test_sandbox() {
+    codex_plus_core::test_sandbox::enter();
+}

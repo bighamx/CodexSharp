@@ -417,6 +417,7 @@ pub fn run() {
             commands::load_request_flow,
             commands::clear_request_logs,
             commands::dictation_local_model_status,
+            commands::enable_local_sensevoice_for_claude,
             commands::download_dictation_local_model,
             commands::load_global_dictation_hotkey,
             commands::set_global_dictation_hotkey,
@@ -481,7 +482,9 @@ pub fn run() {
             gateway_commands::disable_gateway_binding,
             gateway_commands::disable_gateway_binding_full_switch,
             gateway_commands::use_gateway_own_model,
+            gateway_commands::use_claude_code_pool_provider,
             gateway_commands::save_gateway_own_models_shown,
+            gateway_commands::set_gateway_pool_member,
             gateway_commands::rotate_gateway_token,
             gateway_commands::reset_gateway_model_selections,
             gateway_commands::save_gateway_model_suffix,
@@ -501,7 +504,12 @@ pub fn run() {
             gateway_commands::update_gateway_provider,
             gateway_commands::get_native_auth_state,
             gateway_commands::set_native_auth_account,
+            gateway_commands::set_codex_login_identity,
             gateway_commands::add_gateway_provider_key,
+            gateway_commands::remove_gateway_provider_account,
+            gateway_commands::set_gateway_provider_rotation,
+            gateway_commands::set_gateway_credential_settings,
+            gateway_commands::set_gateway_credential_order,
             gateway_commands::replace_gateway_provider_key,
             gateway_commands::delete_gateway_provider_key,
             gateway_commands::test_gateway_provider,
@@ -517,6 +525,7 @@ pub fn run() {
             gateway_commands::apply_gateway_provider_reasoning_sync,
             gateway_commands::save_gateway_provider_models,
             gateway_commands::refresh_gateway_quota,
+            gateway_commands::load_gateway_quota_history,
             gateway_commands::sync_gateway_provider_prices,
             gateway_commands::set_gateway_provider_enabled,
             gateway_commands::reorder_gateway_providers,
@@ -524,6 +533,9 @@ pub fn run() {
             gateway_commands::set_gateway_group_enabled,
             gateway_commands::delete_gateway_group,
             gateway_commands::reveal_gateway_agent_config,
+            gateway_commands::read_agent_config,
+            gateway_commands::save_agent_config,
+            gateway_commands::read_relay_common_config,
             gateway_commands::load_gateway_usage,
             gateway_commands::clear_gateway_usage,
             gateway_commands::load_gateway_balances,
@@ -769,7 +781,7 @@ pub fn run() {
                         codex_plus_core::claude_local_backend::stop_backend();
                         codex_plus_core::resident_helper::stop_resident_helper();
                         // 远程控制服务停掉侧车 app-server，别留孤儿进程。
-                        codex_plus_core::remote_control::stop();
+                        codex_plus_core::remote_control::shutdown();
                         SHUTDOWN_COMPLETE.store(true, Ordering::SeqCst);
                         app.exit(0);
                     });
@@ -1387,4 +1399,11 @@ fn acquire_single_instance_guard() -> Option<codex_plus_core::ports::LoopbackPor
             }
         }
     }
+}
+
+/// 测试不许碰用户的真实目录：main 之前进家目录沙箱（见 `codex_plus_core::test_sandbox`）。
+#[cfg(test)]
+#[ctor::ctor]
+fn enter_test_sandbox() {
+    codex_plus_core::test_sandbox::enter();
 }
