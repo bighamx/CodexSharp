@@ -2132,6 +2132,8 @@ mod tests {
 
     #[test]
     fn non_macos_reports_unsupported_instead_of_missing_runtime() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         assert_eq!(platform_supported(), cfg!(target_os = "macos"));
         let report = unsupported_platform_report(0);
         assert!(!report.ok);
@@ -2163,12 +2165,16 @@ mod tests {
 
     #[test]
     fn json_object_with_utf8_bom_parses() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let map = parse_json_object("\u{feff}{\"mcpServers\":{}}", Path::new("claude_desktop_config.json")).unwrap();
         assert!(map.contains_key("mcpServers"));
     }
 
     #[test]
     fn proxy_vars_cover_both_cases_and_bypass_loopback() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let env = proxy_vars("http://127.0.0.1:7897");
         for key in ["http_proxy", "HTTP_PROXY", "https_proxy", "HTTPS_PROXY", "all_proxy", "ALL_PROXY"] {
             assert_eq!(env[key], "http://127.0.0.1:7897");
@@ -2179,6 +2185,8 @@ mod tests {
 
     #[test]
     fn js_env_enables_browser_and_computer_like_codex() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = tempfile::tempdir().unwrap();
         let env = sample_runtime(temp.path()).js_env();
         assert_eq!(env["CUA_REPL_ENABLED_SURFACES"], "browser,computer");
@@ -2190,6 +2198,8 @@ mod tests {
 
     #[test]
     fn native_client_env_only_carries_whitelisted_variables() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = tempfile::tempdir().unwrap();
         let mut runtime = sample_runtime(temp.path());
         runtime.codex_cli = Some("/Applications/ChatGPT.app/codex".into());
@@ -2219,6 +2229,8 @@ mod tests {
 
     #[test]
     fn state_dir_override_travels_with_the_entry() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let base = json!({ "command": "/x/CodexPlusPlus", "args": ["--codex-plus-cu-mcp"] });
         // 没有覆盖：条目不带 env（正式安装的形状）。
         assert!(entry_with_state_dir(base.clone(), None).get("env").is_none());
@@ -2235,6 +2247,8 @@ mod tests {
 
     #[test]
     fn server_entry_is_stable() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let runtime = sample_runtime(temp.path());
         let left = runtime.server_entry();
@@ -2247,6 +2261,8 @@ mod tests {
 
     #[test]
     fn install_and_uninstall_claude_json() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join(".claude.json");
         fs::write(&path, "{\n  \"numStartups\": 3,\n  \"mcpServers\": {}\n}\n").unwrap();
@@ -2273,6 +2289,8 @@ mod tests {
 
     #[test]
     fn zcode_servers_live_under_nested_mcp_servers() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join("config.json");
         // ZCode 自己的 config.json 已有 plugins，不能被冲掉。
@@ -2298,6 +2316,8 @@ mod tests {
 
     #[test]
     fn devin_servers_live_under_mcp_servers() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join("mcp_config.json");
         // Devin 自己的 mcp_config.json 里已有的 server 不能被冲掉。
@@ -2326,6 +2346,8 @@ mod tests {
 
     #[test]
     fn non_object_intermediate_key_is_left_alone() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join("config.json");
         fs::write(&path, "{\"mcp\": \"disabled\"}").unwrap();
@@ -2336,6 +2358,8 @@ mod tests {
 
     #[test]
     fn target_ids_round_trip() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         for target in Target::ALL {
             assert_eq!(Target::parse(target.id()).unwrap(), target);
         }
@@ -2344,6 +2368,8 @@ mod tests {
 
     #[test]
     fn foreign_entry_is_not_overwritten() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join(".claude.json");
         fs::write(
@@ -2360,6 +2386,8 @@ mod tests {
 
     #[test]
     fn invalid_json_is_left_alone() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join(".claude.json");
         fs::write(&path, "{not json").unwrap();
@@ -2370,12 +2398,16 @@ mod tests {
 
     #[test]
     fn codex_target_is_never_installed() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let error = install(Target::Codex).unwrap_err();
         assert!(error.to_string().contains("Codex 自带 Computer Use"));
     }
 
     #[test]
     fn codex_leftovers_are_recognized_and_removed() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join("config.toml");
         // 两种残留：早期直连 cua-repl，以及指向 Codex # 代理的写法。
@@ -2407,6 +2439,8 @@ mod tests {
 
     #[test]
     fn codex_foreign_entry_is_left_alone() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let path = temp.path().join("config.toml");
         let before = "[mcp_servers.codex_plus_cu]\ncommand = \"/usr/local/bin/someone-else\"\n";
@@ -2419,6 +2453,8 @@ mod tests {
 
     #[test]
     fn summarize_apps_counts_lines_and_takes_names() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let text = concat!(
             "Finder — /System/Library/CoreServices/Finder.app/ — com.apple.finder [running, uses=12]\n",
             "\n",
@@ -2431,6 +2467,8 @@ mod tests {
 
     #[test]
     fn tool_names_reads_tools_list() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let message = json!({
             "jsonrpc": "2.0",
             "id": 2,
@@ -2444,6 +2482,8 @@ mod tests {
 
     #[test]
     fn classify_reports_untrusted_parent() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         assert_eq!(
             classify(
                 "Computer Use server error -10000: Sender process is not authenticated",
@@ -2455,6 +2495,8 @@ mod tests {
 
     #[test]
     fn classify_permission_and_elicitation() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         assert_eq!(
             classify("Computer Use permissions are still pending", true),
             "permission_required"
@@ -2474,6 +2516,8 @@ mod tests {
 
     #[test]
     fn custom_path_appends_file_name_for_directories() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let home = temp.path();
         let dir = home.join("cfg");
@@ -2506,6 +2550,8 @@ mod tests {
 
     #[test]
     fn add_custom_target_validates_and_persists() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let home = temp.path();
         let store = home.join("state").join(CUSTOM_STORE_FILE);
@@ -2540,6 +2586,8 @@ mod tests {
 
     #[test]
     fn custom_target_names_are_optional_validated_and_renamable() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let home = temp.path();
         let store = home.join("state").join(CUSTOM_STORE_FILE);
@@ -2572,6 +2620,8 @@ mod tests {
 
     #[test]
     fn custom_store_without_names_still_loads() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         // 旧版写的存储没有 name 字段。
         let temp = TempDir::new().unwrap();
         let store = temp.path().join(CUSTOM_STORE_FILE);
@@ -2583,6 +2633,8 @@ mod tests {
 
     #[test]
     fn corrupt_custom_store_is_reported_not_overwritten() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let store = temp.path().join(CUSTOM_STORE_FILE);
         fs::write(&store, "{ not json").unwrap();
@@ -2595,6 +2647,8 @@ mod tests {
 
     #[test]
     fn custom_status_follows_the_custom_file() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let temp = TempDir::new().unwrap();
         let runtime = sample_runtime(temp.path());
         let dir = temp.path().join("rec-config");
@@ -2621,6 +2675,8 @@ mod tests {
 
     #[test]
     fn custom_claude_code_hooks_live_next_to_the_config() {
+        // 进程级状态（CODEX_PLUS_STATE_DIR）由别的用例临时设置，读之前先拿同一把锁。
+        let _state_guard = crate::paths::settings_path_test_guard();
         let target = CustomTarget {
             id: "custom-1".into(),
             kind: Target::ClaudeCode,
